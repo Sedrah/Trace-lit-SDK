@@ -1,0 +1,209 @@
+"""
+API response models — what the REST API returns to callers.
+
+These are separate from amo.models.TraceEvent (the internal event model).
+They are shaped for the dashboard and for non-developer readability:
+- costs in USD, not tokens alone
+- human-readable failure reasons, not error codes
+- DAG as nodes + edges ready for React Flow
+"""
+
+from __future__ import annotations
+
+from datetime import datetime
+from typing import Any, List, Optional
+from uuid import UUID
+
+from pydantic import BaseModel, ConfigDict
+
+
+# ---------------------------------------------------------------------------
+# Shared
+# ---------------------------------------------------------------------------
+
+class PageMeta(BaseModel):
+    total: int
+    page: int
+    page_size: int
+    has_more: bool
+
+
+class ErrorResponse(BaseModel):
+    error: str
+    detail: Optional[str] = None
+
+
+# ---------------------------------------------------------------------------
+# Traces
+# ---------------------------------------------------------------------------
+
+class SpanResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    span_id: UUID
+    parent_span_id: Optional[UUID]
+    timestamp: datetime
+    duration_ms: int
+    agent_name: str
+    action: str
+    status: str
+    framework: str
+    model: Optional[str]
+    input_tokens: int
+    output_tokens: int
+    cost_usd: float
+    error_type: Optional[str]
+    error_msg: Optional[str]
+    metadata: dict[str, Any]
+
+
+class TraceResponse(BaseModel):
+    trace_id: UUID
+    org_id: str
+    agent_name: str
+    framework: str
+    started_at: datetime
+    finished_at: datetime
+    total_spans: int
+    error_spans: int
+    total_cost_usd: float
+    total_duration_ms: int
+    status: str
+
+
+class TraceDetailResponse(TraceResponse):
+    spans: List[SpanResponse]
+
+
+class TraceListResponse(BaseModel):
+    items: List[TraceResponse]
+    meta: PageMeta
+
+
+# ---------------------------------------------------------------------------
+# DAG
+# ---------------------------------------------------------------------------
+
+class DAGNode(BaseModel):
+    id: str           # span_id as string
+    label: str        # "{agent_name} — {action}"
+    agent_name: str
+    action: str
+    status: str
+    duration_ms: int
+    cost_usd: float
+    framework: str
+    error_msg: Optional[str]
+
+
+class DAGEdge(BaseModel):
+    source: str       # parent span_id
+    target: str       # child span_id
+    duration_ms: int  # edge weight = child duration
+
+
+class DAGResponse(BaseModel):
+    trace_id: UUID
+    nodes: List[DAGNode]
+    edges: List[DAGEdge]
+
+
+# ---------------------------------------------------------------------------
+# Agents
+# ---------------------------------------------------------------------------
+
+class AgentSummary(BaseModel):
+    agent_name: str
+    framework: str
+    call_count: int
+    error_count: int
+    error_rate: float        # 0.0–1.0
+    avg_duration_ms: float
+    total_cost_usd: float
+    last_seen: datetime
+
+
+class AgentListResponse(BaseModel):
+    items: List[AgentSummary]
+    meta: PageMeta
+
+
+class MetricPoint(BaseModel):
+    bucket: datetime
+    total: float
+    avg_value: float
+    max_value: float
+    sample_count: int
+
+
+class AgentMetricsResponse(BaseModel):
+    agent_name: str
+    metric_name: str
+    granularity: str          # "hourly" | "daily"
+    points: List[MetricPoint]
+
+
+# ---------------------------------------------------------------------------
+# Costs
+# ---------------------------------------------------------------------------
+
+class CostBreakdownItem(BaseModel):
+    agent_name: str
+    framework: str
+    total_cost_usd: float
+    call_count: int
+    avg_cost_per_call: float
+
+
+class CostResponse(BaseModel):
+    total_cost_usd: float
+    period_start: datetime
+    period_end: datetime
+    breakdown: List[CostBreakdownItem]
+
+
+# ---------------------------------------------------------------------------
+# Failures
+# ---------------------------------------------------------------------------
+
+class FailureResponse(BaseModel):
+    span_id: UUID
+    trace_id: UUID
+    timestamp: datetime
+    agent_name: str
+    action: str
+    framework: str
+    classification: str      # human-readable category
+    description: str         # plain-English sentence
+    duration_ms: int
+    error_type: Optional[str]
+
+
+class FailureListResponse(BaseModel):
+    items: List[FailureResponse]
+    meta: PageMeta
+
+
+# ---------------------------------------------------------------------------
+# Alerts
+# ---------------------------------------------------------------------------
+
+class AlertRuleRequest(BaseModel):
+    name: str
+    agent_name: Optional[str] = None      # None = applies to all agents
+    metric: str                           # "cost_usd" | "error_rate" | "duration_ms"
+    threshold: float
+    window_minutes: int = 60
+    channel: str                          # "slack" | "webhook"
+    webhook_url: str
+
+
+class AlertRuleResponse(AlertRuleRequest):
+    id: int
+    org_id: str
+    created_at: datetime
+    enabled: bool
+
+
+class AlertRuleListResponse(BaseModel):
+    items: List[AlertRuleResponse]

@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "amo-api"
+version = "0.1.0"
+description = "AMO REST API — FastAPI server serving traces, metrics, costs, failures, and alerts"
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.27",
+    "clickhouse-connect>=0.7",
+    "asyncpg>=0.29",
+    "pydantic>=2.0",
+    "eval_type_backport>=0.1.3; python_version < '3.10'",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["server"]
+
+[project.scripts]
+amo-api = "server.main:start"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
