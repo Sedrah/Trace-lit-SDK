@@ -124,21 +124,57 @@ Since the target user is **not a developer**, keep these in mind when building U
 
 ---
 
-## Running Locally (once infra exists)
+## Running Locally
 
 ```bash
-# Start full stack
-docker compose -f infra/docker-compose.dev.yml up
+# 1. Start infra (Kafka, ClickHouse, TimescaleDB)
+docker compose -f infra/docker-compose.dev.yml up -d
 
-# SDK development
-cd sdk/python && uv sync && uv run pytest
+# 2. Start API (new terminal, from repo root)
+cd api
+AMO_ALLOW_KEYLESS=true \
+AMO_CLICKHOUSE_HOST=localhost \
+AMO_CLICKHOUSE_USER=amo \
+AMO_CLICKHOUSE_PASSWORD=amo_clickhouse_password \
+AMO_TIMESCALE_DSN=postgresql://amo:amo_pg_password@localhost:5432/amo \
+uvicorn server.main:app --reload --port 8000
 
-# API development
-cd api/server && uv run fastapi dev main.py
+# 3. Start ingestion pipeline (new terminal)
+cd ingestion
+AMO_KAFKA_BROKERS=localhost:9092 \
+AMO_CLICKHOUSE_HOST=localhost \
+AMO_CLICKHOUSE_USER=amo \
+AMO_CLICKHOUSE_PASSWORD=amo_clickhouse_password \
+AMO_TIMESCALE_DSN=postgresql://amo:amo_pg_password@localhost:5432/amo \
+AMO_API_KEYS='{"your-key":"default"}' \
+python -m pipeline.main
 
-# Dashboard development
-cd dashboard/web && pnpm dev
+# 4. Start dashboard (new terminal)
+cd dashboard/web && npm run dev   # http://localhost:3000
+
+# 5. Emit test data
+AMO_API_KEYS='{"dev-key":"default"}' python examples/fake_agent.py
 ```
+
+### SDK tests (no infra needed)
+```bash
+cd sdk/python && pip install -e ".[dev]" && pytest -v
+```
+
+### Infra quirks (ClickHouse on macOS Docker)
+- `infra/clickhouse/config/macros.xml` — defines {shard}/{replica} macros for ReplicatedMergeTree
+- `infra/clickhouse/config/keeper.xml` — enables built-in Keeper so replication works without ZooKeeper
+- `infra/clickhouse/config/listen.xml` — forces 0.0.0.0 binding (fixes macOS IPv4/IPv6 issue)
+
+---
+
+## Known Constraints
+
+- `crewai` and `langgraph` have a hard pip version conflict — cannot be installed together. Use `[all-langchain]` or `[all-crewai]` extras, never `[all]`.
+- `@trace` `model=` parameter exists but token counts must be set manually (or via framework wrappers) — plain Python functions emit 0 tokens and $0.00 cost.
+- ClickHouse 24.x rejects aggregate expressions inside other expressions in SELECT. Derive computed fields (e.g. `status`) in Python from raw aggregates (`error_spans`).
+- `trace_summary` materialized view was removed due to ClickHouse 24.x ILLEGAL_AGGREGATION errors. The API queries `spans` directly with GROUP BY.
+- Minimum Python: 3.9 (not 3.11 as originally planned — macOS system Python constraint).
 
 ---
 
