@@ -27,6 +27,7 @@ def trace(
     agent_name: str | None = None,
     action: str | None = None,
     framework: str = "raw",
+    model: str | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> Callable[[F], F]: ...
 
@@ -37,6 +38,7 @@ def trace(
     agent_name: str | None = None,
     action: str | None = None,
     framework: str = "raw",
+    model: str | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> F | Callable[[F], F]:
     """
@@ -59,12 +61,12 @@ def trace(
         if inspect.iscoroutinefunction(fn):
             @functools.wraps(fn)
             async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
-                return await _run_async(fn, args, kwargs, _agent_name, _action, framework, _metadata)
+                return await _run_async(fn, args, kwargs, _agent_name, _action, framework, model, _metadata)
             return async_wrapper  # type: ignore[return-value]
         else:
             @functools.wraps(fn)
             def sync_wrapper(*args: Any, **kwargs: Any) -> Any:
-                return _run_sync(fn, args, kwargs, _agent_name, _action, framework, _metadata)
+                return _run_sync(fn, args, kwargs, _agent_name, _action, framework, model, _metadata)
             return sync_wrapper  # type: ignore[return-value]
 
     if func is not None:
@@ -87,6 +89,7 @@ def _begin_span(
     agent_name: str,
     action: str,
     framework: str,
+    model: str | None,
     metadata: dict[str, Any],
 ) -> tuple[TraceEvent, float, Any, Any]:
     """
@@ -108,6 +111,7 @@ def _begin_span(
         framework=framework,  # type: ignore[arg-type]
         agent_name=agent_name,
         action=action,
+        model=model,
         metadata=metadata,
     )
     return event, __import__("time").perf_counter(), trace_token, span_token
@@ -155,13 +159,14 @@ def _run_sync(
     agent_name: str,
     action: str,
     framework: str,
+    model: str | None,
     metadata: dict[str, Any],
 ) -> Any:
     cfg = get_config()
     if cfg.disabled or not _should_sample():
         return fn(*args, **kwargs)
 
-    event, start, trace_token, span_token = _begin_span(agent_name, action, framework, metadata)
+    event, start, trace_token, span_token = _begin_span(agent_name, action, framework, model, metadata)
     exc_captured: BaseException | None = None
     try:
         return fn(*args, **kwargs)
@@ -179,13 +184,14 @@ async def _run_async(
     agent_name: str,
     action: str,
     framework: str,
+    model: str | None,
     metadata: dict[str, Any],
 ) -> Any:
     cfg = get_config()
     if cfg.disabled or not _should_sample():
         return await fn(*args, **kwargs)
 
-    event, start, trace_token, span_token = _begin_span(agent_name, action, framework, metadata)
+    event, start, trace_token, span_token = _begin_span(agent_name, action, framework, model, metadata)
     exc_captured: BaseException | None = None
     try:
         return await fn(*args, **kwargs)
