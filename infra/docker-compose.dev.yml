@@ -1,0 +1,94 @@
+##############################################################################
+# AMO — Development stack
+#
+# Runs infrastructure (Kafka, ClickHouse, TimescaleDB) in Docker.
+# AMO services (api, ingestion, dashboard) run locally for hot reload.
+#
+# Usage:
+#   docker compose -f infra/docker-compose.dev.yml up -d
+#
+#   Then in separate terminals:
+#   cd sdk/python && uv run pytest -x           # SDK tests
+#   cd api        && AMO_DEV=true uvicorn server.main:app --reload --port 8000
+#   cd ingestion  && python -m pipeline.main
+#   cd dashboard/web && npm run dev              # http://localhost:3000
+##############################################################################
+
+name: amo-dev
+
+services:
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper_dev_data:/var/lib/zookeeper/data
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      retries: 5
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "9092:9092"    # exposed to host for local SDK testing
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    volumes:
+      - kafka_dev_data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 15s
+      retries: 10
+      start_period: 30s
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.3
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    environment:
+      CLICKHOUSE_USER: amo
+      CLICKHOUSE_PASSWORD: amo_clickhouse_password
+      CLICKHOUSE_DB: amo
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    volumes:
+      - clickhouse_dev_data:/var/lib/clickhouse
+      - ./init/clickhouse:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 10s
+      retries: 10
+      start_period: 20s
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: amo
+      POSTGRES_PASSWORD: amo_pg_password
+      POSTGRES_DB: amo
+    volumes:
+      - timescale_dev_data:/var/lib/postgresql/data
+      - ./init/timescale:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U amo -d amo"]
+      interval: 10s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  zookeeper_dev_data:
+  kafka_dev_data:
+  clickhouse_dev_data:
+  timescale_dev_data:
