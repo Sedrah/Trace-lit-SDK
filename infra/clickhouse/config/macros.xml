@@ -1,0 +1,10 @@
+<clickhouse>
+    <!-- Single-node macro definitions for ReplicatedMergeTree.
+         In a real cluster these would differ per node (shard=1/2/..., replica=1/2/...).
+         Here they're fixed so the schema works identically on one node,
+         making a future scale-out purely an infra change with no DDL changes. -->
+    <macros>
+        <shard>1</shard>
+        <replica>1</replica>
+    </macros>
+</clickhouse>

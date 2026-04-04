@@ -29,8 +29,13 @@ langgraph = [
 crewai = [
     "crewai>=0.1",
 ]
-all = [
-    "amo-sdk[kafka,langchain,langgraph,crewai]",
+# crewai and langgraph have a hard pip conflict — cannot be installed together.
+# Use the group that matches your framework.
+all-langchain = [
+    "amo-sdk[kafka,langchain,langgraph]",
+]
+all-crewai = [
+    "amo-sdk[kafka,langchain,crewai]",  # langchain-core is a crewai dep anyway
 ]
 dev = [
     "pytest>=8.0",

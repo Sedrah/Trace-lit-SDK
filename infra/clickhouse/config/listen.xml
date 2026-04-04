@@ -1,0 +1,6 @@
+<clickhouse>
+    <!-- Force ClickHouse to listen on all IPv4 interfaces.
+         Without this, on macOS Docker the HTTP server binds to :: (IPv6 only)
+         and host connections via 127.0.0.1 get silently dropped. -->
+    <listen_host>0.0.0.0</listen_host>
+</clickhouse>

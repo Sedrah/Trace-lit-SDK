@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS amo.spans
 ENGINE = ReplicatedMergeTree('/clickhouse/tables/{shard}/amo/spans', '{replica}')
 PARTITION BY toYYYYMM(timestamp)
 ORDER BY (org_id, trace_id, timestamp)
-TTL timestamp + INTERVAL 90 DAY
+TTL toDateTime(timestamp) + INTERVAL 90 DAY
 SETTINGS index_granularity = 8192;
 
 
@@ -64,10 +64,10 @@ CREATE TABLE IF NOT EXISTS amo.trace_summary
     total_duration_ms UInt64,
     status        LowCardinality(String)   -- "success" | "error" | "partial"
 )
-ENGINE = ReplicatedAggregatingMergeTree('/clickhouse/tables/{shard}/amo/trace_summary', '{replica}')
+ENGINE = ReplicatedMergeTree('/clickhouse/tables/{shard}/amo/trace_summary', '{replica}')
 PARTITION BY toYYYYMM(started_at)
 ORDER BY (org_id, trace_id)
-TTL started_at + INTERVAL 90 DAY;
+TTL toDateTime(started_at) + INTERVAL 90 DAY;
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS amo.trace_summary_mv
 TO amo.trace_summary
@@ -83,6 +83,6 @@ SELECT
     countIf(status = 'error')           AS error_spans,
     sum(cost_usd)                       AS total_cost_usd,
     sum(duration_ms)                    AS total_duration_ms,
-    if(countIf(status = 'error') > 0, 'error', 'success') AS status
+    min(status)  AS status  -- 'error' < 'success' alphabetically, so min returns 'error' if any span failed
 FROM amo.spans
 GROUP BY org_id, trace_id;

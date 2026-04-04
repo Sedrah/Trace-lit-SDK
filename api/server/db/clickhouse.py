@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, Optional
 from uuid import UUID
 
@@ -37,46 +37,72 @@ async def list_traces(
 ) -> tuple[list[dict[str, Any]], int]:
     ch = _client(request)
 
-    filters = [
+    # Filter on raw spans; post-aggregation filters (status) go in HAVING.
+    span_filters = [
         "org_id = %(org_id)s",
-        "started_at >= %(since)s",
-        "started_at <= %(until)s",
+        "timestamp >= %(since)s",
+        "timestamp <= %(until)s",
     ]
-    params: dict[str, Any] = {
-        "org_id": org_id,
-        "since": since,
-        "until": until,
-    }
+    params: dict[str, Any] = {"org_id": org_id, "since": since, "until": until}
+
     if agent_name:
-        filters.append("agent_name = %(agent_name)s")
+        span_filters.append("agent_name = %(agent_name)s")
         params["agent_name"] = agent_name
-    if status:
-        filters.append("status = %(status)s")
-        params["status"] = status
     if framework:
-        filters.append("framework = %(framework)s")
+        span_filters.append("framework = %(framework)s")
         params["framework"] = framework
 
-    where = " AND ".join(filters)
+    where = " AND ".join(span_filters)
 
+    # status filter: 'error' trace = any span with status='error'
+    # We add it as a span-level pre-filter when status='error', or exclude
+    # traces with any error span when status='success'. This avoids HAVING
+    # with aggregates which ClickHouse 24.x rejects in subquery counts.
+    if status == "error":
+        span_filters.append("status = 'error'")   # only include error spans, trace_ids that have them
+    elif status == "success":
+        # exclude trace_ids that have any error span
+        span_filters.append(
+            "trace_id NOT IN (SELECT trace_id FROM amo.spans "
+            "WHERE org_id = %(org_id)s AND status = 'error')"
+        )
+
+    where = " AND ".join(span_filters)
+
+    # uniq(trace_id) counts distinct traces directly — no subquery, no nested aggregates
     count_result = ch.query(
-        f"SELECT count() AS n FROM amo.trace_summary WHERE {where}", parameters=params
+        f"SELECT uniq(trace_id) FROM amo.spans WHERE {where}", parameters=params
     )
     total = count_result.first_row[0] if count_result.result_rows else 0
 
     result = ch.query(
         f"""
-        SELECT org_id, trace_id, agent_name, framework,
-               started_at, finished_at, total_spans, error_spans,
-               total_cost_usd, total_duration_ms, status
-        FROM amo.trace_summary
+        SELECT
+            org_id,
+            trace_id,
+            any(agent_name)               AS agent_name,
+            any(framework)                AS framework,
+            min(timestamp)                AS started_at,
+            max(timestamp)                AS finished_at,
+            count()                       AS total_spans,
+            countIf(status = 'error')     AS error_spans,
+            sum(cost_usd)                 AS total_cost_usd,
+            sum(duration_ms)              AS total_duration_ms
+        FROM amo.spans
         WHERE {where}
+        GROUP BY org_id, trace_id
         ORDER BY started_at DESC
         LIMIT %(limit)s OFFSET %(offset)s
         """,
         parameters={**params, "limit": limit, "offset": offset},
     )
-    rows = [dict(zip(result.column_names, row)) for row in result.result_rows]
+    rows = []
+    for row in result.result_rows:
+        d = dict(zip(result.column_names, row))
+        # Derive status in Python — avoids ClickHouse 24.x ILLEGAL_AGGREGATION
+        # when using aggregate results inside expressions in SELECT.
+        d["status"] = "error" if d["error_spans"] > 0 else "success"
+        rows.append(d)
     return rows, total
 
 
@@ -86,18 +112,29 @@ async def get_trace(
     ch = _client(request)
     result = ch.query(
         """
-        SELECT org_id, trace_id, agent_name, framework,
-               started_at, finished_at, total_spans, error_spans,
-               total_cost_usd, total_duration_ms, status
-        FROM amo.trace_summary
+        SELECT
+            org_id,
+            trace_id,
+            any(agent_name)           AS agent_name,
+            any(framework)            AS framework,
+            min(timestamp)            AS started_at,
+            max(timestamp)            AS finished_at,
+            count()                   AS total_spans,
+            countIf(status = 'error') AS error_spans,
+            sum(cost_usd)             AS total_cost_usd,
+            sum(duration_ms)          AS total_duration_ms
+        FROM amo.spans
         WHERE org_id = %(org_id)s AND trace_id = %(trace_id)s
+        GROUP BY org_id, trace_id
         LIMIT 1
         """,
         parameters={"org_id": org_id, "trace_id": str(trace_id)},
     )
     if not result.result_rows:
         return None
-    return dict(zip(result.column_names, result.result_rows[0]))
+    d = dict(zip(result.column_names, result.result_rows[0]))
+    d["status"] = "error" if d["error_spans"] > 0 else "success"
+    return d
 
 
 async def get_spans(

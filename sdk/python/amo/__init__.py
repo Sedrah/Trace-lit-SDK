@@ -76,6 +76,9 @@ def configure(
     if endpoint is not None:
         updates["kafka_brokers"] = [endpoint]
     if kafka_brokers is not None:
+        # Guard against a bare string — "host:9092" would be iterated char-by-char otherwise
+        if isinstance(kafka_brokers, str):
+            kafka_brokers = [kafka_brokers]
         updates["kafka_brokers"] = kafka_brokers
     if kafka_topic is not None:
         updates["kafka_topic"] = kafka_topic

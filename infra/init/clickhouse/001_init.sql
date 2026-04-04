@@ -1,8 +1,13 @@
 -- AMO ClickHouse initialisation — runs automatically on first container start.
--- The entrypoint script runs as the default user before ClickHouse starts
--- accepting connections, so we use the native SQL init mechanism.
 
 CREATE DATABASE IF NOT EXISTS amo;
+
+-- ---------------------------------------------------------------------------
+-- spans — core trace store
+-- ReplicatedMergeTree used even on single node so scaling out later
+-- requires only infra changes, no schema migrations.
+-- macros.xml defines {shard}=1 and {replica}=1 for single-node mode.
+-- ---------------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS amo.spans
 (
@@ -27,42 +32,6 @@ CREATE TABLE IF NOT EXISTS amo.spans
 ENGINE = ReplicatedMergeTree('/clickhouse/tables/{shard}/amo/spans', '{replica}')
 PARTITION BY toYYYYMM(timestamp)
 ORDER BY (org_id, trace_id, timestamp)
-TTL timestamp + INTERVAL 90 DAY
+-- toDateTime() cast required for DateTime64 TTL in ClickHouse 24.x
+TTL toDateTime(timestamp) + INTERVAL 90 DAY
 SETTINGS index_granularity = 8192;
-
-CREATE TABLE IF NOT EXISTS amo.trace_summary
-(
-    org_id              LowCardinality(String),
-    trace_id            UUID,
-    agent_name          LowCardinality(String),
-    framework           LowCardinality(String),
-    started_at          DateTime64(3, 'UTC'),
-    finished_at         DateTime64(3, 'UTC'),
-    total_spans         UInt32,
-    error_spans         UInt32,
-    total_cost_usd      Float64,
-    total_duration_ms   UInt64,
-    status              LowCardinality(String)
-)
-ENGINE = ReplicatedAggregatingMergeTree('/clickhouse/tables/{shard}/amo/trace_summary', '{replica}')
-PARTITION BY toYYYYMM(started_at)
-ORDER BY (org_id, trace_id)
-TTL started_at + INTERVAL 90 DAY;
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS amo.trace_summary_mv
-TO amo.trace_summary
-AS
-SELECT
-    org_id,
-    trace_id,
-    any(agent_name)                                         AS agent_name,
-    any(framework)                                          AS framework,
-    min(timestamp)                                          AS started_at,
-    max(timestamp)                                          AS finished_at,
-    count()                                                 AS total_spans,
-    countIf(status = 'error')                               AS error_spans,
-    sum(cost_usd)                                           AS total_cost_usd,
-    sum(duration_ms)                                        AS total_duration_ms,
-    if(countIf(status = 'error') > 0, 'error', 'success')  AS status
-FROM amo.spans
-GROUP BY org_id, trace_id;
