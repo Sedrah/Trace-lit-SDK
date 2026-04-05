@@ -1,0 +1,38 @@
+name: Deploy to Hetzner
+
+on:
+  push:
+    branches: [main]    # auto-deploy on every push to main
+  workflow_dispatch:     # also allows manual trigger from GitHub UI
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            set -e
+
+            REPO_DIR="/opt/trace-lit"
+
+            # Clone repo on first deploy, pull on subsequent ones
+            if [ ! -d "$REPO_DIR/.git" ]; then
+              git clone https://github.com/Trace-lit/Trace-lit-SDK.git "$REPO_DIR"
+            fi
+
+            cd "$REPO_DIR"
+            git pull origin main
+
+            # Build and restart containers (--build rebuilds images if code changed)
+            docker compose -f infra/docker-compose.yml up -d --build
+
+            # Remove dangling images to keep disk clean
+            docker image prune -f
+
+            echo "Deploy complete"
