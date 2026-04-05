@@ -63,89 +63,28 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for full technical detail.
 ## Quick Start
 
 ### 1. Install the SDK
-
 ```bash
-pip install "git+https://github.com/Sedrah/AMO.git#subdirectory=sdk/python"
-
-# With Kafka support (required for sending to AMO):
-pip install "git+https://github.com/Sedrah/AMO.git#subdirectory=sdk/python[kafka]"
+pip install "git+https://github.com/Trace-lit/Trace-lit-SDK.git#subdirectory=sdk[kafka]"
 ```
 
 ### 2. Instrument your agent
-
 ```python
 import trace_lit
 
-amo.configure(
-    kafka_brokers=["your-amo-host:9092"],
-    api_key="your-api-key",
+trace_lit.configure(
+    kafka_brokers=["49.13.235.169:9093"],
+    api_key="your-api-key",  # request one from the Trace-lit team
 )
 
-@amo.trace(agent_name="research-agent", framework="langchain", model="gpt-4o")
-def my_agent_step(query: str) -> str:
-    # your existing agent code — unchanged
+@trace_lit.trace(agent_name="my-agent", framework="langchain")
+def my_agent(query: str) -> str:
+    # your existing code unchanged
     ...
 ```
 
-### 3. LangChain / LangGraph / CrewAI wrappers
-
-```python
-# LangChain — pass as a callback
-from amo.wrappers.langchain import AmoCallbackHandler
-chain = my_chain.with_config(callbacks=[AmoCallbackHandler()])
-
-# LangGraph — wrap the graph
-from amo.wrappers.langgraph import AmoTracedGraph
-graph = AmoTracedGraph(my_graph)
-
-# CrewAI — wrap the crew
-from amo.wrappers.crewai import AmoCrewWrapper
-crew = AmoCrewWrapper(my_crew)
+### 3. View your dashboard
 ```
-
-### 4. Self-host AMO
-
-```bash
-git clone https://github.com/Sedrah/AMO.git
-cd AMO
-cp .env.example .env        # fill in passwords
-docker compose -f infra/docker-compose.yml up -d
-```
-
-Open `http://localhost` — the dashboard is ready.
-
----
-
-## Running Locally (for development)
-
-```bash
-# 1. Start infra
-docker compose -f infra/docker-compose.dev.yml up -d
-
-# 2. Start API (new terminal)
-cd api
-TRACELIT_ALLOW_KEYLESS=true \
-TRACELIT_CLICKHOUSE_HOST=localhost \
-TRACELIT_CLICKHOUSE_USER=amo \
-TRACELIT_CLICKHOUSE_PASSWORD=tracelit_clickhouse_password \
-TRACELIT_TIMESCALE_DSN=postgresql://amo:tracelit_pg_password@localhost:5432/amo \
-uvicorn server.main:app --reload --port 8000
-
-# 3. Start ingestion pipeline (new terminal)
-cd ingestion
-TRACELIT_KAFKA_BROKERS=localhost:9092 \
-TRACELIT_CLICKHOUSE_HOST=localhost \
-TRACELIT_CLICKHOUSE_USER=amo \
-TRACELIT_CLICKHOUSE_PASSWORD=tracelit_clickhouse_password \
-TRACELIT_TIMESCALE_DSN=postgresql://amo:tracelit_pg_password@localhost:5432/amo \
-TRACELIT_API_KEYS='{"dev-key":"default"}' \
-python -m pipeline.main
-
-# 4. Start dashboard (new terminal)
-cd dashboard/web && npm run dev    # http://localhost:3000
-
-# 5. Send test traces
-TRACELIT_API_KEYS='{"dev-key":"default"}' python examples/fake_agent.py
+http://49.13.235.169
 ```
 
 ---
