@@ -177,8 +177,8 @@ services:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:8000/health"]
       interval: 15s
       timeout: 5s
-      retries: 5
-      start_period: 10s
+      retries: 10
+      start_period: 60s   # allow time for ClickHouse init on first boot
 
   dashboard:
     build:
@@ -187,7 +187,7 @@ services:
     restart: unless-stopped
     depends_on:
       api:
-        condition: service_healthy
+        condition: service_started   # don't wait for healthy — api may restart once on first boot
     logging: *default-logging
 
   # --------------------------------------------------------------------------
