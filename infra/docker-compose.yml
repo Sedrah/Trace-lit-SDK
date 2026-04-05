@@ -88,8 +88,8 @@ services:
     volumes:
       - clickhouse_data:/var/lib/clickhouse
       - clickhouse_logs:/var/log/clickhouse-server
-      - ./infra/init/clickhouse:/docker-entrypoint-initdb.d:ro
-      - ./infra/clickhouse/config:/etc/clickhouse-server/config.d:ro
+      - ./init/clickhouse:/docker-entrypoint-initdb.d:ro
+      - ./clickhouse/config:/etc/clickhouse-server/config.d:ro
     ports:
       - "127.0.0.1:8123:8123"   # HTTP (localhost only)
       - "127.0.0.1:9000:9000"   # Native (localhost only)
@@ -118,7 +118,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-trace_lit}
     volumes:
       - timescale_data:/var/lib/postgresql/data
-      - ./infra/init/timescale:/docker-entrypoint-initdb.d:ro
+      - ./init/timescale:/docker-entrypoint-initdb.d:ro
     ports:
       - "127.0.0.1:5432:5432"   # localhost only
     logging: *default-logging
