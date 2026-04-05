@@ -32,8 +32,7 @@ jobs:
             # Build and restart containers (--build rebuilds images if code changed)
             # --env-file is required: compose loads .env relative to the compose file
             # location (infra/), but our .env is at the repo root.
-            docker compose -f infra/docker-compose.yml --env-file .env up -d --build
-
+            COMPOSE_CONTEXT=/opt/trace-lit docker compose -f infra/docker-compose.yml --env-file .env up -d --build
             # Remove dangling images to keep disk clean
             docker image prune -f
 
