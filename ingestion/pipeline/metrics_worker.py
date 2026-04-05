@@ -1,7 +1,7 @@
 """
-Metrics worker — reads from amo.spans.normalized, aggregates, writes to TimescaleDB.
+Metrics worker — reads from trace_lit.spans.normalized, aggregates, writes to TimescaleDB.
 
-Runs as a separate consumer group (amo-metrics) so it can lag behind or restart
+Runs as a separate consumer group (tracelit-metrics) so it can lag behind or restart
 independently from the ingestion worker. This is intentional: metrics can be
 recomputed from normalized events at any time.
 """
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from .config import PipelineConfig
     from .writers.timescale import TimescaleWriter
 
-logger = logging.getLogger("amo.pipeline")
+logger = logging.getLogger("trace_lit.pipeline")
 
 
 class MetricsWorker:
@@ -66,7 +66,7 @@ class MetricsWorker:
 
         from pydantic import ValidationError
 
-        from amo.models import TraceEvent
+        from trace_lit.models import TraceEvent
 
         try:
             payload: bytes = msg.value()  # type: ignore[attr-defined]

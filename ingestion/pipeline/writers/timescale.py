@@ -19,12 +19,12 @@ import logging
 import threading
 from typing import TYPE_CHECKING, Any
 
-from amo.models import TraceEvent
+from trace_lit.models import TraceEvent
 
 if TYPE_CHECKING:
     from ..config import PipelineConfig
 
-logger = logging.getLogger("amo.pipeline")
+logger = logging.getLogger("trace_lit.pipeline")
 
 # (time, org_id, agent_name, metric_name, value, framework)
 MetricRow = tuple[Any, str, str, str, float, str]

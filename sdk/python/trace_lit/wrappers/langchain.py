@@ -6,7 +6,7 @@ where the LLM provider exposes them.
 
 Usage::
 
-    from amo.wrappers import AmoCallbackHandler
+    from trace_lit.wrappers import AmoCallbackHandler
 
     handler = AmoCallbackHandler()
 

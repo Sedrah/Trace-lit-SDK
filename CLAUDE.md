@@ -1,8 +1,8 @@
-# CLAUDE.md — AMO (Agent Monitoring & Observability)
+# CLAUDE.md — Trace-lit (Agent Monitoring & Observability)
 
 ## Project Overview
 
-AMO is an **agent orchestration monitoring platform for non-developers**. It surfaces what AI agents are doing — cost, failures, DAG flow — through an accessible dashboard, without requiring users to read code or logs.
+Trace-lit is an **agent orchestration monitoring platform for non-developers**. It surfaces what AI agents are doing — cost, failures, DAG flow — through an accessible dashboard, without requiring users to read code or logs.
 
 Target users: product managers, ops teams, and business stakeholders who deploy or oversee AI agents built with LangChain, LangGraph, or CrewAI.
 
@@ -13,7 +13,7 @@ Target users: product managers, ops teams, and business stakeholders who deploy 
 | Layer | Technology |
 |---|---|
 | Framework wrappers | LangChain, LangGraph, CrewAI |
-| SDK | Python (`amo-sdk`), JS/TS second |
+| SDK | Python (`Tracelit-SDK`), JS/TS second |
 | Event ingestion | Apache Kafka |
 | Eval engine | Python worker pool (parallel to ingestion) |
 | Trace storage | ClickHouse |
@@ -30,7 +30,7 @@ Target users: product managers, ops teams, and business stakeholders who deploy 
 ```
 AMO/
 ├── sdk/
-│   ├── python/          # amo-sdk Python package
+│   ├── python/          # Tracelit-SDK Python package
 │   │   ├── amo/
 │   │   │   ├── decorators.py     # @trace decorator
 │   │   │   ├── wrappers/         # LangChain, LangGraph, CrewAI
@@ -38,7 +38,7 @@ AMO/
 │   │   │   └── models.py         # TraceEvent, SpanEvent, MetricEvent
 │   │   ├── tests/
 │   │   └── pyproject.toml
-│   └── js/              # amo-sdk JS/TS package (phase 2)
+│   └── js/              # Tracelit-SDK JS/TS package (phase 2)
 ├── ingestion/
 │   ├── kafka/           # Kafka topic configs, docker setup
 │   └── pipeline/        # Consumer workers, event normalizer
@@ -94,7 +94,7 @@ Eval engine and JS SDK are **phase 2**.
 ### API
 - FastAPI with Pydantic v2 models
 - All endpoints return structured JSON — no plain text errors
-- Auth: API key header (`X-AMO-API-Key`) for MVP, OAuth2 for phase 2
+- Auth: API key header (`X-Tracelit-Api-Key`) for MVP, OAuth2 for phase 2
 
 ### Events
 - All SDK events must follow `TraceEvent` schema (see `sdk/python/amo/models.py`)
@@ -132,28 +132,28 @@ docker compose -f infra/docker-compose.dev.yml up -d
 
 # 2. Start API (new terminal, from repo root)
 cd api
-AMO_ALLOW_KEYLESS=true \
-AMO_CLICKHOUSE_HOST=localhost \
-AMO_CLICKHOUSE_USER=amo \
-AMO_CLICKHOUSE_PASSWORD=amo_clickhouse_password \
-AMO_TIMESCALE_DSN=postgresql://amo:amo_pg_password@localhost:5432/amo \
+TRACELIT_ALLOW_KEYLESS=true \
+TRACELIT_CLICKHOUSE_HOST=localhost \
+TRACELIT_CLICKHOUSE_USER=amo \
+TRACELIT_CLICKHOUSE_PASSWORD=tracelit_clickhouse_password \
+TRACELIT_TIMESCALE_DSN=postgresql://amo:tracelit_pg_password@localhost:5432/amo \
 uvicorn server.main:app --reload --port 8000
 
 # 3. Start ingestion pipeline (new terminal)
 cd ingestion
-AMO_KAFKA_BROKERS=localhost:9092 \
-AMO_CLICKHOUSE_HOST=localhost \
-AMO_CLICKHOUSE_USER=amo \
-AMO_CLICKHOUSE_PASSWORD=amo_clickhouse_password \
-AMO_TIMESCALE_DSN=postgresql://amo:amo_pg_password@localhost:5432/amo \
-AMO_API_KEYS='{"your-key":"default"}' \
+TRACELIT_KAFKA_BROKERS=localhost:9092 \
+TRACELIT_CLICKHOUSE_HOST=localhost \
+TRACELIT_CLICKHOUSE_USER=amo \
+TRACELIT_CLICKHOUSE_PASSWORD=tracelit_clickhouse_password \
+TRACELIT_TIMESCALE_DSN=postgresql://amo:tracelit_pg_password@localhost:5432/amo \
+TRACELIT_API_KEYS='{"your-key":"default"}' \
 python -m pipeline.main
 
 # 4. Start dashboard (new terminal)
 cd dashboard/web && npm run dev   # http://localhost:3000
 
 # 5. Emit test data
-AMO_API_KEYS='{"dev-key":"default"}' python examples/fake_agent.py
+TRACELIT_API_KEYS='{"dev-key":"default"}' python examples/fake_agent.py
 ```
 
 ### SDK tests (no infra needed)

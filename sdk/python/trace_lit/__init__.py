@@ -3,7 +3,7 @@ AMO SDK — Agent Monitoring & Observability
 
 Quick start::
 
-    import amo
+    import trace_lit
 
     amo.configure(api_key="your-key", backend="console")  # console for dev, kafka for prod
 
@@ -53,12 +53,12 @@ def configure(
         backend: 'kafka' (default, production), 'console' (dev/debug), or 'noop' (disabled).
         kafka_brokers: List of Kafka broker addresses. Defaults to ['localhost:9092'].
         endpoint: Convenience alias for a single Kafka broker (overrides kafka_brokers).
-        kafka_topic: Kafka topic name. Defaults to 'amo.spans.raw'.
+        kafka_topic: Kafka topic name. Defaults to 'trace_lit.spans.raw'.
         batch_size: Max events per batch before flushing. Defaults to 100.
         flush_interval_ms: Max ms to wait before flushing a partial batch. Defaults to 500.
         sampling_rate: Fraction of spans to emit (0.0–1.0). Defaults to 1.0 (all).
-        log_level: Python logging level for the 'amo' logger. Defaults to 'WARNING'.
-        disabled: Set True to make all tracing a no-op. Also controlled by AMO_DISABLED env var.
+        log_level: Python logging level for the 'trace_lit' logger. Defaults to 'WARNING'.
+        disabled: Set True to make all tracing a no-op. Also controlled by TRACELIT_DISABLED env var.
 
     Example::
 
@@ -109,7 +109,7 @@ def configure(
     _set_config(new_config)
 
     # Apply log level to the amo logger
-    logging.getLogger("amo").setLevel(new_config.log_level)
+    logging.getLogger("trace_lit").setLevel(new_config.log_level)
 
     # Replace the emitter with one matching the new config
     reset_emitter(_create_emitter(new_config))

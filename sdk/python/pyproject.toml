@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "amo-sdk"
+name = "Tracelit-SDK"
 version = "0.1.0"
-description = "Agent Monitoring & Observability SDK — instrument AI agents with one decorator"
+description = "Trace-lit — Agent Monitoring & Observability SDK — instrument AI agents with one decorator"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
@@ -32,10 +32,10 @@ crewai = [
 # crewai and langgraph have a hard pip conflict — cannot be installed together.
 # Use the group that matches your framework.
 all-langchain = [
-    "amo-sdk[kafka,langchain,langgraph]",
+    "Tracelit-SDK[kafka,langchain,langgraph]",
 ]
 all-crewai = [
-    "amo-sdk[kafka,langchain,crewai]",  # langchain-core is a crewai dep anyway
+    "Tracelit-SDK[kafka,langchain,crewai]",  # langchain-core is a crewai dep anyway
 ]
 dev = [
     "pytest>=8.0",
@@ -46,7 +46,7 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["amo"]
+packages = ["trace_lit"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

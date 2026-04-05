@@ -7,10 +7,10 @@ import time
 from datetime import datetime, timezone
 from uuid import uuid4
 
-import amo
-from amo.context import get_current_trace_id, get_current_span_id
-from amo.emitter import get_emitter
-from amo.models import TraceEvent
+import trace_lit
+from trace_lit.context import get_current_trace_id, get_current_span_id
+from trace_lit.emitter import get_emitter
+from trace_lit.models import TraceEvent
 
 amo.configure(
     kafka_brokers=["localhost:9092"],

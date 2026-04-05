@@ -8,7 +8,7 @@ from uuid import UUID
 import pytest
 from pydantic import ValidationError
 
-from amo.models import ErrorDetail, TraceEvent
+from trace_lit.models import ErrorDetail, TraceEvent
 
 
 def test_trace_event_defaults() -> None:

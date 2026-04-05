@@ -1,8 +1,8 @@
-# AMO — Agent Monitoring & Observability
+# Trace-lit — Agent Monitoring & Observability
 
 **Visibility into your AI agents — for everyone, not just developers.**
 
-AMO is an open-source monitoring platform for AI agent orchestration. It gives product managers, ops teams, and business stakeholders a clear view of what their AI agents are doing: where they succeed, where they fail, what they cost, and why.
+Trace-lit is an open-source monitoring platform for AI agent orchestration. It gives product managers, ops teams, and business stakeholders a clear view of what their AI agents are doing: where they succeed, where they fail, what they cost, and why.
 
 ---
 
@@ -35,7 +35,7 @@ AMO solves this with a thin SDK that captures structured traces, and a plain-lan
 └───────────────────┬─────────────────────────┘
                     │ structured events
 ┌───────────────────▼─────────────────────────┐
-│  SDK Layer (amo-sdk)                         │
+│  SDK Layer (Tracelit-SDK)                         │
 │  @trace decorator · async emitter            │
 └───────────────────┬─────────────────────────┘
                     │ Kafka publish
@@ -74,7 +74,7 @@ pip install "git+https://github.com/Sedrah/AMO.git#subdirectory=sdk/python[kafka
 ### 2. Instrument your agent
 
 ```python
-import amo
+import trace_lit
 
 amo.configure(
     kafka_brokers=["your-amo-host:9092"],
@@ -124,28 +124,28 @@ docker compose -f infra/docker-compose.dev.yml up -d
 
 # 2. Start API (new terminal)
 cd api
-AMO_ALLOW_KEYLESS=true \
-AMO_CLICKHOUSE_HOST=localhost \
-AMO_CLICKHOUSE_USER=amo \
-AMO_CLICKHOUSE_PASSWORD=amo_clickhouse_password \
-AMO_TIMESCALE_DSN=postgresql://amo:amo_pg_password@localhost:5432/amo \
+TRACELIT_ALLOW_KEYLESS=true \
+TRACELIT_CLICKHOUSE_HOST=localhost \
+TRACELIT_CLICKHOUSE_USER=amo \
+TRACELIT_CLICKHOUSE_PASSWORD=tracelit_clickhouse_password \
+TRACELIT_TIMESCALE_DSN=postgresql://amo:tracelit_pg_password@localhost:5432/amo \
 uvicorn server.main:app --reload --port 8000
 
 # 3. Start ingestion pipeline (new terminal)
 cd ingestion
-AMO_KAFKA_BROKERS=localhost:9092 \
-AMO_CLICKHOUSE_HOST=localhost \
-AMO_CLICKHOUSE_USER=amo \
-AMO_CLICKHOUSE_PASSWORD=amo_clickhouse_password \
-AMO_TIMESCALE_DSN=postgresql://amo:amo_pg_password@localhost:5432/amo \
-AMO_API_KEYS='{"dev-key":"default"}' \
+TRACELIT_KAFKA_BROKERS=localhost:9092 \
+TRACELIT_CLICKHOUSE_HOST=localhost \
+TRACELIT_CLICKHOUSE_USER=amo \
+TRACELIT_CLICKHOUSE_PASSWORD=tracelit_clickhouse_password \
+TRACELIT_TIMESCALE_DSN=postgresql://amo:tracelit_pg_password@localhost:5432/amo \
+TRACELIT_API_KEYS='{"dev-key":"default"}' \
 python -m pipeline.main
 
 # 4. Start dashboard (new terminal)
 cd dashboard/web && npm run dev    # http://localhost:3000
 
 # 5. Send test traces
-AMO_API_KEYS='{"dev-key":"default"}' python examples/fake_agent.py
+TRACELIT_API_KEYS='{"dev-key":"default"}' python examples/fake_agent.py
 ```
 
 ---

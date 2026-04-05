@@ -93,7 +93,7 @@ def client(ch_client: MockCHClient, pg_pool: MockPGPool) -> TestClient:
     )
 
     import os
-    os.environ["AMO_ALLOW_KEYLESS"] = "true"
+    os.environ["TRACELIT_ALLOW_KEYLESS"] = "true"
 
     app = create_app(cfg)
 

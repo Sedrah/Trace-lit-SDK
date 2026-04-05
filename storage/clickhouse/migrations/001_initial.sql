@@ -1,7 +1,7 @@
 -- AMO ClickHouse schema — initial migration
--- Run against the 'amo' database.
+-- Run against the 'trace_lit' database.
 
-CREATE DATABASE IF NOT EXISTS amo;
+CREATE DATABASE IF NOT EXISTS trace_lit;
 
 -- ---------------------------------------------------------------------------
 -- spans table — the core trace store
@@ -18,7 +18,7 @@ CREATE DATABASE IF NOT EXISTS amo;
 --     on expected cardinality.
 -- ---------------------------------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS amo.spans
+CREATE TABLE IF NOT EXISTS trace_lit.spans
 (
     org_id          LowCardinality(String),
     trace_id        UUID,
@@ -50,7 +50,7 @@ SETTINGS index_granularity = 8192;
 -- Used by the API to serve trace-list pages without full table scans.
 -- ---------------------------------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS amo.trace_summary
+CREATE TABLE IF NOT EXISTS trace_lit.trace_summary
 (
     org_id        LowCardinality(String),
     trace_id      UUID,
@@ -69,8 +69,8 @@ PARTITION BY toYYYYMM(started_at)
 ORDER BY (org_id, trace_id)
 TTL toDateTime(started_at) + INTERVAL 90 DAY;
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS amo.trace_summary_mv
-TO amo.trace_summary
+CREATE MATERIALIZED VIEW IF NOT EXISTS trace_lit.trace_summary_mv
+TO trace_lit.trace_summary
 AS
 SELECT
     org_id,
@@ -84,5 +84,5 @@ SELECT
     sum(cost_usd)                       AS total_cost_usd,
     sum(duration_ms)                    AS total_duration_ms,
     min(status)  AS status  -- 'error' < 'success' alphabetically, so min returns 'error' if any span failed
-FROM amo.spans
+FROM trace_lit.spans
 GROUP BY org_id, trace_id;

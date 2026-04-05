@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import pytest
 
-from amo.models import TraceEvent
+from trace_lit.models import TraceEvent
 from pipeline.normalizer import Normalizer, _extract_api_key
 from tests.conftest import TEST_API_KEY, TEST_ORG_ID
 
@@ -95,7 +95,7 @@ def test_reject_unknown_api_key(
     normalizer: Normalizer,
     valid_payload: bytes,
 ) -> None:
-    headers = [("X-AMO-API-Key", b"sk-unknown-key")]
+    headers = [("X-Tracelit-Api-Key", b"sk-unknown-key")]
     result = normalizer.normalize(valid_payload, headers)
     assert result is None
     assert normalizer.stats["rejected_auth"] == 1
@@ -108,7 +108,7 @@ def test_stats_track_accepted_and_rejected(
 ) -> None:
     normalizer.normalize(valid_payload, valid_headers)  # accepted
     normalizer.normalize(b"bad json", valid_headers)    # rejected schema
-    normalizer.normalize(valid_payload, [("X-AMO-API-Key", b"sk-bad")])  # rejected auth
+    normalizer.normalize(valid_payload, [("X-Tracelit-Api-Key", b"sk-bad")])  # rejected auth
 
     assert normalizer.stats == {
         "accepted": 1,
@@ -122,7 +122,7 @@ def test_stats_track_accepted_and_rejected(
 # ---------------------------------------------------------------------------
 
 def test_extract_api_key_present() -> None:
-    headers = [("X-AMO-API-Key", b"sk-abc")]
+    headers = [("X-Tracelit-Api-Key", b"sk-abc")]
     assert _extract_api_key(headers) == "sk-abc"
 
 

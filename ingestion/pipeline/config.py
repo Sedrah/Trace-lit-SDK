@@ -8,16 +8,16 @@ from dataclasses import dataclass, field
 class PipelineConfig:
     # Kafka
     kafka_brokers: list[str] = field(default_factory=lambda: ["localhost:9092"])
-    raw_topic: str = "amo.spans.raw"
-    normalized_topic: str = "amo.spans.normalized"
-    metrics_topic: str = "amo.metrics"
-    ingestion_group_id: str = "amo-ingestion"
-    metrics_group_id: str = "amo-metrics"
+    raw_topic: str = "trace_lit.spans.raw"
+    normalized_topic: str = "trace_lit.spans.normalized"
+    metrics_topic: str = "trace_lit.metrics"
+    ingestion_group_id: str = "tracelit-ingestion"
+    metrics_group_id: str = "tracelit-metrics"
 
     # ClickHouse
     clickhouse_host: str = "localhost"
     clickhouse_port: int = 8123
-    clickhouse_database: str = "amo"
+    clickhouse_database: str = "trace_lit"
     clickhouse_user: str = "default"
     clickhouse_password: str = ""
 
@@ -38,23 +38,23 @@ class PipelineConfig:
     @classmethod
     def from_env(cls) -> PipelineConfig:
         return cls(
-            kafka_brokers=os.getenv("AMO_KAFKA_BROKERS", "localhost:9092").split(","),
-            raw_topic=os.getenv("AMO_RAW_TOPIC", "amo.spans.raw"),
-            normalized_topic=os.getenv("AMO_NORMALIZED_TOPIC", "amo.spans.normalized"),
-            metrics_topic=os.getenv("AMO_METRICS_TOPIC", "amo.metrics"),
-            ingestion_group_id=os.getenv("AMO_INGESTION_GROUP_ID", "amo-ingestion"),
-            metrics_group_id=os.getenv("AMO_METRICS_GROUP_ID", "amo-metrics"),
-            clickhouse_host=os.getenv("AMO_CLICKHOUSE_HOST", "localhost"),
-            clickhouse_port=int(os.getenv("AMO_CLICKHOUSE_PORT", "8123")),
-            clickhouse_database=os.getenv("AMO_CLICKHOUSE_DATABASE", "amo"),
-            clickhouse_user=os.getenv("AMO_CLICKHOUSE_USER", "default"),
-            clickhouse_password=os.getenv("AMO_CLICKHOUSE_PASSWORD", ""),
+            kafka_brokers=os.getenv("TRACELIT_KAFKA_BROKERS", "localhost:9092").split(","),
+            raw_topic=os.getenv("TRACELIT_RAW_TOPIC", "trace_lit.spans.raw"),
+            normalized_topic=os.getenv("TRACELIT_NORMALIZED_TOPIC", "trace_lit.spans.normalized"),
+            metrics_topic=os.getenv("TRACELIT_METRICS_TOPIC", "trace_lit.metrics"),
+            ingestion_group_id=os.getenv("TRACELIT_INGESTION_GROUP_ID", "tracelit-ingestion"),
+            metrics_group_id=os.getenv("TRACELIT_METRICS_GROUP_ID", "tracelit-metrics"),
+            clickhouse_host=os.getenv("TRACELIT_CLICKHOUSE_HOST", "localhost"),
+            clickhouse_port=int(os.getenv("TRACELIT_CLICKHOUSE_PORT", "8123")),
+            clickhouse_database=os.getenv("TRACELIT_CLICKHOUSE_DATABASE", "amo"),
+            clickhouse_user=os.getenv("TRACELIT_CLICKHOUSE_USER", "default"),
+            clickhouse_password=os.getenv("TRACELIT_CLICKHOUSE_PASSWORD", ""),
             timescale_dsn=os.getenv(
-                "AMO_TIMESCALE_DSN", "postgresql://amo:amo@localhost:5432/amo"
+                "TRACELIT_TIMESCALE_DSN", "postgresql://amo:amo@localhost:5432/amo"
             ),
-            clickhouse_batch_size=int(os.getenv("AMO_CH_BATCH_SIZE", "500")),
-            clickhouse_flush_interval_s=float(os.getenv("AMO_CH_FLUSH_INTERVAL_S", "2.0")),
-            timescale_batch_size=int(os.getenv("AMO_TS_BATCH_SIZE", "1000")),
-            timescale_flush_interval_s=float(os.getenv("AMO_TS_FLUSH_INTERVAL_S", "5.0")),
-            api_keys_json=os.getenv("AMO_API_KEYS", "{}"),
+            clickhouse_batch_size=int(os.getenv("TRACELIT_CH_BATCH_SIZE", "500")),
+            clickhouse_flush_interval_s=float(os.getenv("TRACELIT_CH_FLUSH_INTERVAL_S", "2.0")),
+            timescale_batch_size=int(os.getenv("TRACELIT_TS_BATCH_SIZE", "1000")),
+            timescale_flush_interval_s=float(os.getenv("TRACELIT_TS_FLUSH_INTERVAL_S", "5.0")),
+            api_keys_json=os.getenv("TRACELIT_API_KEYS", "{}"),
         )

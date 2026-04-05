@@ -7,14 +7,14 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from amo.emitter import (
+from trace_lit.emitter import (
     ConsoleEmitter,
     KafkaEmitter,
     NoopEmitter,
     _BatchingEmitter,
     _create_emitter,
 )
-from amo.models import TraceEvent
+from trace_lit.models import TraceEvent
 
 
 def _make_event(**kwargs: object) -> TraceEvent:
@@ -102,7 +102,7 @@ def test_safe_publish_retries_and_drops(capsys: pytest.CaptureFixture[str]) -> N
             raise RuntimeError("kafka down")
 
     import logging
-    logging.getLogger("amo").setLevel("WARNING")
+    logging.getLogger("trace_lit").setLevel("WARNING")
 
     emitter = _FailingEmitter(batch_size=1, flush_interval_ms=50)
     emitter.emit(_make_event())
@@ -117,21 +117,21 @@ def test_safe_publish_retries_and_drops(capsys: pytest.CaptureFixture[str]) -> N
 # ---------------------------------------------------------------------------
 
 def test_create_emitter_noop_when_disabled() -> None:
-    from amo.config import Config
+    from trace_lit.config import Config
     cfg = Config(disabled=True)
     emitter = _create_emitter(cfg)
     assert isinstance(emitter, NoopEmitter)
 
 
 def test_create_emitter_noop_backend() -> None:
-    from amo.config import Config
+    from trace_lit.config import Config
     cfg = Config(backend="noop")
     emitter = _create_emitter(cfg)
     assert isinstance(emitter, NoopEmitter)
 
 
 def test_create_emitter_console_backend() -> None:
-    from amo.config import Config
+    from trace_lit.config import Config
     cfg = Config(backend="console")
     emitter = _create_emitter(cfg)
     assert isinstance(emitter, ConsoleEmitter)
@@ -139,7 +139,7 @@ def test_create_emitter_console_backend() -> None:
 
 def test_create_emitter_kafka_missing_dep() -> None:
     """KafkaEmitter should raise a clear ImportError if confluent-kafka is not installed."""
-    from amo.config import Config
+    from trace_lit.config import Config
     cfg = Config(backend="kafka", api_key="test-key")
 
     with patch.dict("sys.modules", {"confluent_kafka": None}):

@@ -16,7 +16,7 @@ COPY ingestion/ /app/
 RUN pip install --no-cache-dir -e ".[dev]" || pip install --no-cache-dir -e "."
 
 # Non-root user for security
-RUN adduser --disabled-password --gecos "" amo
-USER amo
+RUN adduser --disabled-password --gecos "" tracelit
+USER tracelit
 
 CMD ["python", "-m", "pipeline.main"]

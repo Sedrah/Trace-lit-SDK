@@ -1,6 +1,6 @@
 """
-Ingestion worker — reads from amo.spans.raw, normalizes, writes to ClickHouse,
-and produces normalized events to amo.spans.normalized.
+Ingestion worker — reads from trace_lit.spans.raw, normalizes, writes to ClickHouse,
+and produces normalized events to trace_lit.spans.normalized.
 
 Design decisions:
 - Manual offset commit: offset is committed ONLY after ClickHouse write succeeds.
@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from .producer import NormalizedProducer
     from .writers.clickhouse import ClickHouseWriter
 
-logger = logging.getLogger("amo.pipeline")
+logger = logging.getLogger("trace_lit.pipeline")
 
 
 class IngestionWorker:
@@ -95,7 +95,7 @@ class IngestionWorker:
             # Write to ClickHouse (buffered — flushes automatically on batch_size / interval)
             self._ch_writer.write(normalized)
 
-            # Produce to amo.spans.normalized for downstream consumers (metrics, evals)
+            # Produce to trace_lit.spans.normalized for downstream consumers (metrics, evals)
             self._producer.produce(normalized)
 
             # Commit offset only after successful ClickHouse write

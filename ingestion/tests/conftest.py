@@ -5,7 +5,7 @@ from uuid import uuid4
 
 import pytest
 
-from amo.models import TraceEvent
+from trace_lit.models import TraceEvent
 from pipeline.api_keys import ApiKeyResolver
 from pipeline.normalizer import Normalizer
 
@@ -44,4 +44,4 @@ def valid_payload(valid_event: TraceEvent) -> bytes:
 
 @pytest.fixture()
 def valid_headers() -> list[tuple[str, bytes]]:
-    return [("X-AMO-API-Key", TEST_API_KEY.encode())]
+    return [("X-Tracelit-Api-Key", TEST_API_KEY.encode())]

@@ -21,7 +21,7 @@ import type {
 const BASE = "/api/v1";
 
 function getApiKey(): string {
-  return localStorage.getItem("amo_api_key") ?? "";
+  return localStorage.getItem("trace_lit_api_key") ?? "";
 }
 
 async function request<T>(
@@ -33,7 +33,7 @@ async function request<T>(
     ...options,
     headers: {
       "Content-Type": "application/json",
-      ...(key ? { "X-AMO-API-Key": key } : {}),
+      ...(key ? { "X-Tracelit-Api-Key": key } : {}),
       ...(options.headers ?? {}),
     },
   });
@@ -129,13 +129,13 @@ export function deleteAlert(id: number): Promise<void> {
 // ---------------------------------------------------------------------------
 
 export function saveApiKey(key: string): void {
-  localStorage.setItem("amo_api_key", key);
+  localStorage.setItem("trace_lit_api_key", key);
 }
 
 export function clearApiKey(): void {
-  localStorage.removeItem("amo_api_key");
+  localStorage.removeItem("trace_lit_api_key");
 }
 
 export function hasApiKey(): boolean {
-  return Boolean(localStorage.getItem("amo_api_key"));
+  return Boolean(localStorage.getItem("trace_lit_api_key"));
 }

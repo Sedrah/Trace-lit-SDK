@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 
 from .models import TraceEvent
 
-logger = logging.getLogger("amo")
+logger = logging.getLogger("trace_lit")
 
 _SENTINEL = object()  # signals the worker thread to shut down
 
@@ -27,7 +27,7 @@ class BaseEmitter(ABC):
 
 
 class NoopEmitter(BaseEmitter):
-    """Drops all events. Used when AMO_DISABLED=true or backend='noop'."""
+    """Drops all events. Used when TRACELIT_DISABLED=true or backend='noop'."""
 
     def emit(self, _event: TraceEvent) -> None:
         pass
@@ -136,11 +136,11 @@ class KafkaEmitter(_BatchingEmitter):
         except ImportError as exc:
             raise ImportError(
                 "confluent-kafka is required for the Kafka backend. "
-                "Install it with: pip install 'amo-sdk[kafka]'"
+                "Install it with: pip install 'Tracelit-SDK[kafka]'"
             ) from exc
 
         self._topic = topic
-        self._api_key_header = [("X-AMO-API-Key", api_key.encode())]
+        self._api_key_header = [("X-Tracelit-Api-Key", api_key.encode())]
         self._producer = Producer({"bootstrap.servers": ",".join(brokers)})
         super().__init__(batch_size=batch_size, flush_interval_ms=flush_interval_ms)
 

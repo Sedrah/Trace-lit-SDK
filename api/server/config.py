@@ -8,7 +8,7 @@ from dataclasses import dataclass
 class ApiConfig:
     clickhouse_host: str = "localhost"
     clickhouse_port: int = 8123
-    clickhouse_database: str = "amo"
+    clickhouse_database: str = "trace_lit"
     clickhouse_user: str = "default"
     clickhouse_password: str = ""
 
@@ -24,15 +24,15 @@ class ApiConfig:
     @classmethod
     def from_env(cls) -> ApiConfig:
         return cls(
-            clickhouse_host=os.getenv("AMO_CLICKHOUSE_HOST", "localhost"),
-            clickhouse_port=int(os.getenv("AMO_CLICKHOUSE_PORT", "8123")),
-            clickhouse_database=os.getenv("AMO_CLICKHOUSE_DATABASE", "amo"),
-            clickhouse_user=os.getenv("AMO_CLICKHOUSE_USER", "default"),
-            clickhouse_password=os.getenv("AMO_CLICKHOUSE_PASSWORD", ""),
+            clickhouse_host=os.getenv("TRACELIT_CLICKHOUSE_HOST", "localhost"),
+            clickhouse_port=int(os.getenv("TRACELIT_CLICKHOUSE_PORT", "8123")),
+            clickhouse_database=os.getenv("TRACELIT_CLICKHOUSE_DATABASE", "amo"),
+            clickhouse_user=os.getenv("TRACELIT_CLICKHOUSE_USER", "default"),
+            clickhouse_password=os.getenv("TRACELIT_CLICKHOUSE_PASSWORD", ""),
             timescale_dsn=os.getenv(
-                "AMO_TIMESCALE_DSN", "postgresql://amo:amo@localhost:5432/amo"
+                "TRACELIT_TIMESCALE_DSN", "postgresql://amo:amo@localhost:5432/amo"
             ),
-            key_cache_ttl_s=int(os.getenv("AMO_KEY_CACHE_TTL_S", "300")),
-            default_page_size=int(os.getenv("AMO_DEFAULT_PAGE_SIZE", "50")),
-            max_page_size=int(os.getenv("AMO_MAX_PAGE_SIZE", "500")),
+            key_cache_ttl_s=int(os.getenv("TRACELIT_KEY_CACHE_TTL_S", "300")),
+            default_page_size=int(os.getenv("TRACELIT_DEFAULT_PAGE_SIZE", "50")),
+            max_page_size=int(os.getenv("TRACELIT_MAX_PAGE_SIZE", "500")),
         )

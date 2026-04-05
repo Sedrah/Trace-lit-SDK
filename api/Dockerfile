@@ -10,8 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY api/ /app/
 RUN pip install --no-cache-dir -e "."
 
-RUN adduser --disabled-password --gecos "" amo
-USER amo
+RUN adduser --disabled-password --gecos "" tracelit
+USER tracelit
 
 EXPOSE 8000
 

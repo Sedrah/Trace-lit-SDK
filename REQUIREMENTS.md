@@ -1,4 +1,4 @@
-# AMO — Requirements
+# Trace-lit — Requirements
 
 ## Functional Requirements
 
@@ -178,7 +178,7 @@
 
 ## MVP Deliverables Checklist
 
-- [ ] `amo-sdk` Python package installable via `pip install amo-sdk`
+- [ ] `Tracelit-SDK` Python package installable via `pip install Tracelit-SDK`
 - [ ] `@trace` decorator working on sync + async Python functions
 - [ ] LangChain, LangGraph, CrewAI wrappers
 - [ ] Kafka ingestion pipeline (consumer + normalizer)

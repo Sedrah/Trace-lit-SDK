@@ -23,7 +23,7 @@ from fastapi.responses import JSONResponse
 from .config import ApiConfig
 from .routes import agents, alerts, costs, failures, traces
 
-logger = logging.getLogger("amo.api")
+logger = logging.getLogger("trace_lit.api")
 
 # ---------------------------------------------------------------------------
 # App factory
@@ -44,7 +44,7 @@ def create_app(config: ApiConfig | None = None) -> FastAPI:
     app.state.config = cfg
 
     # CORS — allow the dashboard origin in dev; lock down in prod via env
-    origins = os.getenv("AMO_CORS_ORIGINS", "http://localhost:3000").split(",")
+    origins = os.getenv("TRACELIT_CORS_ORIGINS", "http://localhost:3000").split(",")
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
@@ -116,9 +116,9 @@ def start() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
     uvicorn.run(
         "server.main:app",
-        host=os.getenv("AMO_API_HOST", "0.0.0.0"),
-        port=int(os.getenv("AMO_API_PORT", "8000")),
-        reload=os.getenv("AMO_DEV", "").lower() in ("1", "true"),
+        host=os.getenv("TRACELIT_API_HOST", "0.0.0.0"),
+        port=int(os.getenv("TRACELIT_API_PORT", "8000")),
+        reload=os.getenv("TRACELIT_DEV", "").lower() in ("1", "true"),
     )
 
 

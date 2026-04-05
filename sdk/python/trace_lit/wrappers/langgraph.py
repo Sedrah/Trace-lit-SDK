@@ -8,7 +8,7 @@ an AmoCallbackHandler into every graph invocation.
 Usage::
 
     from langgraph.graph import StateGraph
-    from amo.wrappers import with_amo_tracing
+    from trace_lit.wrappers import with_amo_tracing
 
     graph = StateGraph(...).compile()
     traced_graph = with_amo_tracing(graph)

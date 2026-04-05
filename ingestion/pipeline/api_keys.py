@@ -1,12 +1,12 @@
 """
 api_key → org_id resolver.
 
-MVP implementation: in-memory dict loaded from AMO_API_KEYS env var (JSON string).
+MVP implementation: in-memory dict loaded from TRACELIT_API_KEYS env var (JSON string).
 
 SaaS upgrade path: swap _lookup() for a database query with a short-lived TTL cache.
 The interface stays the same — the rest of the pipeline never needs to change.
 
-AMO_API_KEYS format:
+TRACELIT_API_KEYS format:
     '{"sk-abc123": "org-acme", "sk-def456": "org-globex"}'
 
 The default org "default" is returned for the empty string key, which handles
@@ -19,7 +19,7 @@ import json
 import logging
 from typing import Optional
 
-logger = logging.getLogger("amo.pipeline")
+logger = logging.getLogger("trace_lit.pipeline")
 
 
 class ApiKeyResolver:
@@ -32,14 +32,14 @@ class ApiKeyResolver:
 
     @classmethod
     def from_json(cls, json_str: str) -> ApiKeyResolver:
-        """Build from a JSON string (e.g. from env var AMO_API_KEYS)."""
+        """Build from a JSON string (e.g. from env var TRACELIT_API_KEYS)."""
         key_map: dict[str, str] = {"": "default"}  # keyless → default org
         if json_str.strip():
             try:
                 loaded = json.loads(json_str)
                 key_map.update(loaded)
             except json.JSONDecodeError as exc:
-                logger.warning("AMO: failed to parse AMO_API_KEYS: %s", exc)
+                logger.warning("AMO: failed to parse TRACELIT_API_KEYS: %s", exc)
         return cls(key_map)
 
     def resolve(self, api_key: str) -> Optional[str]:

@@ -2,18 +2,18 @@
 AMO ingestion pipeline entry point.
 
 Starts two workers on separate threads:
-  - IngestionWorker: amo.spans.raw → normalize → ClickHouse + amo.spans.normalized
-  - MetricsWorker:   amo.spans.normalized → aggregate → TimescaleDB
+  - IngestionWorker: trace_lit.spans.raw → normalize → ClickHouse + trace_lit.spans.normalized
+  - MetricsWorker:   trace_lit.spans.normalized → aggregate → TimescaleDB
 
 Usage:
     amo-pipeline                   # reads all config from env vars
     python -m pipeline.main        # same
 
 Environment variables (see pipeline/config.py for full list):
-    AMO_KAFKA_BROKERS=localhost:9092
-    AMO_CLICKHOUSE_HOST=localhost
-    AMO_TIMESCALE_DSN=postgresql://amo:amo@localhost:5432/amo
-    AMO_API_KEYS={"sk-your-key": "org-your-org"}
+    TRACELIT_KAFKA_BROKERS=localhost:9092
+    TRACELIT_CLICKHOUSE_HOST=localhost
+    TRACELIT_TIMESCALE_DSN=postgresql://amo:amo@localhost:5432/amo
+    TRACELIT_API_KEYS={"sk-your-key": "org-your-org"}
 """
 
 from __future__ import annotations
@@ -37,7 +37,7 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
     datefmt="%Y-%m-%dT%H:%M:%S",
 )
-logger = logging.getLogger("amo.pipeline")
+logger = logging.getLogger("trace_lit.pipeline")
 
 
 def main() -> None:
@@ -71,10 +71,10 @@ def main() -> None:
     signal.signal(signal.SIGINT, shutdown)
 
     ingestion_thread = threading.Thread(
-        target=ingestion_worker.run, name="amo-ingestion", daemon=False
+        target=ingestion_worker.run, name="tracelit-ingestion", daemon=False
     )
     metrics_thread = threading.Thread(
-        target=metrics_worker.run, name="amo-metrics", daemon=False
+        target=metrics_worker.run, name="tracelit-metrics", daemon=False
     )
 
     ingestion_thread.start()

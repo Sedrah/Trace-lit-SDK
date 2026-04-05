@@ -20,12 +20,12 @@ from typing import Optional
 
 from pydantic import ValidationError
 
-from amo.models import TraceEvent
+from trace_lit.models import TraceEvent
 
 from .api_keys import ApiKeyResolver
 from .cost import calculate_cost
 
-logger = logging.getLogger("amo.pipeline")
+logger = logging.getLogger("trace_lit.pipeline")
 
 
 class Normalizer:
@@ -46,7 +46,7 @@ class Normalizer:
         Args:
             payload: UTF-8 JSON bytes from the Kafka message value.
             headers: Kafka message headers list of (key, value_bytes) tuples.
-                     Expected to contain 'X-AMO-API-Key'.
+                     Expected to contain 'X-Tracelit-Api-Key'.
 
         Returns:
             Enriched TraceEvent with org_id and cost_usd populated,
@@ -105,7 +105,7 @@ def _extract_api_key(headers: list[tuple[str, bytes]] | None) -> str:
     if not headers:
         return ""
     for key, value in headers:
-        if key == "X-AMO-API-Key":
+        if key == "X-Tracelit-Api-Key":
             try:
                 return value.decode()
             except Exception:

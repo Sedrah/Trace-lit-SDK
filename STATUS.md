@@ -1,4 +1,4 @@
-# AMO — Project Status
+# Trace-lit — Project Status
 
 Last updated: 2026-04-05
 
@@ -40,7 +40,7 @@ All MVP components are built, tested locally, and running end-to-end.
 
 | Item | Priority | Notes |
 |---|---|---|
-| Publish `amo-sdk` to PyPI | High | Unblocks easy tester onboarding |
+| Publish `Tracelit-SDK` to PyPI | High | Unblocks easy tester onboarding |
 | JS/TS SDK | High | Needed for Node.js agent users |
 | Eval engine (quality scoring) | Medium | Parallel worker pool, post-ingestion |
 | Kubernetes manifests | Medium | For enterprise self-host |
@@ -66,7 +66,7 @@ These are already mounted in both compose files. Linux hosts may not need them.
 ## Data Flow
 
 ```
-SDK @trace → Kafka (topic: amo.spans.raw)
+SDK @trace → Kafka (topic: trace_lit.spans.raw)
   → ingestion pipeline → ClickHouse (amo.spans table)
                        → TimescaleDB (agent_metrics hypertable)
   → API /api/v1/* → dashboard
@@ -83,5 +83,5 @@ cd ingestion   && pytest -v
 cd api         && pytest -v
 
 # End-to-end (requires docker compose dev stack running)
-AMO_API_KEYS='{"dev-key":"default"}' python examples/fake_agent.py
+TRACELIT_API_KEYS='{"dev-key":"default"}' python examples/fake_agent.py
 ```

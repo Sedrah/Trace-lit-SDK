@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "amo-api"
+name = "tracelit-api"
 version = "0.1.0"
 description = "AMO REST API — FastAPI server serving traces, metrics, costs, failures, and alerts"
 requires-python = ">=3.9"
@@ -20,7 +20,7 @@ dependencies = [
 packages = ["server"]
 
 [project.scripts]
-amo-api = "server.main:start"
+tracelit-api = "server.main:start"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

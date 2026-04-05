@@ -8,7 +8,7 @@ import logging
 from datetime import datetime
 from typing import Any, Optional
 
-logger = logging.getLogger("amo.api")
+logger = logging.getLogger("trace_lit.api")
 
 
 def _pool(request: Any) -> Any:

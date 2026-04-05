@@ -1,4 +1,4 @@
-# AMO — Architecture
+# Trace-lit — Architecture
 
 ## Overview
 
@@ -35,7 +35,7 @@ The `@trace` decorator works on any Python function — no framework required.
 
 ---
 
-## Layer 2: SDK (`amo-sdk`)
+## Layer 2: SDK (`Tracelit-SDK`)
 
 **Purpose:** Thin, non-blocking event emission layer. Converts raw execution data into structured events and publishes to Kafka.
 
@@ -105,9 +105,9 @@ amo.configure(
 
 | Topic | Partition key | Purpose |
 |---|---|---|
-| `amo.spans.raw` | `trace_id` | Raw span events from SDK |
-| `amo.spans.normalized` | `trace_id` | After normalization |
-| `amo.metrics` | `agent_name` | Aggregated metrics |
+| `trace_lit.spans.raw` | `trace_id` | Raw span events from SDK |
+| `trace_lit.spans.normalized` | `trace_id` | After normalization |
+| `trace_lit.metrics` | `agent_name` | Aggregated metrics |
 | `amo.evals` | `trace_id` | Eval results |
 | `amo.alerts` | `agent_name` | Alert triggers |
 
@@ -118,12 +118,12 @@ Partitioning by `trace_id` ensures all spans of a single trace are processed in 
 ### Ingestion pipeline (consumer workers)
 
 ```
-amo.spans.raw
+trace_lit.spans.raw
     → Normalizer worker
         → schema validation
         → cost calculation (tokens × model price)
         → DAG edge extraction (parent_span_id → span_id)
-    → amo.spans.normalized
+    → trace_lit.spans.normalized
         → ClickHouse writer (batch insert)
         → Metrics aggregator → TimescaleDB writer
         → Eval dispatcher → amo.evals (parallel)
@@ -131,7 +131,7 @@ amo.spans.raw
 
 ### Eval engine (phase 2, parallel to ingestion)
 
-The eval engine consumes `amo.spans.normalized` in parallel and writes to `amo.evals`. It does not block ingestion.
+The eval engine consumes `trace_lit.spans.normalized` in parallel and writes to `amo.evals`. It does not block ingestion.
 
 MVP eval checks (built-in):
 - **Timeout detection** — duration_ms > configurable threshold
@@ -226,7 +226,7 @@ Base URL: `/api/v1`
 | `/alerts` | GET/POST | Alert rules |
 | `/health` | GET | Service health |
 
-Auth: `X-AMO-API-Key` header (MVP). Keys managed via `POST /api/v1/keys`.
+Auth: `X-Tracelit-Api-Key` header (MVP). Keys managed via `POST /api/v1/keys`.
 
 #### API key design (SaaS-forward)
 

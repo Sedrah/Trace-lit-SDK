@@ -7,7 +7,7 @@ One span is emitted per kickoff() call. Per-task spans are phase 2.
 Usage::
 
     from crewai import Crew, Agent, Task
-    from amo.wrappers import AmoCrewWrapper
+    from trace_lit.wrappers import AmoCrewWrapper
 
     crew = Crew(agents=[...], tasks=[...])
     traced = AmoCrewWrapper(crew)

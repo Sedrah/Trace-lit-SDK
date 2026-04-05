@@ -1,5 +1,5 @@
 """
-NormalizedProducer — publishes enriched TraceEvents to amo.spans.normalized.
+NormalizedProducer — publishes enriched TraceEvents to trace_lit.spans.normalized.
 
 Downstream consumers (metrics worker, eval engine) read from this topic.
 Partitioned by trace_id so all spans of a trace go to the same partition.
@@ -13,9 +13,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .config import PipelineConfig
 
-from amo.models import TraceEvent
+from trace_lit.models import TraceEvent
 
-logger = logging.getLogger("amo.pipeline")
+logger = logging.getLogger("trace_lit.pipeline")
 
 
 class NormalizedProducer:

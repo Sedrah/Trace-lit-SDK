@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# AMO — convenience start script for self-hosted deployment.
+# Trace-lit — convenience start script for self-hosted deployment.
 #
 # Usage:
 #   ./scripts/start.sh          # start all services
@@ -19,8 +19,8 @@ COMPOSE_DEV="$ROOT/infra/docker-compose.dev.yml"
 # Helpers
 # ---------------------------------------------------------------------------
 
-info()  { echo "[AMO] $*"; }
-error() { echo "[AMO] ERROR: $*" >&2; exit 1; }
+info()  { echo "[Trace-lit] $*"; }
+error() { echo "[Trace-lit] ERROR: $*" >&2; exit 1; }
 
 check_deps() {
     command -v docker  >/dev/null 2>&1 || error "docker is not installed."
@@ -43,7 +43,7 @@ cmd_start_prod() {
     ensure_env
     info "Starting production stack..."
     docker compose -f "$COMPOSE_PROD" --env-file "$ENV_FILE" up -d --build
-    info "AMO is running. Open http://localhost"
+    info "Trace-lit is running. Open http://localhost"
 }
 
 cmd_start_dev() {

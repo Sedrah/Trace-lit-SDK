@@ -1,7 +1,7 @@
 """
 API response models — what the REST API returns to callers.
 
-These are separate from amo.models.TraceEvent (the internal event model).
+These are separate from trace_lit.models.TraceEvent (the internal event model).
 They are shaped for the dashboard and for non-developer readability:
 - costs in USD, not tokens alone
 - human-readable failure reasons, not error codes

@@ -6,9 +6,9 @@ so `import amo` never fails even if LangChain or CrewAI are not installed.
 
 Usage::
 
-    from amo.wrappers import AmoCallbackHandler      # LangChain / LangGraph
-    from amo.wrappers import with_amo_tracing        # LangGraph graph helper
-    from amo.wrappers import AmoCrewWrapper          # CrewAI
+    from trace_lit.wrappers import AmoCallbackHandler      # LangChain / LangGraph
+    from trace_lit.wrappers import with_amo_tracing        # LangGraph graph helper
+    from trace_lit.wrappers import AmoCrewWrapper          # CrewAI
 """
 
 from __future__ import annotations

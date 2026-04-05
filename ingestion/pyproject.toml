@@ -3,12 +3,12 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "amo-ingestion"
+name = "tracelit-ingestion"
 version = "0.1.0"
 description = "AMO ingestion pipeline — Kafka consumer, normalizer, ClickHouse + TimescaleDB writers"
 requires-python = ">=3.9"
 dependencies = [
-    "amo-sdk>=0.1.0",
+    "Tracelit-SDK>=0.1.0",
     "confluent-kafka>=2.0",
     "clickhouse-connect>=0.7",
     "psycopg2-binary>=2.9",
@@ -20,7 +20,7 @@ dependencies = [
 packages = ["pipeline"]
 
 [project.scripts]
-amo-pipeline = "pipeline.main:main"
+tracelit-pipeline = "pipeline.main:main"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

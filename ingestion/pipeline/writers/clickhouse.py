@@ -16,12 +16,12 @@ import threading
 import time
 from typing import TYPE_CHECKING, Any
 
-from amo.models import TraceEvent
+from trace_lit.models import TraceEvent
 
 if TYPE_CHECKING:
     from ..config import PipelineConfig
 
-logger = logging.getLogger("amo.pipeline")
+logger = logging.getLogger("trace_lit.pipeline")
 
 # Column order must match the CREATE TABLE in storage/clickhouse/migrations/001_initial.sql
 _COLUMNS = [

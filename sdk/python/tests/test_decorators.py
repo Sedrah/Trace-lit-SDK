@@ -7,9 +7,9 @@ from uuid import UUID
 
 import pytest
 
-import amo
-from amo.context import get_current_span_id, get_current_trace_id
-from amo.emitter import reset_emitter
+import trace_lit
+from trace_lit.context import get_current_span_id, get_current_trace_id
+from trace_lit.emitter import reset_emitter
 from tests.conftest import CapturingEmitter
 
 

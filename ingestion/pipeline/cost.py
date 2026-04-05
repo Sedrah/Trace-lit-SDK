@@ -3,10 +3,10 @@ Model pricing table and cost calculation.
 
 Prices are in USD per 1M tokens. The table covers the most common models used
 with LangChain, LangGraph, and CrewAI. All values are configurable via the
-AMO_MODEL_PRICING env var (JSON override).
+TRACELIT_MODEL_PRICING env var (JSON override).
 
 Format of override:
-    AMO_MODEL_PRICING='{"gpt-4o": {"input_per_1m": 2.50, "output_per_1m": 10.0}}'
+    TRACELIT_MODEL_PRICING='{"gpt-4o": {"input_per_1m": 2.50, "output_per_1m": 10.0}}'
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ import logging
 import os
 from dataclasses import dataclass
 
-logger = logging.getLogger("amo.pipeline")
+logger = logging.getLogger("trace_lit.pipeline")
 
 
 @dataclass(frozen=True)
@@ -26,7 +26,7 @@ class ModelPricing:
 
 
 # ---------------------------------------------------------------------------
-# Default pricing table (as of early 2026 — update via AMO_MODEL_PRICING)
+# Default pricing table (as of early 2026 — update via TRACELIT_MODEL_PRICING)
 # ---------------------------------------------------------------------------
 
 _DEFAULT_PRICING: dict[str, ModelPricing] = {
@@ -68,9 +68,9 @@ _DEFAULT_PRICING: dict[str, ModelPricing] = {
 
 
 def _load_pricing() -> dict[str, ModelPricing]:
-    """Load the pricing table, applying any AMO_MODEL_PRICING overrides from env."""
+    """Load the pricing table, applying any TRACELIT_MODEL_PRICING overrides from env."""
     pricing = dict(_DEFAULT_PRICING)
-    override_json = os.getenv("AMO_MODEL_PRICING", "")
+    override_json = os.getenv("TRACELIT_MODEL_PRICING", "")
     if override_json:
         try:
             overrides = json.loads(override_json)
@@ -80,7 +80,7 @@ def _load_pricing() -> dict[str, ModelPricing]:
                     output_per_1m=float(prices["output_per_1m"]),
                 )
         except Exception as exc:
-            logger.warning("AMO: failed to parse AMO_MODEL_PRICING override: %s", exc)
+            logger.warning("AMO: failed to parse TRACELIT_MODEL_PRICING override: %s", exc)
     return pricing
 
 

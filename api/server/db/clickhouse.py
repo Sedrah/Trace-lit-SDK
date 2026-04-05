@@ -13,7 +13,7 @@ from datetime import datetime
 from typing import Any, Optional
 from uuid import UUID
 
-logger = logging.getLogger("amo.api")
+logger = logging.getLogger("trace_lit.api")
 
 
 def _client(request: Any) -> Any:
@@ -63,7 +63,7 @@ async def list_traces(
     elif status == "success":
         # exclude trace_ids that have any error span
         span_filters.append(
-            "trace_id NOT IN (SELECT trace_id FROM amo.spans "
+            "trace_id NOT IN (SELECT trace_id FROM trace_lit.spans "
             "WHERE org_id = %(org_id)s AND status = 'error')"
         )
 
@@ -71,7 +71,7 @@ async def list_traces(
 
     # uniq(trace_id) counts distinct traces directly — no subquery, no nested aggregates
     count_result = ch.query(
-        f"SELECT uniq(trace_id) FROM amo.spans WHERE {where}", parameters=params
+        f"SELECT uniq(trace_id) FROM trace_lit.spans WHERE {where}", parameters=params
     )
     total = count_result.first_row[0] if count_result.result_rows else 0
 
@@ -88,7 +88,7 @@ async def list_traces(
             countIf(status = 'error')     AS error_spans,
             sum(cost_usd)                 AS total_cost_usd,
             sum(duration_ms)              AS total_duration_ms
-        FROM amo.spans
+        FROM trace_lit.spans
         WHERE {where}
         GROUP BY org_id, trace_id
         ORDER BY started_at DESC
@@ -123,7 +123,7 @@ async def get_trace(
             countIf(status = 'error') AS error_spans,
             sum(cost_usd)             AS total_cost_usd,
             sum(duration_ms)          AS total_duration_ms
-        FROM amo.spans
+        FROM trace_lit.spans
         WHERE org_id = %(org_id)s AND trace_id = %(trace_id)s
         GROUP BY org_id, trace_id
         LIMIT 1
@@ -147,7 +147,7 @@ async def get_spans(
                agent_name, action, status, framework, model,
                input_tokens, output_tokens, cost_usd,
                error_type, error_msg, metadata
-        FROM amo.spans
+        FROM trace_lit.spans
         WHERE org_id = %(org_id)s AND trace_id = %(trace_id)s
         ORDER BY timestamp ASC
         """,
@@ -199,7 +199,7 @@ async def list_failures(
     where = " AND ".join(filters)
 
     count_result = ch.query(
-        f"SELECT count() FROM amo.spans WHERE {where}", parameters=params
+        f"SELECT count() FROM trace_lit.spans WHERE {where}", parameters=params
     )
     total = count_result.first_row[0] if count_result.result_rows else 0
 
@@ -207,7 +207,7 @@ async def list_failures(
         f"""
         SELECT span_id, trace_id, timestamp, agent_name, action,
                framework, duration_ms, error_type, error_msg
-        FROM amo.spans
+        FROM trace_lit.spans
         WHERE {where}
         ORDER BY timestamp DESC
         LIMIT %(limit)s OFFSET %(offset)s
@@ -244,7 +244,7 @@ async def get_costs(
     where = " AND ".join(filters)
 
     total_result = ch.query(
-        f"SELECT sum(cost_usd) FROM amo.spans WHERE {where}", parameters=params
+        f"SELECT sum(cost_usd) FROM trace_lit.spans WHERE {where}", parameters=params
     )
     total_cost = float(total_result.first_row[0] or 0)
 
@@ -253,7 +253,7 @@ async def get_costs(
         SELECT agent_name, framework,
                sum(cost_usd) AS total_cost_usd,
                count() AS call_count
-        FROM amo.spans
+        FROM trace_lit.spans
         WHERE {where}
         GROUP BY agent_name, framework
         ORDER BY total_cost_usd DESC

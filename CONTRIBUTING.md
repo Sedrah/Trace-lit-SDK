@@ -51,7 +51,7 @@ cd api && pytest -v
 ## Project Structure
 
 ```
-sdk/python/          # amo-sdk Python package (@trace, emitter, wrappers)
+sdk/python/          # Tracelit-SDK Python package (@trace, emitter, wrappers)
 ingestion/           # Kafka consumer + ClickHouse/TimescaleDB writers
 api/                 # FastAPI REST server
 dashboard/web/       # React + TypeScript frontend

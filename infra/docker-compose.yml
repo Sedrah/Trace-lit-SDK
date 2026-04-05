@@ -10,7 +10,7 @@
 # All data is stored in named Docker volumes (survives container restarts).
 ##############################################################################
 
-name: amo
+name: trace-lit
 
 x-logging: &default-logging
   driver: json-file
@@ -72,9 +72,9 @@ services:
     image: clickhouse/clickhouse-server:24.3
     restart: unless-stopped
     environment:
-      CLICKHOUSE_USER: ${AMO_CLICKHOUSE_USER:-amo}
-      CLICKHOUSE_PASSWORD: ${AMO_CLICKHOUSE_PASSWORD:-amo_clickhouse_password}
-      CLICKHOUSE_DB: ${AMO_CLICKHOUSE_DATABASE:-amo}
+      CLICKHOUSE_USER: ${TRACELIT_CLICKHOUSE_USER:-tracelit}
+      CLICKHOUSE_PASSWORD: ${TRACELIT_CLICKHOUSE_PASSWORD:-tracelit_clickhouse_password}
+      CLICKHOUSE_DB: ${TRACELIT_CLICKHOUSE_DATABASE:-trace_lit}
       CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
     volumes:
       - clickhouse_data:/var/lib/clickhouse
@@ -104,9 +104,9 @@ services:
     image: timescale/timescaledb:latest-pg16
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-amo}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-amo_pg_password}
-      POSTGRES_DB: ${POSTGRES_DB:-amo}
+      POSTGRES_USER: ${POSTGRES_USER:-tracelit}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tracelit_pg_password}
+      POSTGRES_DB: ${POSTGRES_DB:-trace_lit}
     volumes:
       - timescale_data:/var/lib/postgresql/data
       - ./infra/init/timescale:/docker-entrypoint-initdb.d:ro
@@ -114,7 +114,7 @@ services:
       - "127.0.0.1:5432:5432"   # localhost only
     logging: *default-logging
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-amo} -d ${POSTGRES_DB:-amo}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tracelit} -d ${POSTGRES_DB:-trace_lit}"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -138,9 +138,9 @@ services:
         condition: service_healthy
     env_file: ../.env
     environment:
-      AMO_KAFKA_BROKERS: kafka:9092
-      AMO_CLICKHOUSE_HOST: clickhouse
-      AMO_TIMESCALE_DSN: postgresql://${POSTGRES_USER:-amo}:${POSTGRES_PASSWORD:-amo_pg_password}@timescaledb:5432/${POSTGRES_DB:-amo}
+      TRACELIT_KAFKA_BROKERS: kafka:9092
+      TRACELIT_CLICKHOUSE_HOST: clickhouse
+      TRACELIT_TIMESCALE_DSN: postgresql://${POSTGRES_USER:-tracelit}:${POSTGRES_PASSWORD:-tracelit_pg_password}@timescaledb:5432/${POSTGRES_DB:-trace_lit}
     logging: *default-logging
     healthcheck:
       test: ["CMD-SHELL", "pgrep -f 'pipeline.main' || exit 1"]
@@ -160,9 +160,9 @@ services:
         condition: service_healthy
     env_file: ../.env
     environment:
-      AMO_CLICKHOUSE_HOST: clickhouse
-      AMO_TIMESCALE_DSN: postgresql://${POSTGRES_USER:-amo}:${POSTGRES_PASSWORD:-amo_pg_password}@timescaledb:5432/${POSTGRES_DB:-amo}
-      AMO_CORS_ORIGINS: http://localhost,http://localhost:80
+      TRACELIT_CLICKHOUSE_HOST: clickhouse
+      TRACELIT_TIMESCALE_DSN: postgresql://${POSTGRES_USER:-tracelit}:${POSTGRES_PASSWORD:-tracelit_pg_password}@timescaledb:5432/${POSTGRES_DB:-trace_lit}
+      TRACELIT_CORS_ORIGINS: http://localhost,http://localhost:80
     logging: *default-logging
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:8000/health"]

@@ -12,7 +12,7 @@ class Config:
     api_key: str = ""
     backend: Literal["kafka", "console", "noop"] = "kafka"
     kafka_brokers: list[str] = field(default_factory=lambda: ["localhost:9092"])
-    kafka_topic: str = "amo.spans.raw"
+    kafka_topic: str = "trace_lit.spans.raw"
     batch_size: int = 100
     flush_interval_ms: int = 500
     sampling_rate: float = 1.0
@@ -32,15 +32,15 @@ class Config:
     @classmethod
     def from_env(cls) -> Config:
         return cls(
-            api_key=os.getenv("AMO_API_KEY", ""),
-            backend=os.getenv("AMO_BACKEND", "kafka"),  # type: ignore[arg-type]
-            kafka_brokers=os.getenv("AMO_KAFKA_BROKERS", "localhost:9092").split(","),
-            kafka_topic=os.getenv("AMO_KAFKA_TOPIC", "amo.spans.raw"),
-            batch_size=int(os.getenv("AMO_BATCH_SIZE", "100")),
-            flush_interval_ms=int(os.getenv("AMO_FLUSH_INTERVAL_MS", "500")),
-            sampling_rate=float(os.getenv("AMO_SAMPLING_RATE", "1.0")),
-            log_level=os.getenv("AMO_LOG_LEVEL", "WARNING"),
-            disabled=os.getenv("AMO_DISABLED", "").lower() in ("1", "true", "yes"),
+            api_key=os.getenv("TRACELIT_API_KEY", ""),
+            backend=os.getenv("TRACELIT_BACKEND", "kafka"),  # type: ignore[arg-type]
+            kafka_brokers=os.getenv("TRACELIT_KAFKA_BROKERS", "localhost:9092").split(","),
+            kafka_topic=os.getenv("TRACELIT_KAFKA_TOPIC", "trace_lit.spans.raw"),
+            batch_size=int(os.getenv("TRACELIT_BATCH_SIZE", "100")),
+            flush_interval_ms=int(os.getenv("TRACELIT_FLUSH_INTERVAL_MS", "500")),
+            sampling_rate=float(os.getenv("TRACELIT_SAMPLING_RATE", "1.0")),
+            log_level=os.getenv("TRACELIT_LOG_LEVEL", "WARNING"),
+            disabled=os.getenv("TRACELIT_DISABLED", "").lower() in ("1", "true", "yes"),
         )
 
 

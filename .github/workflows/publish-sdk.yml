@@ -1,0 +1,34 @@
+name: Publish Tracelit-SDK to PyPI
+
+on:
+  release:
+    types: [published]   # trigger when you create a GitHub Release
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write    # required for trusted publishing (no API token needed)
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install build tools
+        run: pip install build
+
+      - name: Build package
+        working-directory: sdk/python
+        run: python -m build   # produces dist/Tracelit_SDK-*.whl and dist/Tracelit_SDK-*.tar.gz
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: sdk/python/dist/
+          # Uses PyPI Trusted Publishing — no API token secret needed.
+          # Set up at: https://pypi.org/manage/project/Tracelit-SDK/settings/publishing/
+          # Add publisher: owner=Trace-lit, repo=Trace-lit-SDK, workflow=publish-sdk.yml

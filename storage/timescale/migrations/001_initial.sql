@@ -1,5 +1,5 @@
 -- AMO TimescaleDB schema — initial migration
--- Run against the 'amo' database as a superuser (or a user with CREATEDATABASE).
+-- Run against the 'trace_lit' database as a superuser (or a user with CREATEDATABASE).
 
 CREATE EXTENSION IF NOT EXISTS timescaledb;
 

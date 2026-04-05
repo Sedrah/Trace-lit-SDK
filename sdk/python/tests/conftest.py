@@ -8,9 +8,9 @@ from unittest.mock import patch
 
 import pytest
 
-import amo
-from amo.emitter import BaseEmitter, reset_emitter
-from amo.models import TraceEvent
+import trace_lit
+from trace_lit.emitter import BaseEmitter, reset_emitter
+from trace_lit.models import TraceEvent
 
 
 class CapturingEmitter(BaseEmitter):

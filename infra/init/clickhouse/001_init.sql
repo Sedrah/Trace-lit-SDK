@@ -1,6 +1,6 @@
 -- AMO ClickHouse initialisation — runs automatically on first container start.
 
-CREATE DATABASE IF NOT EXISTS amo;
+CREATE DATABASE IF NOT EXISTS trace_lit;
 
 -- ---------------------------------------------------------------------------
 -- spans — core trace store
@@ -9,7 +9,7 @@ CREATE DATABASE IF NOT EXISTS amo;
 -- macros.xml defines {shard}=1 and {replica}=1 for single-node mode.
 -- ---------------------------------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS amo.spans
+CREATE TABLE IF NOT EXISTS trace_lit.spans
 (
     org_id          LowCardinality(String),
     trace_id        UUID,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS amo.spans
     error_msg       String,
     metadata        String
 )
-ENGINE = ReplicatedMergeTree('/clickhouse/tables/{shard}/amo/spans', '{replica}')
+ENGINE = ReplicatedMergeTree('/clickhouse/tables/{shard}/trace_lit/spans', '{replica}')
 PARTITION BY toYYYYMM(timestamp)
 ORDER BY (org_id, trace_id, timestamp)
 -- toDateTime() cast required for DateTime64 TTL in ClickHouse 24.x

@@ -72,7 +72,7 @@ def test_get_dag_structure(client: TestClient, ch_client: MockCHClient) -> None:
     now = datetime.now(timezone.utc).isoformat()
 
     ch_client.set_result(
-        "amo.spans",
+        "trace_lit.spans",
         [
             [parent_id, None,      now, 1000, "root-agent", "run",   "success", "langchain", "gpt-4o", 100, 50, 0.001, "", "", "{}"],
             [child_id,  parent_id, now, 500,  "tool-agent", "search","success", "langchain", None,      0,   0,  0.0,   "", "", "{}"],

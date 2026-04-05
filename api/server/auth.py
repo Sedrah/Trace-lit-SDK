@@ -1,7 +1,7 @@
 """
 API key authentication.
 
-Every request must carry X-AMO-API-Key. The key is hashed (SHA-256) and
+Every request must carry X-Tracelit-Api-Key. The key is hashed (SHA-256) and
 looked up in the api_keys table. The resolved org_id is injected into every
 route via FastAPI's dependency injection.
 
@@ -9,7 +9,7 @@ SHA-256 is used (not bcrypt) because API keys are high-entropy secrets — a fas
 hash is safe. bcrypt is for low-entropy user passwords. Queries hit the DB at
 most once per key per KEY_CACHE_TTL_S seconds.
 
-Self-hosted installs with no api_keys rows can use AMO_ALLOW_KEYLESS=true which
+Self-hosted installs with no api_keys rows can use TRACELIT_ALLOW_KEYLESS=true which
 maps any request to org_id="default". This is NOT for production SaaS use.
 """
 
@@ -24,13 +24,13 @@ from typing import Optional
 from fastapi import Depends, HTTPException, Request, Security
 from fastapi.security import APIKeyHeader
 
-logger = logging.getLogger("amo.api")
+logger = logging.getLogger("trace_lit.api")
 
-_API_KEY_HEADER = APIKeyHeader(name="X-AMO-API-Key", auto_error=False)
+_API_KEY_HEADER = APIKeyHeader(name="X-Tracelit-Api-Key", auto_error=False)
 
 
 def _allow_keyless() -> bool:
-    return os.getenv("AMO_ALLOW_KEYLESS", "").lower() in ("1", "true", "yes")
+    return os.getenv("TRACELIT_ALLOW_KEYLESS", "").lower() in ("1", "true", "yes")
 
 # In-memory cache: sha256_hex → (org_id, expires_at)
 _cache: dict[str, tuple[str, float]] = {}
@@ -62,7 +62,7 @@ async def require_org(
         return "default"
 
     if not api_key:
-        raise HTTPException(status_code=401, detail="Missing API key. Add X-AMO-API-Key header.")
+        raise HTTPException(status_code=401, detail="Missing API key. Add X-Tracelit-Api-Key header.")
 
     key_hash = _sha256(api_key)
     now = time.monotonic()
