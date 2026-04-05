@@ -30,7 +30,9 @@ jobs:
             git pull origin main
 
             # Build and restart containers (--build rebuilds images if code changed)
-            docker compose -f infra/docker-compose.yml up -d --build
+            # --env-file is required: compose loads .env relative to the compose file
+            # location (infra/), but our .env is at the repo root.
+            docker compose -f infra/docker-compose.yml --env-file .env up -d --build
 
             # Remove dangling images to keep disk clean
             docker image prune -f
