@@ -19,13 +19,18 @@ Quick start::
 
 from __future__ import annotations
 
+import atexit
 import logging
 from typing import Any
 
 from .config import Config, _set_config, get_config
 from .context import get_current_trace_id
 from .decorators import trace
-from .emitter import _create_emitter, reset_emitter
+from .emitter import _create_emitter, get_emitter, reset_emitter
+
+# Registered once; subsequent configure() calls reuse the same handler because
+# get_emitter() always returns the current singleton at exit time.
+_atexit_registered = False
 
 __all__ = ["configure", "trace", "get_current_trace_id"]
 
@@ -113,3 +118,12 @@ def configure(
 
     # Replace the emitter with one matching the new config
     reset_emitter(_create_emitter(new_config))
+
+    # Drain the queue before the process exits — the background thread is a
+    # daemon thread so Python would kill it without flushing on a short script.
+    # Registered once; the handler always closes the current singleton so
+    # subsequent configure() calls are covered without double-registering.
+    global _atexit_registered
+    if not _atexit_registered:
+        atexit.register(lambda: get_emitter().close())
+        _atexit_registered = True
