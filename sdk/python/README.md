@@ -5,17 +5,17 @@ Python SDK for Trace-lit — instrument AI agents with one decorator.
 ## Install
 
 ```bash
-pip install "Tracelit-SDK[kafka] @ git+https://github.com/Trace-lit/Trace-lit-SDK.git#subdirectory=sdk/python"
+pip install "tracelit-sdk[kafka]"
 ```
 
 For LangChain / LangGraph:
 ```bash
-pip install "Tracelit-SDK[all-langchain] @ git+https://github.com/Trace-lit/Trace-lit-SDK.git#subdirectory=sdk/python"
+pip install "tracelit-sdk[all-langchain]"
 ```
 
 For CrewAI:
 ```bash
-pip install "Tracelit-SDK[all-crewai] @ git+https://github.com/Trace-lit/Trace-lit-SDK.git#subdirectory=sdk/python"
+pip install "tracelit-sdk[all-crewai]"
 ```
 
 > **Note:** `crewai` and `langgraph` have a hard pip version conflict — never install `[all-langchain]` and `[all-crewai]` in the same environment.

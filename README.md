@@ -64,7 +64,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for full technical detail.
 
 ### 1. Install the SDK
 ```bash
-pip install "Tracelit-SDK[kafka] @ git+https://github.com/Trace-lit/Trace-lit-SDK.git#subdirectory=sdk/python"
+pip install "tracelit-sdk[kafka]"
 ```
 
 ### 2. Instrument your agent
