@@ -1,4 +1,4 @@
-# Contributing to AMO
+# Contributing to Trace-lit
 
 ## Development Setup
 
@@ -11,8 +11,8 @@
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/Sedrah/AMO.git
-cd AMO
+git clone https://github.com/Trace-lit/Trace-lit-SDK.git
+cd Trace-lit-SDK
 
 # SDK
 pip install -e "sdk/python[dev]"
@@ -79,16 +79,6 @@ examples/            # Usage examples and test scripts
 - `fix:` bug fix
 - `docs:` documentation only
 - `refactor:` no behaviour change
-
----
-
-## Key Design Rules
-
-- **`org_id` on every schema** — every ClickHouse table, TimescaleDB table, and API response must include `org_id`. This is the #1 SaaS migration rule.
-- **SDK is non-blocking** — the emitter runs on a background daemon thread. Never add synchronous I/O to the hot path.
-- **No stack traces in the dashboard** — the API global exception handler strips all internal errors. Keep it that way.
-- **API key → org_id server-side** — the SDK never knows its own `org_id`. It sends `api_key` in Kafka headers; the pipeline resolves the mapping.
-- **ClickHouse aggregates** — CH 24.x rejects aggregate expressions inside other expressions in SELECT. Derive computed fields (e.g. `status`) in Python from raw aggregate columns.
 
 ---
 
