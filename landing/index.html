@@ -135,12 +135,12 @@ body{cursor:auto}
     </div>
     <div class="term-body">
       <div><span class="tc"># install</span></div>
-      <div><span class="tw">pip install tracelit</span></div>
+      <div><span class="tw">pip install "tracelit-sdk[kafka]"</span></div>
       <br>
       <div><span class="tc"># instrument any agent — one line</span></div>
       <div><span class="tp">import</span> <span class="tw">trace_lit</span></div>
       <br>
-      <div><span class="tw">trace_lit.configure(kafka_brokers=[<span class="ta">"your-host:9093"</span>], api_key=<span class="ta">"sk-..."</span>)</span></div>
+      <div><span class="tw">trace_lit.configure(kafka_brokers=[<span class="ta">"app.trace-lit.com:9093"</span>], api_key=<span class="ta">"sk-demo-abc123"</span>)</span></div>
       <br>
       <div><span class="tg">@trace_lit.trace</span><span class="tw">(agent_name=<span class="ta">"my-agent"</span>, framework=<span class="ta">"langchain"</span>)</span></div>
       <div><span class="tp">def</span> <span class="tg">run</span><span class="tw">(query: str) -> str:</span></div>
