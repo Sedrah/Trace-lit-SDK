@@ -34,7 +34,7 @@ _atexit_registered = False
 
 __all__ = ["configure", "trace", "get_current_trace_id"]
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 def configure(

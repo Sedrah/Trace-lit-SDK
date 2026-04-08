@@ -48,7 +48,7 @@ Click any trace to see the execution graph and step timeline.
 ## Test the connection
 
 ```bash
-python -m trace_lit.quickstart --broker app.trace-lit.com:9093 --key sk-demo-abc123
+python3 -m trace_lit.quickstart --broker app.trace-lit.com:9093 --key sk-demo-abc123
 # ✓ Connected to Trace-lit
 # ✓ Test trace sent
 # ✓ View at https://app.trace-lit.com
