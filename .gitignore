@@ -209,3 +209,4 @@ dashboard/web/node_modules/
 
 # macOS
 .DS_Store
+.venv
