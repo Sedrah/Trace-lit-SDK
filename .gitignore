@@ -206,3 +206,6 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 dashboard/web/node_modules/
+
+# macOS
+.DS_Store

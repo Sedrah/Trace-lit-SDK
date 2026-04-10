@@ -26,7 +26,7 @@ pip install "tracelit-sdk[all-crewai]"
 import trace_lit
 
 trace_lit.configure(
-    kafka_brokers=["49.13.235.169:9093"],
+    kafka_brokers=["app.trace-lit.com:9093"],
     api_key="your-api-key",
 )
 
