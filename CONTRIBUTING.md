@@ -11,7 +11,7 @@
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/Trace-lit/Trace-lit-SDK.git
+git clone https://github.com/Sedrah/Trace-lit-SDK.git
 cd Trace-lit-SDK
 
 # SDK
@@ -84,7 +84,10 @@ examples/            # Usage examples and test scripts
 
 ## Opening a PR
 
-1. Branch from `main`
-2. Keep PRs focused — one feature or fix per PR
-3. All tests must pass
-4. Update relevant docs if behaviour changes
+1. **Open an issue first** — describe what you want to change and why. This avoids wasted effort on PRs that won't be merged.
+2. Branch from `main` and submit your PR against `main` only.
+3. Keep PRs focused — one feature or fix per PR.
+4. All tests must pass.
+5. Update relevant docs if behaviour changes.
+
+PRs are reviewed within 5 business days.
