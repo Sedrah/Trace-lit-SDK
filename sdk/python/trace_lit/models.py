@@ -31,7 +31,7 @@ class TraceEvent(BaseModel):
     duration_ms: int = 0
 
     # Agent context
-    framework: Literal["langchain", "langgraph", "crewai", "raw"] = "raw"
+    framework: Literal["langchain", "langgraph", "crewai", "openclaw", "raw"] = "raw"
     agent_name: str
     action: str
 
