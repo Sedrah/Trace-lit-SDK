@@ -24,7 +24,16 @@ trace_lit.configure(
 def run(query):
     ...
 ```
+## Test the connection
 
+```bash
+python3 -m trace_lit.quickstart --broker app.trace-lit.com:9093 --key sk-demo-abc123
+# ✓ Connected to Trace-lit
+# ✓ Test trace sent
+# ✓ View at https://app.trace-lit.com
+```
+
+---
 **[View dashboard →](https://app.trace-lit.com)**
 
 ---
@@ -45,16 +54,6 @@ Click any trace to see the execution graph and step timeline.
 
 ---
 
-## Test the connection
-
-```bash
-python3 -m trace_lit.quickstart --broker app.trace-lit.com:9093 --key sk-demo-abc123
-# ✓ Connected to Trace-lit
-# ✓ Test trace sent
-# ✓ View at https://app.trace-lit.com
-```
-
----
 
 **Get access** — [contact us](mailto:hello@trace-lit.com) or open an issue.
 
