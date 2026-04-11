@@ -55,6 +55,6 @@ Click any trace to see the execution graph and step timeline.
 ---
 
 
-**Get access** — [contact us](mailto:hello@trace-lit.com) or open an issue.
+**Community** — [Join the Discord](https://discord.gg/XqDEFthE) · [GitHub](https://github.com/Sedrah/Trace-lit-SDK) · [contact us](mailto:hello@trace-lit.com)
 
 MIT License
