@@ -4,12 +4,20 @@
 //
 // Hooks into OpenClaw session lifecycle events and sends traces to Trace-lit.
 // Activates automatically on session start — no manual instrumentation needed.
+//
+// Event mapping (confirmed from OpenClaw docs):
+//   command:new          → session start
+//   command:stop/reset   → session end
+//   tool_result_persist  → tool call (synchronous, fires when tool result written)
 
 const { v4: uuidv4 } = require("uuid");
 const { getConfig } = require("./config");
 const { Tracer } = require("./tracer");
 
 let tracer = null;
+
+// Per-session state keyed by sessionKey — survives across events within a session.
+const sessions = new Map();
 
 // Called by OpenClaw when the skill is loaded.
 async function activate(skill) {
@@ -31,54 +39,93 @@ async function activate(skill) {
     return;
   }
 
-  // ── Session lifecycle hooks ──────────────────────────────────────────────
+  // ── Session start ─────────────────────────────────────────────────────────
+  // command:new fires when the user sends /new
 
-  skill.on("session:start", async (session) => {
+  skill.on("command:new", async (event) => {
     if (!tracer) return;
-    // Attach trace/span IDs to the session so all events share the same trace
-    session.traceId = uuidv4();
-    session.spanId = uuidv4();
-    session.startedAt = Date.now();
-    session.totalInputTokens = 0;
-    session.totalOutputTokens = 0;
+
+    const sessionData = {
+      traceId: uuidv4(),
+      spanId: uuidv4(),
+      startedAt: Date.now(),
+      totalInputTokens: 0,
+      totalOutputTokens: 0,
+      model: event.context?.cfg?.model || null,
+      agentName: config.agentName,
+    };
+    sessions.set(event.sessionKey, sessionData);
 
     try {
-      await tracer.traceSessionStart(session);
+      await tracer.traceSessionStart(sessionData);
     } catch (err) {
       skill.log.warn(`[tracelit] Failed to emit session_start: ${err.message}`);
     }
   });
 
-  skill.on("tool:call", async (session, toolCall) => {
-    if (!tracer || !session.traceId) return;
+  // ── Tool call ─────────────────────────────────────────────────────────────
+  // tool_result_persist fires synchronously when any tool result is written.
+  // event.context.sessionEntry contains the tool result data.
 
-    // Accumulate token totals on the session
-    session.totalInputTokens += toolCall.inputTokens || 0;
-    session.totalOutputTokens += toolCall.outputTokens || 0;
+  skill.on("tool_result_persist", async (event) => {
+    if (!tracer) return;
+
+    const sessionData = sessions.get(event.sessionKey);
+    if (!sessionData) return; // session started before skill was active
+
+    const entry = event.context?.sessionEntry || {};
+    const toolCall = {
+      name: entry.tool_name || entry.name || "tool_call",
+      durationMs: entry.duration_ms || 0,
+      inputTokens: entry.input_tokens || 0,
+      outputTokens: entry.output_tokens || 0,
+      error: entry.error || null,
+    };
+
+    sessionData.totalInputTokens += toolCall.inputTokens;
+    sessionData.totalOutputTokens += toolCall.outputTokens;
 
     try {
-      await tracer.traceToolCall(session, toolCall);
+      await tracer.traceToolCall(sessionData, toolCall);
     } catch (err) {
       skill.log.warn(`[tracelit] Failed to emit tool_call: ${err.message}`);
     }
   });
 
-  skill.on("session:end", async (session) => {
-    if (!tracer || !session.traceId) return;
+  // ── Session end ───────────────────────────────────────────────────────────
+  // command:stop and command:reset both terminate the active session.
 
-    session.durationMs = Date.now() - (session.startedAt || Date.now());
+  async function handleSessionEnd(event) {
+    if (!tracer) return;
+
+    const sessionData = sessions.get(event.sessionKey);
+    if (!sessionData) return;
+
+    sessionData.durationMs = Date.now() - sessionData.startedAt;
+    sessions.delete(event.sessionKey);
 
     try {
-      await tracer.traceSessionEnd(session);
+      await tracer.traceSessionEnd(sessionData);
     } catch (err) {
       skill.log.warn(`[tracelit] Failed to emit session_end: ${err.message}`);
     }
-  });
+  }
+
+  skill.on("command:stop", handleSessionEnd);
+  skill.on("command:reset", handleSessionEnd);
 }
 
-// Called by OpenClaw on shutdown — drain the Kafka producer before exit.
+// Called by OpenClaw on shutdown — flush any open sessions and disconnect.
 async function deactivate() {
   if (tracer) {
+    // Flush any sessions that didn't receive a stop/reset event
+    for (const [, sessionData] of sessions) {
+      sessionData.durationMs = Date.now() - sessionData.startedAt;
+      try {
+        await tracer.traceSessionEnd(sessionData);
+      } catch (_) {}
+    }
+    sessions.clear();
     await tracer.disconnect();
     tracer = null;
   }
