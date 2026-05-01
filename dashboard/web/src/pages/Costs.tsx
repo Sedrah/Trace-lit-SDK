@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Cell,
   Legend,
@@ -32,8 +32,10 @@ const PERIODS = [
 
 export default function Costs() {
   const [periodIdx, setPeriodIdx] = useState(0);
-  const since = PERIODS[periodIdx].since();
-  const until = new Date().toISOString();
+  const { since, until } = useMemo(() => ({
+    since: PERIODS[periodIdx].since(),
+    until: new Date().toISOString(),
+  }), [periodIdx]);
 
   const { data, isLoading, isError } = useCosts({ since, until });
 
