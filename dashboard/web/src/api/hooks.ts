@@ -110,3 +110,33 @@ export function useDeleteAlert() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["alerts"] }),
   });
 }
+
+// ---------------------------------------------------------------------------
+// Admin — API key management
+// ---------------------------------------------------------------------------
+
+export function useAdminKeys(adminKey: string, orgId?: string) {
+  return useQuery({
+    queryKey: ["admin-keys", adminKey, orgId],
+    queryFn: () => api.listAdminKeys(adminKey, orgId),
+    enabled: Boolean(adminKey),
+    retry: false,
+  });
+}
+
+export function useCreateAdminKey(adminKey: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: Parameters<typeof api.createAdminKey>[1]) =>
+      api.createAdminKey(adminKey, body),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-keys"] }),
+  });
+}
+
+export function useDeleteAdminKey(adminKey: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (keyId: number) => api.deleteAdminKey(adminKey, keyId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-keys"] }),
+  });
+}
