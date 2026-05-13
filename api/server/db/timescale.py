@@ -148,3 +148,43 @@ async def delete_alert_rule(
         rule_id, org_id,
     )
     return result == "DELETE 1"
+
+
+# ---------------------------------------------------------------------------
+# API key management (admin)
+# ---------------------------------------------------------------------------
+
+async def create_api_key(request: Any, data: dict[str, Any]) -> dict[str, Any]:
+    pool = _pool(request)
+    row = await pool.fetchrow(
+        """
+        INSERT INTO api_keys (key_hash, org_id, name, expires_at)
+        VALUES ($1, $2, $3, $4)
+        RETURNING id, org_id, name, created_at, expires_at
+        """,
+        data["key_hash"],
+        data["org_id"],
+        data["name"],
+        data.get("expires_at"),
+    )
+    return dict(row)
+
+
+async def list_api_keys(request: Any, org_id: Optional[str]) -> list[dict[str, Any]]:
+    pool = _pool(request)
+    if org_id:
+        rows = await pool.fetch(
+            "SELECT id, org_id, name, created_at, expires_at FROM api_keys WHERE org_id = $1 ORDER BY created_at DESC",
+            org_id,
+        )
+    else:
+        rows = await pool.fetch(
+            "SELECT id, org_id, name, created_at, expires_at FROM api_keys ORDER BY created_at DESC"
+        )
+    return [dict(r) for r in rows]
+
+
+async def delete_api_key(request: Any, key_id: int) -> bool:
+    pool = _pool(request)
+    result = await pool.execute("DELETE FROM api_keys WHERE id = $1", key_id)
+    return result == "DELETE 1"
