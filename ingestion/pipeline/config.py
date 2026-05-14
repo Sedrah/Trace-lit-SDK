@@ -22,7 +22,7 @@ class PipelineConfig:
     clickhouse_password: str = ""
 
     # TimescaleDB
-    timescale_dsn: str = "postgresql://amo:amo@localhost:5432/amo"
+    timescale_dsn: str = "postgresql://tracelit:tracelit_pg_password@localhost:5432/trace_lit"
 
     # Batching
     clickhouse_batch_size: int = 500
@@ -51,7 +51,7 @@ class PipelineConfig:
             clickhouse_user=os.getenv("TRACELIT_CLICKHOUSE_USER", "default"),
             clickhouse_password=os.getenv("TRACELIT_CLICKHOUSE_PASSWORD", ""),
             timescale_dsn=os.getenv(
-                "TRACELIT_TIMESCALE_DSN", "postgresql://amo:amo@localhost:5432/amo"
+                "TRACELIT_TIMESCALE_DSN", "postgresql://tracelit:tracelit_pg_password@localhost:5432/trace_lit"
             ),
             clickhouse_batch_size=int(os.getenv("TRACELIT_CH_BATCH_SIZE", "500")),
             clickhouse_flush_interval_s=float(os.getenv("TRACELIT_CH_FLUSH_INTERVAL_S", "2.0")),

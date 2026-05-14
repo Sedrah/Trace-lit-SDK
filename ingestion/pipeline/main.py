@@ -12,7 +12,7 @@ Usage:
 Environment variables (see pipeline/config.py for full list):
     TRACELIT_KAFKA_BROKERS=localhost:9092
     TRACELIT_CLICKHOUSE_HOST=localhost
-    TRACELIT_TIMESCALE_DSN=postgresql://amo:amo@localhost:5432/amo
+    TRACELIT_TIMESCALE_DSN=postgresql://tracelit:tracelit_pg_password@localhost:5432/trace_lit
     TRACELIT_API_KEYS={"sk-your-key": "org-your-org"}
 """
 

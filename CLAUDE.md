@@ -136,7 +136,7 @@ TRACELIT_ALLOW_KEYLESS=true \
 TRACELIT_CLICKHOUSE_HOST=localhost \
 TRACELIT_CLICKHOUSE_USER=amo \
 TRACELIT_CLICKHOUSE_PASSWORD=tracelit_clickhouse_password \
-TRACELIT_TIMESCALE_DSN=postgresql://amo:tracelit_pg_password@localhost:5432/amo \
+TRACELIT_TIMESCALE_DSN=postgresql://tracelit:tracelit_pg_password@localhost:5432/trace_lit \
 uvicorn server.main:app --reload --port 8000
 
 # 3. Start ingestion pipeline (new terminal)
@@ -145,7 +145,7 @@ TRACELIT_KAFKA_BROKERS=localhost:9092 \
 TRACELIT_CLICKHOUSE_HOST=localhost \
 TRACELIT_CLICKHOUSE_USER=amo \
 TRACELIT_CLICKHOUSE_PASSWORD=tracelit_clickhouse_password \
-TRACELIT_TIMESCALE_DSN=postgresql://amo:tracelit_pg_password@localhost:5432/amo \
+TRACELIT_TIMESCALE_DSN=postgresql://tracelit:tracelit_pg_password@localhost:5432/trace_lit \
 TRACELIT_API_KEYS='{"your-key":"default"}' \
 python -m pipeline.main
 

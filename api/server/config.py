@@ -12,7 +12,7 @@ class ApiConfig:
     clickhouse_user: str = "default"
     clickhouse_password: str = ""
 
-    timescale_dsn: str = "postgresql://amo:amo@localhost:5432/amo"
+    timescale_dsn: str = "postgresql://tracelit:tracelit_pg_password@localhost:5432/trace_lit"
 
     # Auth key cache TTL in seconds
     key_cache_ttl_s: int = 300
@@ -30,7 +30,7 @@ class ApiConfig:
             clickhouse_user=os.getenv("TRACELIT_CLICKHOUSE_USER", "default"),
             clickhouse_password=os.getenv("TRACELIT_CLICKHOUSE_PASSWORD", ""),
             timescale_dsn=os.getenv(
-                "TRACELIT_TIMESCALE_DSN", "postgresql://amo:amo@localhost:5432/amo"
+                "TRACELIT_TIMESCALE_DSN", "postgresql://tracelit:tracelit_pg_password@localhost:5432/trace_lit"
             ),
             key_cache_ttl_s=int(os.getenv("TRACELIT_KEY_CACHE_TTL_S", "300")),
             default_page_size=int(os.getenv("TRACELIT_DEFAULT_PAGE_SIZE", "50")),
