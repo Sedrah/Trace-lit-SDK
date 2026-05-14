@@ -21,7 +21,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .config import ApiConfig
-from .routes import agents, alerts, costs, failures, traces
+from .routes import admin, agents, alerts, costs, failures, traces
 
 logger = logging.getLogger("trace_lit.api")
 
@@ -99,6 +99,7 @@ def create_app(config: ApiConfig | None = None) -> FastAPI:
     app.include_router(costs.router,    prefix=prefix)
     app.include_router(failures.router, prefix=prefix)
     app.include_router(alerts.router,   prefix=prefix)
+    app.include_router(admin.router,    prefix=prefix)
 
     @app.get("/health", tags=["Health"])
     async def health() -> dict[str, str]:

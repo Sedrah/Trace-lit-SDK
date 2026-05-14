@@ -6,6 +6,7 @@ import Alerts from "./pages/Alerts";
 import Costs from "./pages/Costs";
 import Failures from "./pages/Failures";
 import Overview from "./pages/Overview";
+import Settings from "./pages/Settings";
 import TraceDetail from "./pages/TraceDetail";
 import Traces from "./pages/Traces";
 
@@ -32,6 +33,7 @@ export default function App() {
             <Route path="/costs"               element={<Costs />} />
             <Route path="/failures"            element={<Failures />} />
             <Route path="/alerts"              element={<Alerts />} />
+            <Route path="/settings"            element={<Settings />} />
           </Route>
         </Routes>
       </BrowserRouter>

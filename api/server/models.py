@@ -207,3 +207,30 @@ class AlertRuleResponse(AlertRuleRequest):
 
 class AlertRuleListResponse(BaseModel):
     items: List[AlertRuleResponse]
+
+
+# ---------------------------------------------------------------------------
+# Admin — API key management
+# ---------------------------------------------------------------------------
+
+class ApiKeyCreateRequest(BaseModel):
+    org_id: str
+    name: str
+    expires_at: Optional[datetime] = None
+
+
+class ApiKeyResponse(BaseModel):
+    id: int
+    org_id: str
+    name: str
+    created_at: datetime
+    expires_at: Optional[datetime]
+    # key_hash is intentionally excluded — never returned after creation
+
+
+class ApiKeyCreateResponse(ApiKeyResponse):
+    raw_key: str   # returned once at creation, never stored in plaintext
+
+
+class ApiKeyListResponse(BaseModel):
+    items: List[ApiKeyResponse]

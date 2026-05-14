@@ -49,7 +49,11 @@ def main() -> None:
     logger.info("  TimescaleDB:   %s", config.timescale_dsn.split("@")[-1])  # hide credentials
 
     # Build services
-    resolver = ApiKeyResolver.from_json(config.api_keys_json)
+    resolver = ApiKeyResolver.from_json(
+        config.api_keys_json,
+        timescale_dsn=config.timescale_dsn,
+        cache_ttl_s=config.key_cache_ttl_s,
+    )
     normalizer = Normalizer(resolver)
     ch_writer = ClickHouseWriter(config)
     ts_writer = TimescaleWriter(config)
@@ -90,6 +94,7 @@ def main() -> None:
     ch_writer.close()
     ts_writer.close()
     producer.flush()
+    resolver.close()
 
     logger.info("AMO pipeline shutdown complete. Stats: %s", normalizer.stats)
     sys.exit(0)

@@ -11,6 +11,9 @@ import type {
   AlertRuleListResponse,
   AlertRuleRequest,
   AlertRuleResponse,
+  ApiKeyCreateRequest,
+  ApiKeyCreateResponse,
+  ApiKeyListResponse,
   CostResponse,
   DAGResponse,
   FailureListResponse,
@@ -20,7 +23,7 @@ import type {
 
 const BASE = "/api/v1";
 
-function getApiKey(): string {
+export function getApiKey(): string {
   return localStorage.getItem("trace_lit_api_key") ?? "";
 }
 
@@ -138,4 +141,56 @@ export function clearApiKey(): void {
 
 export function hasApiKey(): boolean {
   return Boolean(localStorage.getItem("trace_lit_api_key"));
+}
+
+// ---------------------------------------------------------------------------
+// Admin — API key management
+// ---------------------------------------------------------------------------
+
+function adminRequest<T>(
+  path: string,
+  adminKey: string,
+  options: RequestInit = {},
+): Promise<T> {
+  return request(path, {
+    ...options,
+    headers: {
+      "X-Tracelit-Admin-Key": adminKey,
+      ...((options.headers as Record<string, string>) ?? {}),
+    },
+  });
+}
+
+export function listAdminKeys(
+  adminKey: string,
+  orgId?: string,
+): Promise<ApiKeyListResponse> {
+  const qs = orgId ? `?org_id=${encodeURIComponent(orgId)}` : "";
+  return adminRequest(`/admin/keys${qs}`, adminKey);
+}
+
+export function createAdminKey(
+  adminKey: string,
+  body: ApiKeyCreateRequest,
+): Promise<ApiKeyCreateResponse> {
+  return adminRequest("/admin/keys", adminKey, {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export function deleteAdminKey(adminKey: string, keyId: number): Promise<void> {
+  return adminRequest(`/admin/keys/${keyId}`, adminKey, { method: "DELETE" });
+}
+
+export function saveAdminKey(key: string): void {
+  localStorage.setItem("trace_lit_admin_key", key);
+}
+
+export function clearAdminKey(): void {
+  localStorage.removeItem("trace_lit_admin_key");
+}
+
+export function getStoredAdminKey(): string {
+  return localStorage.getItem("trace_lit_admin_key") ?? "";
 }

@@ -171,3 +171,26 @@ export interface AlertRuleRequest {
   channel: string;
   webhook_url: string;
 }
+
+// Admin — API key management
+export interface ApiKeyResponse {
+  id: number;
+  org_id: string;
+  name: string;
+  created_at: string;
+  expires_at: string | null;
+}
+
+export interface ApiKeyCreateResponse extends ApiKeyResponse {
+  raw_key: string;
+}
+
+export interface ApiKeyListResponse {
+  items: ApiKeyResponse[];
+}
+
+export interface ApiKeyCreateRequest {
+  org_id: string;
+  name: string;
+  expires_at?: string | null;
+}

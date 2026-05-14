@@ -32,8 +32,9 @@ class PipelineConfig:
 
     # api_key → org_id map loaded from env (JSON string)
     # Format: '{"sk-key1": "org-acme", "sk-key2": "org-globex"}'
-    # In SaaS this is replaced by a DB lookup; for MVP it's env-configured.
+    # Unknown keys are resolved via TimescaleDB with a TTL cache.
     api_keys_json: str = "{}"
+    key_cache_ttl_s: float = 300.0
 
     @classmethod
     def from_env(cls) -> PipelineConfig:
@@ -57,4 +58,5 @@ class PipelineConfig:
             timescale_batch_size=int(os.getenv("TRACELIT_TS_BATCH_SIZE", "1000")),
             timescale_flush_interval_s=float(os.getenv("TRACELIT_TS_FLUSH_INTERVAL_S", "5.0")),
             api_keys_json=os.getenv("TRACELIT_API_KEYS", "{}"),
+            key_cache_ttl_s=float(os.getenv("TRACELIT_KEY_CACHE_TTL_S", "300")),
         )
