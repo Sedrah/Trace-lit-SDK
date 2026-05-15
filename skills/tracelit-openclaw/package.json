@@ -1,0 +1,16 @@
+{
+  "name": "tracelit-openclaw",
+  "version": "0.1.0",
+  "description": "OpenClaw skill — sends agent session traces to Trace-lit for observability",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "test": "node src/index.js --dry-run"
+  },
+  "dependencies": {
+    "kafkajs": "^2.2.4",
+    "uuid": "^9.0.0"
+  },
+  "keywords": ["tracelit", "observability", "openclaw", "tracing"],
+  "license": "MIT"
+}
