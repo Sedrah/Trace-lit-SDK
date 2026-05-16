@@ -36,7 +36,7 @@ from typing import Any
 from uuid import uuid4
 
 from .config import get_config
-from .context import get_current_span_id, get_current_trace_id, reset_span_context, set_span_context
+from .context import get_current_agent_name, get_current_span_id, get_current_trace_id, reset_span_context, set_span_context
 from .emitter import get_emitter
 from .models import ErrorDetail, TraceEvent
 
@@ -85,6 +85,7 @@ class trace_span:
         self._start: float = 0.0
         self._trace_token: Any = None
         self._span_token: Any = None
+        self._agent_token: Any = None
         self._disabled = False
 
     def _enter(self) -> SpanHandle:
@@ -96,8 +97,11 @@ class trace_span:
         parent_span_id = get_current_span_id()
         trace_id = get_current_trace_id() or uuid4()
         span_id = uuid4()
+        resolved_agent = self._agent_name or get_current_agent_name() or "unknown"
 
-        self._trace_token, self._span_token = set_span_context(trace_id, span_id)
+        self._trace_token, self._span_token, self._agent_token = set_span_context(
+            trace_id, span_id, resolved_agent
+        )
         self._start = time.perf_counter()
 
         self._event = TraceEvent(
@@ -106,7 +110,7 @@ class trace_span:
             parent_span_id=parent_span_id,
             timestamp=datetime.now(timezone.utc),
             framework=self._framework,  # type: ignore[arg-type]
-            agent_name=self._agent_name or "unknown",
+            agent_name=resolved_agent,
             action=self._action,
             model=self._model,
             metadata=self._metadata,
@@ -117,7 +121,7 @@ class trace_span:
         if self._disabled or self._event is None:
             return
 
-        reset_span_context(self._trace_token, self._span_token)
+        reset_span_context(self._trace_token, self._span_token, self._agent_token)
         duration_ms = int((time.perf_counter() - self._start) * 1000)
 
         extra: dict[str, Any] = {

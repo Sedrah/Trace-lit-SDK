@@ -101,7 +101,7 @@ def _begin_span(
     trace_id = get_current_trace_id() or uuid4()
     span_id = uuid4()
 
-    trace_token, span_token = set_span_context(trace_id, span_id)
+    trace_token, span_token, agent_token = set_span_context(trace_id, span_id, agent_name)
 
     event = TraceEvent(
         trace_id=trace_id,
@@ -114,7 +114,7 @@ def _begin_span(
         model=model,
         metadata=metadata,
     )
-    return event, __import__("time").perf_counter(), trace_token, span_token
+    return event, __import__("time").perf_counter(), trace_token, span_token, agent_token
 
 
 def _end_span(
@@ -123,11 +123,12 @@ def _end_span(
     exc: BaseException | None,
     trace_token: Any,
     span_token: Any,
+    agent_token: Any = None,
 ) -> None:
     """Finalize the event and emit it. Always restores context."""
     import time
 
-    reset_span_context(trace_token, span_token)
+    reset_span_context(trace_token, span_token, agent_token)
 
     duration_ms = int((time.perf_counter() - start) * 1000)
 
@@ -166,7 +167,7 @@ def _run_sync(
     if cfg.disabled or not _should_sample():
         return fn(*args, **kwargs)
 
-    event, start, trace_token, span_token = _begin_span(agent_name, action, framework, model, metadata)
+    event, start, trace_token, span_token, agent_token = _begin_span(agent_name, action, framework, model, metadata)
     exc_captured: BaseException | None = None
     try:
         return fn(*args, **kwargs)
@@ -174,7 +175,7 @@ def _run_sync(
         exc_captured = exc
         raise
     finally:
-        _end_span(event, start, exc_captured, trace_token, span_token)
+        _end_span(event, start, exc_captured, trace_token, span_token, agent_token)
 
 
 async def _run_async(
@@ -191,7 +192,7 @@ async def _run_async(
     if cfg.disabled or not _should_sample():
         return await fn(*args, **kwargs)
 
-    event, start, trace_token, span_token = _begin_span(agent_name, action, framework, model, metadata)
+    event, start, trace_token, span_token, agent_token = _begin_span(agent_name, action, framework, model, metadata)
     exc_captured: BaseException | None = None
     try:
         return await fn(*args, **kwargs)
@@ -199,4 +200,4 @@ async def _run_async(
         exc_captured = exc
         raise
     finally:
-        _end_span(event, start, exc_captured, trace_token, span_token)
+        _end_span(event, start, exc_captured, trace_token, span_token, agent_token)

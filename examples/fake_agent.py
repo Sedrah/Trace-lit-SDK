@@ -1,18 +1,20 @@
 # examples/fake_agent.py
-# Simulates a two-agent pipeline with realistic token counts so cost shows up
-# in the dashboard. Uses @trace for spans that don't call LLMs, and emits
-# TraceEvent directly for spans that simulate LLM calls with token counts.
-# One run intentionally fails with a classified error so the Failures view
-# in the dashboard has something to show.
+#
+# Demonstrates two new features:
+#
+# 1. INTERNAL VISIBILITY — trace_span() shows individual LLM calls and tool
+#    calls as child spans inside an agent function, with token counts.
+#
+# 2. FAILURE ATTRIBUTION — the server classifies root causes and cascades.
+#    Three failure scenarios are included:
+#      a) Tool empty result → cascades to downstream LLM call
+#      b) LLM timeout
+#      c) Rate limit
 
 import time
-from datetime import datetime, timezone
-from uuid import uuid4
 
 import trace_lit as amo
-from trace_lit.context import get_current_trace_id, get_current_span_id
-from trace_lit.emitter import get_emitter
-from trace_lit.models import ErrorDetail, TraceEvent
+from trace_lit import trace_span
 
 amo.configure(
     kafka_brokers=["app.trace-lit.com:9093"],
@@ -20,118 +22,148 @@ amo.configure(
 )
 
 
-def emit_llm_span(
-    agent_name: str,
-    framework: str,
-    model: str,
-    action: str,
-    input_tokens: int,
-    output_tokens: int,
-    duration_ms: int,
-) -> None:
-    """Emit a span that looks like a real LLM call with token counts."""
-    trace_id = get_current_trace_id() or uuid4()
-    parent_span_id = get_current_span_id()
-    event = TraceEvent(
-        trace_id=trace_id,
-        span_id=uuid4(),
-        parent_span_id=parent_span_id,
-        timestamp=datetime.now(timezone.utc),
-        framework=framework,   # type: ignore[arg-type]
-        agent_name=agent_name,
-        action=action,
-        status="success",
-        duration_ms=duration_ms,
-        model=model,
-        input_tokens=input_tokens,
-        output_tokens=output_tokens,
-        # cost_usd is 0 here — ingestion pipeline recalculates from tokens + model pricing
-    )
-    get_emitter().emit(event)
-
-
-def emit_failed_span(
-    agent_name: str,
-    action: str,
-    error_type: str,
-    error_message: str,
-    duration_ms: int,
-) -> None:
-    """Emit a span with status=error and a classified failure reason."""
-    trace_id = get_current_trace_id() or uuid4()
-    parent_span_id = get_current_span_id()
-    event = TraceEvent(
-        trace_id=trace_id,
-        span_id=uuid4(),
-        parent_span_id=parent_span_id,
-        timestamp=datetime.now(timezone.utc),
-        framework="langchain",
-        agent_name=agent_name,
-        action=action,
-        status="error",
-        duration_ms=duration_ms,
-        error=ErrorDetail(
-            error_type=error_type,
-            message=error_message,
-        ),
-    )
-    get_emitter().emit(event)
-
+# ---------------------------------------------------------------------------
+# Happy-path pipeline — shows internal visibility with trace_span
+# ---------------------------------------------------------------------------
 
 @amo.trace(agent_name="research-agent", framework="langchain")
 def research_pipeline(query: str) -> str:
-    time.sleep(0.05)
-    # Simulate a GPT-4o call inside this span
-    emit_llm_span(
-        agent_name="research-agent",
-        framework="langchain",
-        model="gpt-4o",
-        action="llm_call",
-        input_tokens=450,
-        output_tokens=120,
-        duration_ms=800,
-    )
+    # Step 1: plan the query — small model, low cost
+    with trace_span("plan_research", model="gpt-4o-mini") as span:
+        time.sleep(0.04)
+        span.set_tokens(input_tokens=110, output_tokens=35)
+
+    # Step 2: run web search tool
+    with trace_span("web_search") as span:
+        time.sleep(0.07)
+        span.set_metadata(results_count=8, query=query)
+
+    # Step 3: synthesise — large model, more tokens
+    with trace_span("synthesise_results", model="gpt-4o") as span:
+        time.sleep(0.09)
+        span.set_tokens(input_tokens=850, output_tokens=380)
+
     return f"Research results for: {query}"
 
 
 @amo.trace(agent_name="writer-agent", framework="crewai")
 def write_pipeline(research: str) -> str:
-    time.sleep(0.05)
-    # Simulate a Claude call inside this span
-    emit_llm_span(
-        agent_name="writer-agent",
-        framework="crewai",
-        model="claude-3-5-sonnet-20241022",
-        action="llm_call",
-        input_tokens=600,
-        output_tokens=300,
-        duration_ms=1200,
-    )
+    # Step 1: outline structure
+    with trace_span("create_outline", model="gpt-4o-mini") as span:
+        time.sleep(0.04)
+        span.set_tokens(input_tokens=190, output_tokens=75)
+
+    # Step 2: write the report — Claude, longer output
+    with trace_span("write_report", model="claude-3-5-sonnet-20241022") as span:
+        time.sleep(0.11)
+        span.set_tokens(input_tokens=620, output_tokens=420)
+
     return f"Report: {research[:80]}"
 
 
-@amo.trace(agent_name="research-agent", framework="langchain")
-def failing_pipeline(query: str) -> None:
-    time.sleep(0.05)
-    # Simulate an LLM call that times out
-    emit_failed_span(
-        agent_name="research-agent",
-        action="llm_call",
-        error_type="LLM timeout",
-        error_message="OpenAI API did not respond within 30s — request abandoned",
-        duration_ms=30000,
-    )
+# ---------------------------------------------------------------------------
+# Failure scenario A — tool returns empty → root cause + intra-agent cascade
+#
+# Attribution result:
+#   Root cause:  market-data-agent / fetch_market_data
+#                classification: tool_empty_result
+#                "Tool returned an empty result"
+#   Cascade:     call_market_api inner span (parent failed)
+# ---------------------------------------------------------------------------
 
+@amo.trace(agent_name="market-data-agent", action="fetch_market_data", framework="langchain")
+def failing_tool_pipeline(symbol: str) -> str:
+    # Successful planning step — shows up as green child span
+    with trace_span("plan_query", model="gpt-4o-mini") as span:
+        time.sleep(0.04)
+        span.set_tokens(input_tokens=70, output_tokens=22)
+
+    # Tool call that returns nothing — this is the root cause
+    with trace_span("call_market_api") as span:
+        time.sleep(0.09)
+        raise ValueError(
+            "Tool returned empty result — market API returned 0 records for " + symbol
+        )
+
+    return "never reached"  # noqa: unreachable
+
+
+# ---------------------------------------------------------------------------
+# Failure scenario B — LLM timeout
+#
+# Attribution result:
+#   Root cause:  summariser-agent / summarise
+#                classification: llm_timeout
+#                "LLM did not respond in time"
+#   Cascade:     llm_call inner span (parent failed)
+# ---------------------------------------------------------------------------
+
+@amo.trace(agent_name="summariser-agent", action="summarise", framework="langchain")
+def failing_timeout_pipeline(_text: str) -> str:
+    with trace_span("llm_call", model="gpt-4o") as span:
+        time.sleep(0.08)
+        raise TimeoutError("OpenAI API did not respond within 30s — request abandoned")
+
+    return "never reached"  # noqa: unreachable
+
+
+# ---------------------------------------------------------------------------
+# Failure scenario C — rate limit, with a prior successful step to show
+#                       mixed internal visibility in the same trace
+#
+# Attribution result:
+#   Root cause:  enrichment-agent / enrich_entity
+#                classification: rate_limit
+#                "LLM API rate limit exceeded"
+#   Cascade:     enrich_llm_call inner span (parent failed)
+# ---------------------------------------------------------------------------
+
+@amo.trace(agent_name="enrichment-agent", action="enrich_entity", framework="langgraph")
+def failing_rate_limit_pipeline(entity: str) -> str:
+    # First step succeeds — mixed trace shows green + red in DAG
+    with trace_span("lookup_entity_db") as span:
+        time.sleep(0.03)
+        span.set_metadata(entity=entity, found=True)
+
+    # Second step hits rate limit
+    with trace_span("enrich_llm_call", model="gpt-4o") as span:
+        time.sleep(0.05)
+        raise RuntimeError("Rate limit exceeded — 429 Too Many Requests from OpenAI")
+
+    return "never reached"  # noqa: unreachable
+
+
+# ---------------------------------------------------------------------------
+# Run
+# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    for i in range(5):
-        r = research_pipeline(f"AI agent use case {i}")
+    # Happy-path traces — demonstrate internal visibility
+    for i in range(4):
+        r = research_pipeline(f"AI agent use case {i + 1}")
         write_pipeline(r)
-        print(f"Trace {i + 1} emitted")
+        print(f"Happy-path trace {i + 1} emitted")
 
-    # One intentional failure — shows up in the Failures view with a reason
-    failing_pipeline("what caused the outage?")
-    print("Failure trace emitted")
+    time.sleep(0.5)
 
-    time.sleep(3)  # let the batch flush before exit
-    print("Done.")
+    # Failure traces — demonstrate attribution
+    try:
+        failing_tool_pipeline("AAPL")
+    except Exception:
+        pass
+    print("Failure A emitted (tool_empty_result + cascade)")
+
+    try:
+        failing_timeout_pipeline("Summarise quarterly earnings report...")
+    except Exception:
+        pass
+    print("Failure B emitted (llm_timeout)")
+
+    try:
+        failing_rate_limit_pipeline("OpenAI Inc.")
+    except Exception:
+        pass
+    print("Failure C emitted (rate_limit, mixed trace)")
+
+    time.sleep(3)
+    print("Done. Open any red trace in the dashboard to see failure attribution.")
