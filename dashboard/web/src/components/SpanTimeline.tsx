@@ -1,115 +1,139 @@
 /**
- * Step log — ordered list of spans, indented by depth.
- * Designed for non-developers: action name, agent, duration, tokens, cost.
- * No bars — numbers speak louder than proportional widths at mixed scales.
+ * Step table — spans sorted in execution order (parent before children),
+ * displayed as a readable table with status, action, agent, model,
+ * duration, tokens, and cost.
  */
 
 import type { SpanResponse } from "../types";
 import { formatCost, formatDuration } from "./ui";
 
-function getDepth(
-  spanId: string,
-  parentMap: Record<string, string | null>,
-  cache: Record<string, number>,
-): number {
-  if (spanId in cache) return cache[spanId];
-  const parentId = parentMap[spanId];
-  const depth =
-    parentId && parentId in parentMap ? getDepth(parentId, parentMap, cache) + 1 : 0;
-  cache[spanId] = depth;
-  return depth;
+/** Topological sort: root spans first, then children in timestamp order. */
+function sortSpans(spans: SpanResponse[]): SpanResponse[] {
+  const byId = new Map(spans.map((s) => [s.span_id, s]));
+  const children = new Map<string | null, SpanResponse[]>();
+
+  for (const s of spans) {
+    const p = s.parent_span_id ?? null;
+    if (!children.has(p)) children.set(p, []);
+    children.get(p)!.push(s);
+  }
+
+  // Sort each sibling group by timestamp
+  for (const [, group] of children) {
+    group.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  }
+
+  // Only include roots whose parent doesn't exist in the span set
+  const roots = (children.get(null) ?? []).filter((s) => !byId.has(s.parent_span_id!));
+
+  const result: SpanResponse[] = [];
+  function walk(span: SpanResponse) {
+    result.push(span);
+    for (const child of children.get(span.span_id) ?? []) walk(child);
+  }
+  for (const root of roots) walk(root);
+
+  // Append any orphaned spans not reached by the walk
+  const visited = new Set(result.map((s) => s.span_id));
+  for (const s of spans) if (!visited.has(s.span_id)) result.push(s);
+
+  return result;
 }
 
-const STATUS_BORDER: Record<string, string> = {
-  success: "border-green-400",
-  error:   "border-red-400",
-  timeout: "border-yellow-400",
+function getDepth(spanId: string, parentMap: Record<string, string | null>, cache: Record<string, number>): number {
+  if (spanId in cache) return cache[spanId];
+  const p = parentMap[spanId];
+  const d = p && p in parentMap ? getDepth(p, parentMap, cache) + 1 : 0;
+  cache[spanId] = d;
+  return d;
+}
+
+const STATUS_COLOURS: Record<string, { dot: string; row: string }> = {
+  success: { dot: "bg-green-400",  row: "" },
+  error:   { dot: "bg-red-500",    row: "bg-red-50/40" },
+  timeout: { dot: "bg-yellow-400", row: "bg-yellow-50/40" },
 };
 
-const STATUS_DOT: Record<string, string> = {
-  success: "bg-green-400",
-  error:   "bg-red-500",
-  timeout: "bg-yellow-400",
-};
-
-export function SpanTimeline({
-  spans,
-}: {
-  spans: SpanResponse[];
-  totalMs: number;
-}) {
+export function SpanTimeline({ spans }: { spans: SpanResponse[]; totalMs: number }) {
   if (spans.length === 0) return null;
 
-  const parentMap: Record<string, string | null> = Object.fromEntries(
-    spans.map((s) => [s.span_id, s.parent_span_id]),
-  );
+  const sorted = sortSpans(spans);
+  const parentMap = Object.fromEntries(sorted.map((s) => [s.span_id, s.parent_span_id ?? null]));
   const depthCache: Record<string, number> = {};
 
   return (
-    <div className="divide-y divide-gray-100">
-      {spans.map((span, idx) => {
-        const depth = getDepth(span.span_id, parentMap, depthCache);
-        const isChild = depth > 0;
-        const borderCls = STATUS_BORDER[span.status] ?? "border-gray-300";
-        const dotCls = STATUS_DOT[span.status] ?? "bg-gray-400";
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-gray-200 text-xs text-gray-400 font-medium uppercase tracking-wide">
+            <th className="px-4 py-2 text-left w-8">#</th>
+            <th className="px-4 py-2 text-left">Step</th>
+            <th className="px-4 py-2 text-left">Agent</th>
+            <th className="px-4 py-2 text-left">Model</th>
+            <th className="px-4 py-2 text-right">Duration</th>
+            <th className="px-4 py-2 text-right">Tokens in / out</th>
+            <th className="px-4 py-2 text-right">Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sorted.map((span, idx) => {
+            const depth = getDepth(span.span_id, parentMap, depthCache);
+            const { dot, row } = STATUS_COLOURS[span.status] ?? { dot: "bg-gray-400", row: "" };
+            const hasTokens = span.input_tokens > 0 || span.output_tokens > 0;
 
-        return (
-          <div
-            key={span.span_id}
-            className={`flex items-start gap-3 py-3 ${isChild ? "bg-gray-50/60" : ""}`}
-            style={{ paddingLeft: 20 + depth * 24 }}
-          >
-            {/* Step number */}
-            <span className="text-xs text-gray-300 font-mono w-5 shrink-0 pt-0.5 text-right">
-              {idx + 1}
-            </span>
+            return (
+              <>
+                <tr
+                  key={span.span_id}
+                  className={`border-b border-gray-100 hover:bg-gray-50 ${row}`}
+                >
+                  <td className="px-4 py-2.5 text-xs text-gray-300 font-mono">{idx + 1}</td>
 
-            {/* Status bar + content */}
-            <div className={`flex-1 border-l-2 pl-3 ${borderCls}`}>
-              <div className="flex items-center gap-2 flex-wrap">
-                {/* Status dot */}
-                <span className={`inline-block w-2 h-2 rounded-full shrink-0 ${dotCls}`} />
+                  {/* Step name — indented by depth */}
+                  <td className="px-4 py-2.5">
+                    <div className="flex items-center gap-2" style={{ paddingLeft: depth * 20 }}>
+                      {depth > 0 && <span className="text-gray-300 text-xs">↳</span>}
+                      <span className={`w-2 h-2 rounded-full shrink-0 ${dot}`} />
+                      <span className="font-medium text-gray-900">{span.action}</span>
+                    </div>
+                    {span.error_msg && (
+                      <p className="text-xs text-red-500 mt-0.5 pl-6" style={{ paddingLeft: depth * 20 + 24 }}>
+                        {span.error_msg}
+                      </p>
+                    )}
+                  </td>
 
-                {/* Action (primary) */}
-                <span className="text-sm font-semibold text-gray-900">{span.action}</span>
+                  <td className="px-4 py-2.5 text-gray-500 text-xs">{span.agent_name}</td>
 
-                {/* Agent name */}
-                <span className="text-xs text-gray-400">{span.agent_name}</span>
+                  <td className="px-4 py-2.5">
+                    {span.model ? (
+                      <span className="text-xs font-mono px-1.5 py-0.5 rounded bg-purple-50 text-purple-600">
+                        {span.model}
+                      </span>
+                    ) : (
+                      <span className="text-gray-300">—</span>
+                    )}
+                  </td>
 
-                {/* Model pill */}
-                {span.model && (
-                  <span className="text-xs px-1.5 py-0.5 rounded bg-purple-50 text-purple-600 font-mono">
-                    {span.model}
-                  </span>
-                )}
-              </div>
+                  <td className="px-4 py-2.5 text-right text-gray-600 tabular-nums">
+                    {formatDuration(span.duration_ms)}
+                  </td>
 
-              {/* Metrics row */}
-              <div className="flex items-center gap-4 mt-1 text-xs text-gray-400">
-                <span>{formatDuration(span.duration_ms)}</span>
+                  <td className="px-4 py-2.5 text-right text-gray-500 tabular-nums text-xs">
+                    {hasTokens
+                      ? `${span.input_tokens.toLocaleString()} / ${span.output_tokens.toLocaleString()}`
+                      : <span className="text-gray-300">—</span>}
+                  </td>
 
-                {(span.input_tokens > 0 || span.output_tokens > 0) && (
-                  <span>
-                    {span.input_tokens.toLocaleString()} in /{" "}
-                    {span.output_tokens.toLocaleString()} out tokens
-                  </span>
-                )}
-
-                {span.cost_usd > 0 && (
-                  <span className="font-mono">{formatCost(span.cost_usd)}</span>
-                )}
-              </div>
-
-              {/* Error message */}
-              {span.error_msg && (
-                <p className="mt-1 text-xs text-red-600 bg-red-50 rounded px-2 py-1">
-                  {span.error_msg}
-                </p>
-              )}
-            </div>
-          </div>
-        );
-      })}
+                  <td className="px-4 py-2.5 text-right font-mono text-gray-600 text-xs">
+                    {span.cost_usd > 0 ? formatCost(span.cost_usd) : <span className="text-gray-300">—</span>}
+                  </td>
+                </tr>
+              </>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }
