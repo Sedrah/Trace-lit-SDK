@@ -210,6 +210,35 @@ class AlertRuleListResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Failure attribution
+# ---------------------------------------------------------------------------
+
+class RootCause(BaseModel):
+    span_id: str
+    agent_name: str
+    action: str
+    classification: str       # e.g. "llm_timeout", "tool_empty_result"
+    description: str          # plain-English sentence
+    cascaded_to: List[str]    # span_ids of spans that failed because of this
+
+
+class CascadeFailure(BaseModel):
+    span_id: str
+    agent_name: str
+    action: str
+    caused_by_span_id: str
+    caused_by_agent: str
+    caused_by_action: str
+
+
+class AttributionResponse(BaseModel):
+    trace_id: UUID
+    has_failures: bool
+    root_causes: List[RootCause]
+    cascades: List[CascadeFailure]
+
+
+# ---------------------------------------------------------------------------
 # Admin — API key management
 # ---------------------------------------------------------------------------
 

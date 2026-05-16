@@ -27,14 +27,15 @@ from .config import Config, _set_config, get_config
 from .context import get_current_trace_id
 from .decorators import trace
 from .emitter import _create_emitter, get_emitter, reset_emitter
+from .span import SpanHandle, trace_span
 
 # Registered once; subsequent configure() calls reuse the same handler because
 # get_emitter() always returns the current singleton at exit time.
 _atexit_registered = False
 
-__all__ = ["configure", "trace", "get_current_trace_id"]
+__all__ = ["configure", "trace", "trace_span", "SpanHandle", "get_current_trace_id"]
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 
 def configure(

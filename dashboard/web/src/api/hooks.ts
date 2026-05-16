@@ -43,6 +43,14 @@ export function useDag(traceId: string) {
   });
 }
 
+export function useAttribution(traceId: string, hasFailures: boolean) {
+  return useQuery({
+    queryKey: ["attribution", traceId],
+    queryFn: () => api.getAttribution(traceId),
+    enabled: Boolean(traceId) && hasFailures,
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Agents
 // ---------------------------------------------------------------------------
