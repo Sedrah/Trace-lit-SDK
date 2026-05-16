@@ -14,6 +14,7 @@ import type {
   ApiKeyCreateRequest,
   ApiKeyCreateResponse,
   ApiKeyListResponse,
+  AttributionResponse,
   CostResponse,
   DAGResponse,
   FailureListResponse,
@@ -74,6 +75,10 @@ export function getTrace(traceId: string): Promise<TraceDetailResponse> {
 
 export function getDag(traceId: string): Promise<DAGResponse> {
   return request(`/traces/${traceId}/dag`);
+}
+
+export function getAttribution(traceId: string): Promise<AttributionResponse> {
+  return request(`/traces/${traceId}/attribution`);
 }
 
 // ---------------------------------------------------------------------------

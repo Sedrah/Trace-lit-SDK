@@ -172,6 +172,32 @@ export interface AlertRuleRequest {
   webhook_url: string;
 }
 
+// Failure attribution
+export interface RootCause {
+  span_id: string;
+  agent_name: string;
+  action: string;
+  classification: string;
+  description: string;
+  cascaded_to: string[];
+}
+
+export interface CascadeFailure {
+  span_id: string;
+  agent_name: string;
+  action: string;
+  caused_by_span_id: string;
+  caused_by_agent: string;
+  caused_by_action: string;
+}
+
+export interface AttributionResponse {
+  trace_id: string;
+  has_failures: boolean;
+  root_causes: RootCause[];
+  cascades: CascadeFailure[];
+}
+
 // Admin — API key management
 export interface ApiKeyResponse {
   id: number;

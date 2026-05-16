@@ -8,13 +8,17 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
+from ..attribution import attribute_failures
 from ..auth import require_org
 from ..db import clickhouse as ch
 from ..models import (
+    AttributionResponse,
+    CascadeFailure,
     DAGEdge,
     DAGNode,
     DAGResponse,
     PageMeta,
+    RootCause,
     SpanResponse,
     TraceDetailResponse,
     TraceListResponse,
@@ -112,3 +116,22 @@ async def get_dag(
     ]
 
     return DAGResponse(trace_id=trace_id, nodes=nodes, edges=edges)
+
+
+@router.get("/{trace_id}/attribution", response_model=AttributionResponse)
+async def get_attribution(
+    trace_id: UUID,
+    request: Request,
+    org_id: str = Depends(require_org),
+) -> AttributionResponse:
+    spans = await ch.get_spans(request, org_id, trace_id)
+    if not spans:
+        raise HTTPException(status_code=404, detail="Trace not found.")
+
+    result = attribute_failures(spans)
+    return AttributionResponse(
+        trace_id=trace_id,
+        has_failures=result["has_failures"],
+        root_causes=[RootCause(**r) for r in result["root_causes"]],
+        cascades=[CascadeFailure(**c) for c in result["cascades"]],
+    )
