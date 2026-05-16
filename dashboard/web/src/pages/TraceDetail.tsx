@@ -152,9 +152,9 @@ export default function TraceDetail() {
         {trace.spans && trace.spans.length > 0 && (
           <div className="bg-white rounded-lg border border-gray-200">
             <div className="px-5 py-3 border-b border-gray-100">
-              <h2 className="text-sm font-semibold text-gray-700">Step Timeline</h2>
+              <h2 className="text-sm font-semibold text-gray-700">Steps</h2>
               <p className="text-xs text-gray-400 mt-0.5">
-                Each row is one step. Width = time spent. Cost shown where available.
+                Every step in order — duration, tokens, and cost where available.
               </p>
             </div>
             <div className="p-5">
