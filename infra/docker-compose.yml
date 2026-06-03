@@ -145,6 +145,9 @@ services:
         condition: service_healthy
       timescaledb:
         condition: service_healthy
+    ports:
+      - "4317:4317"   # OTLP/gRPC  (reserved — not yet active)
+      - "4318:4318"   # OTLP/HTTP  (active)
     env_file: ../.env
     environment:
       TRACELIT_KAFKA_BROKERS: kafka:9092
@@ -152,7 +155,7 @@ services:
       TRACELIT_TIMESCALE_DSN: postgresql://${POSTGRES_USER:-tracelit}:${POSTGRES_PASSWORD:-tracelit_pg_password}@timescaledb:5432/${POSTGRES_DB:-trace_lit}
     logging: *default-logging
     healthcheck:
-      test: ["CMD-SHELL", "pgrep -f 'pipeline.main' || exit 1"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:4318/health"]
       interval: 30s
       timeout: 10s
       retries: 3

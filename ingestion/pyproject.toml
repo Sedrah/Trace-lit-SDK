@@ -14,6 +14,16 @@ dependencies = [
     "psycopg2-binary>=2.9",
     "pydantic>=2.0",
     "eval_type_backport>=0.1.3; python_version < '3.10'",
+    # OTLP/HTTP receiver
+    "fastapi>=0.111",
+    "uvicorn>=0.29",
+]
+
+[project.optional-dependencies]
+# Protobuf support for OTLP/HTTP binary encoding (most OTel SDKs default to this)
+otlp-proto = [
+    "opentelemetry-proto>=1.24",
+    "protobuf>=4.25",
 ]
 
 [tool.hatch.build.targets.wheel]
