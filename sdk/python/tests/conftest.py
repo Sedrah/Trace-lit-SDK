@@ -41,7 +41,7 @@ def capturing_emitter() -> Iterator[CapturingEmitter]:
 @pytest.fixture(autouse=True)
 def reset_config() -> Iterator[None]:
     """Reset SDK config to a deterministic test state before each test."""
-    amo.configure(backend="noop", disabled=False, sampling_rate=1.0)
+    trace_lit.configure(backend="noop", disabled=False, sampling_rate=1.0)
     yield
     # Leave state clean for the next test
-    amo.configure(backend="noop", disabled=False, sampling_rate=1.0)
+    trace_lit.configure(backend="noop", disabled=False, sampling_rate=1.0)

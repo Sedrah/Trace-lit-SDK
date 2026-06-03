@@ -18,7 +18,7 @@ from tests.conftest import CapturingEmitter
 # ---------------------------------------------------------------------------
 
 def test_trace_sync_success(capturing_emitter: CapturingEmitter) -> None:
-    @amo.trace
+    @trace_lit.trace
     def add(a: int, b: int) -> int:
         return a + b
 
@@ -32,7 +32,7 @@ def test_trace_sync_success(capturing_emitter: CapturingEmitter) -> None:
 
 
 def test_trace_sync_exception(capturing_emitter: CapturingEmitter) -> None:
-    @amo.trace
+    @trace_lit.trace
     def boom() -> None:
         raise ValueError("test error")
 
@@ -48,7 +48,7 @@ def test_trace_sync_exception(capturing_emitter: CapturingEmitter) -> None:
 
 
 def test_trace_with_labels(capturing_emitter: CapturingEmitter) -> None:
-    @amo.trace(agent_name="researcher", action="web_search", framework="raw")
+    @trace_lit.trace(agent_name="researcher", action="web_search", framework="raw")
     def search(query: str) -> list[str]:
         return [query]
 
@@ -64,7 +64,7 @@ def test_trace_with_labels(capturing_emitter: CapturingEmitter) -> None:
 
 @pytest.mark.asyncio
 async def test_trace_async_success(capturing_emitter: CapturingEmitter) -> None:
-    @amo.trace
+    @trace_lit.trace
     async def async_add(a: int, b: int) -> int:
         return a + b
 
@@ -76,7 +76,7 @@ async def test_trace_async_success(capturing_emitter: CapturingEmitter) -> None:
 
 @pytest.mark.asyncio
 async def test_trace_async_exception(capturing_emitter: CapturingEmitter) -> None:
-    @amo.trace
+    @trace_lit.trace
     async def async_boom() -> None:
         raise RuntimeError("async error")
 
@@ -94,11 +94,11 @@ async def test_trace_async_exception(capturing_emitter: CapturingEmitter) -> Non
 # ---------------------------------------------------------------------------
 
 def test_nested_spans_parent_child(capturing_emitter: CapturingEmitter) -> None:
-    @amo.trace(agent_name="outer", action="outer_action")
+    @trace_lit.trace(agent_name="outer", action="outer_action")
     def outer() -> None:
         inner()
 
-    @amo.trace(agent_name="inner", action="inner_action")
+    @trace_lit.trace(agent_name="inner", action="inner_action")
     def inner() -> None:
         pass
 
@@ -114,15 +114,15 @@ def test_nested_spans_parent_child(capturing_emitter: CapturingEmitter) -> None:
 
 
 def test_nested_spans_same_trace_id(capturing_emitter: CapturingEmitter) -> None:
-    @amo.trace
+    @trace_lit.trace
     def level1() -> None:
         level2()
 
-    @amo.trace
+    @trace_lit.trace
     def level2() -> None:
         level3()
 
-    @amo.trace
+    @trace_lit.trace
     def level3() -> None:
         pass
 
@@ -134,7 +134,7 @@ def test_nested_spans_same_trace_id(capturing_emitter: CapturingEmitter) -> None
 
 def test_context_restored_after_exception(capturing_emitter: CapturingEmitter) -> None:
     """Context vars must be restored even when the function raises."""
-    @amo.trace
+    @trace_lit.trace
     def failing() -> None:
         raise ValueError("fail")
 
@@ -156,7 +156,7 @@ def test_context_restored_after_exception(capturing_emitter: CapturingEmitter) -
 async def test_concurrent_tasks_isolated_trace_ids(capturing_emitter: CapturingEmitter) -> None:
     """Two concurrent asyncio tasks must not share trace IDs."""
 
-    @amo.trace
+    @trace_lit.trace
     async def task(name: str) -> str:
         await asyncio.sleep(0)  # yield to the event loop
         return name
@@ -174,10 +174,10 @@ async def test_concurrent_tasks_isolated_trace_ids(capturing_emitter: CapturingE
 # ---------------------------------------------------------------------------
 
 def test_disabled_emits_nothing(capturing_emitter: CapturingEmitter) -> None:
-    amo.configure(disabled=True)
+    trace_lit.configure(disabled=True)
     reset_emitter(capturing_emitter)
 
-    @amo.trace
+    @trace_lit.trace
     def noop() -> int:
         return 42
 
@@ -186,10 +186,10 @@ def test_disabled_emits_nothing(capturing_emitter: CapturingEmitter) -> None:
 
 
 def test_sampling_rate_zero_emits_nothing(capturing_emitter: CapturingEmitter) -> None:
-    amo.configure(sampling_rate=0.0)
+    trace_lit.configure(sampling_rate=0.0)
     reset_emitter(capturing_emitter)
 
-    @amo.trace
+    @trace_lit.trace
     def noop() -> int:
         return 99
 
@@ -201,10 +201,10 @@ def test_sampling_rate_zero_emits_nothing(capturing_emitter: CapturingEmitter) -
 
 
 def test_sampling_rate_full_emits_all(capturing_emitter: CapturingEmitter) -> None:
-    amo.configure(sampling_rate=1.0)
+    trace_lit.configure(sampling_rate=1.0)
     reset_emitter(capturing_emitter)
 
-    @amo.trace
+    @trace_lit.trace
     def noop() -> None:
         pass
 
@@ -219,7 +219,7 @@ def test_sampling_rate_full_emits_all(capturing_emitter: CapturingEmitter) -> No
 # ---------------------------------------------------------------------------
 
 def test_return_value_preserved(capturing_emitter: CapturingEmitter) -> None:
-    @amo.trace
+    @trace_lit.trace
     def compute() -> dict[str, int]:
         return {"answer": 42}
 
@@ -228,7 +228,7 @@ def test_return_value_preserved(capturing_emitter: CapturingEmitter) -> None:
 
 @pytest.mark.asyncio
 async def test_async_return_value_preserved(capturing_emitter: CapturingEmitter) -> None:
-    @amo.trace
+    @trace_lit.trace
     async def compute() -> list[int]:
         return [1, 2, 3]
 
