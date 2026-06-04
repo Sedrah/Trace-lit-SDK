@@ -1,17 +1,17 @@
 # examples/fake_agent.py
 #
-# Demonstrates two new features:
+# Demonstrates three features:
 #
-# 1. INTERNAL VISIBILITY — trace_span() shows individual LLM calls and tool
+# 1. AUTO-PATCHING — trace_lit.autopatch() intercepts every openai/anthropic
+#    call automatically. No manual set_tokens() needed.
+#
+# 2. INTERNAL VISIBILITY — trace_span() shows individual LLM calls and tool
 #    calls as child spans inside an agent function, with token counts.
 #
-# 2. FAILURE ATTRIBUTION — the server classifies root causes and cascades.
-#    Three failure scenarios are included:
-#      a) Tool empty result → cascades to downstream LLM call
-#      b) LLM timeout
-#      c) Rate limit
+# 3. FAILURE ATTRIBUTION — the server classifies root causes and cascades.
 
 import time
+from unittest.mock import MagicMock
 
 import trace_lit as amo
 from trace_lit import trace_span
@@ -20,6 +20,60 @@ amo.configure(
     kafka_brokers=["app.trace-lit.com:9093"],
     api_key="sk-demo-abc123",
 )
+
+
+# ---------------------------------------------------------------------------
+# AUTO-PATCHING DEMO
+#
+# autopatch() wraps the openai client so every LLM call emits a span with
+# model + tokens automatically. No trace_span, no set_tokens() — zero code.
+#
+# We mock the openai response here so no real API key is needed.
+# In production: remove the mock, add your real OPENAI_API_KEY.
+# ---------------------------------------------------------------------------
+
+def _fake_openai_response(prompt_tokens: int, completion_tokens: int) -> MagicMock:
+    r = MagicMock()
+    r.usage.prompt_tokens     = prompt_tokens
+    r.usage.completion_tokens = completion_tokens
+    r.choices[0].message.content = "Fake LLM response"
+    return r
+
+
+def demo_autopatch() -> None:
+    # Patch the openai client before autopatching so no real API call is made
+    import openai.resources.chat.completions.completions as _cc
+    _cc.Completions.create = lambda _, **kw: _fake_openai_response(
+        prompt_tokens=int(kw.get("max_tokens", 200) * 1.5),
+        completion_tokens=int(kw.get("max_tokens", 200)),
+    )
+
+    result = amo.autopatch()
+    print(f"  autopatch result: {result}")   # {"openai": True, "anthropic": False/True}
+
+    # From here: any call to client.chat.completions.create() is automatically traced.
+    # The span captures model name + tokens with zero extra code.
+    import openai
+    client = openai.OpenAI(api_key="sk-fake-key-for-demo-only")
+
+    @amo.trace(agent_name="autopatch-demo", framework="raw")
+    def run_pipeline(query: str) -> str:
+        # Call 1 — planning step
+        client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": f"Plan how to answer: {query}"}],
+            max_tokens=100,
+        )
+        # Call 2 — answer step, bigger model
+        client.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "user", "content": query}],
+            max_tokens=400,
+        )
+        return "done"
+
+    run_pipeline("What is the future of grid energy AI?")
+    print("  autopatch trace emitted — look for 'autopatch-demo' in dashboard")
 
 
 # ---------------------------------------------------------------------------
@@ -138,7 +192,13 @@ def failing_rate_limit_pipeline(entity: str) -> str:
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
+    # Auto-patching demo — tokens captured automatically, no set_tokens()
+    print("--- autopatch demo ---")
+    demo_autopatch()
+    time.sleep(0.5)
+
     # Happy-path traces — demonstrate internal visibility
+    print("--- internal visibility demo ---")
     for i in range(4):
         r = research_pipeline(f"AI agent use case {i + 1}")
         write_pipeline(r)
