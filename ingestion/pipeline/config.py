@@ -36,6 +36,9 @@ class PipelineConfig:
     api_keys_json: str = "{}"
     key_cache_ttl_s: float = 300.0
 
+    # OTLP/HTTP receiver port (4318 is the OTLP standard; 0 = disabled)
+    otlp_http_port: int = 4318
+
     @classmethod
     def from_env(cls) -> PipelineConfig:
         return cls(
@@ -59,4 +62,5 @@ class PipelineConfig:
             timescale_flush_interval_s=float(os.getenv("TRACELIT_TS_FLUSH_INTERVAL_S", "5.0")),
             api_keys_json=os.getenv("TRACELIT_API_KEYS", "{}"),
             key_cache_ttl_s=float(os.getenv("TRACELIT_KEY_CACHE_TTL_S", "300")),
+            otlp_http_port=int(os.getenv("TRACELIT_OTLP_HTTP_PORT", "4318")),
         )

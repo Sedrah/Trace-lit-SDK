@@ -10,8 +10,12 @@
 #   Then in separate terminals:
 #   cd sdk/python && uv run pytest -x           # SDK tests
 #   cd api        && TRACELIT_DEV=true uvicorn server.main:app --reload --port 8000
-#   cd ingestion  && python -m pipeline.main
+#   cd ingestion  && python -m pipeline.main     # OTLP/HTTP on :4318
 #   cd dashboard/web && npm run dev              # http://localhost:3000
+#
+# OTel SDK config to point at local Trace-lit:
+#   OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
+#   OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer <your-api-key>"
 ##############################################################################
 
 name: trace-lit-dev
