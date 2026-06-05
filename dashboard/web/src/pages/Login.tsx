@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { saveApiKey } from "../api/client";
 
 export default function Login() {
@@ -80,7 +80,8 @@ export default function Login() {
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-6">
-          Contact your admin to get an API key.
+          Don't have an account?{" "}
+          <Link to="/signup" className="text-brand-600 hover:underline">Sign up</Link>
         </p>
       </div>
     </div>

@@ -8,6 +8,8 @@ import Costs from "./pages/Costs";
 import Failures from "./pages/Failures";
 import Login from "./pages/Login";
 import Overview from "./pages/Overview";
+import Signup from "./pages/Signup";
+import Verify from "./pages/Verify";
 import Settings from "./pages/Settings";
 import TraceDetail from "./pages/TraceDetail";
 import Traces from "./pages/Traces";
@@ -31,7 +33,9 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/login"  element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/verify" element={<Verify />} />
           <Route
             element={
               <RequireAuth>
