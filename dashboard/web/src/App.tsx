@@ -1,10 +1,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { hasApiKey } from "./api/client";
 import { Layout } from "./components/Layout";
 import Agents from "./pages/Agents";
 import Alerts from "./pages/Alerts";
 import Costs from "./pages/Costs";
 import Failures from "./pages/Failures";
+import Login from "./pages/Login";
 import Overview from "./pages/Overview";
 import Settings from "./pages/Settings";
 import TraceDetail from "./pages/TraceDetail";
@@ -20,12 +22,23 @@ const queryClient = new QueryClient({
   },
 });
 
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  return hasApiKey() ? <>{children}</> : <Navigate to="/login" replace />;
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
-          <Route element={<Layout />}>
+          <Route path="/login" element={<Login />} />
+          <Route
+            element={
+              <RequireAuth>
+                <Layout />
+              </RequireAuth>
+            }
+          >
             <Route path="/"                    element={<Overview />} />
             <Route path="/traces"              element={<Traces />} />
             <Route path="/traces/:traceId"     element={<TraceDetail />} />

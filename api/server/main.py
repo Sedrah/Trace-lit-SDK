@@ -21,7 +21,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .config import ApiConfig
-from .routes import admin, agents, alerts, costs, failures, traces
+from .routes import admin, agents, alerts, auth, costs, failures, traces
 
 logger = logging.getLogger("trace_lit.api")
 
@@ -94,6 +94,7 @@ def create_app(config: ApiConfig | None = None) -> FastAPI:
     # ---------------------------------------------------------------------------
 
     prefix = "/api/v1"
+    app.include_router(auth.router,     prefix=prefix)
     app.include_router(traces.router,   prefix=prefix)
     app.include_router(agents.router,   prefix=prefix)
     app.include_router(costs.router,    prefix=prefix)
