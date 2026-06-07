@@ -194,7 +194,7 @@ async def verify(token: str, request: Request) -> dict:
     session_token = secrets.token_urlsafe(32)
     token_hash    = _hash(session_token)
     await pool.execute(
-        "INSERT INTO sessions (user_id, org_id, token_hash) VALUES ($1, $2, $3)",
+        "INSERT INTO sessions (user_id, org_id, token_hash, expires_at) VALUES ($1, $2, $3, NOW() + INTERVAL '90 days')",
         user_id, org_id, token_hash,
     )
 

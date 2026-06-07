@@ -208,3 +208,22 @@ export function clearAdminKey(): void {
 export function getStoredAdminKey(): string {
   return localStorage.getItem("trace_lit_admin_key") ?? "";
 }
+
+// ---------------------------------------------------------------------------
+// Settings — user's own SDK key management (session-authenticated)
+// ---------------------------------------------------------------------------
+
+export type SettingsKeyResponse = { id: number; org_id: string; name: string; created_at: string };
+export type CreateSettingsKeyResponse = SettingsKeyResponse & { api_key: string };
+
+export function listSettingsKeys(): Promise<{ items: SettingsKeyResponse[] }> {
+  return request("/settings/keys");
+}
+
+export function createSettingsKey(name: string): Promise<CreateSettingsKeyResponse> {
+  return request("/settings/keys", { method: "POST", body: JSON.stringify({ name }) });
+}
+
+export function deleteSettingsKey(id: number): Promise<void> {
+  return request(`/settings/keys/${id}`, { method: "DELETE" });
+}

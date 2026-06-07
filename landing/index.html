@@ -128,12 +128,12 @@ body{cursor:auto}
 <section class="hero">
   <div class="hero-glow"></div>
   <div class="hero-glow2"></div>
-  <div class="badge"><span class="badge-dot"></span>OPEN BETA</div>
+  <div class="badge"><span class="badge-dot"></span>OPEN BETA · SDK v0.1.4</div>
   <h1>Visibility into your<br><em>AI agents</em></h1>
-  <p class="hero-sub">Trace every hop, attribute every dollar, classify every failure — across any agent framework, in production.</p>
+  <p class="hero-sub">Trace every hop, attribute every failure, monitor every dollar — across any agent framework. Fully air-gapped.</p>
   <div class="hero-cta">
-    <a href="https://www.linkedin.com/in/sedra-abdlbaset/" target="_blank" class="btn-main">
-      Get early access
+    <a href="https://app.trace-lit.com" class="btn-main">
+      Start for free
       <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 7h10M7 2l5 5-5 5"/></svg>
     </a>
   </div>
@@ -147,19 +147,21 @@ body{cursor:auto}
       <div class="tdot" style="background:#22c55e"></div>
     </div>
     <div class="term-body">
-      <div><span class="tc"># install</span></div>
-      <div><span class="tw">pip install "tracelit-sdk[kafka]"</span></div>
+      <div><span class="tc"># Option 1 — Python SDK (any agent)</span></div>
+      <div><span class="tw">pip install tracelit-sdk</span></div>
       <br>
-      <div><span class="tc"># instrument any agent — one line</span></div>
       <div><span class="tp">import</span> <span class="tw">trace_lit</span></div>
+      <div><span class="tw">trace_lit.configure(api_key=<span class="ta">"sk-..."</span>)</span></div>
+      <div><span class="tw">trace_lit.autopatch()  </span><span class="tc"># wraps openai/anthropic automatically</span></div>
       <br>
-      <div><span class="tw">trace_lit.configure(kafka_brokers=[<span class="ta">"app.trace-lit.com:9093"</span>], api_key=<span class="ta">"sk-demo-abc123"</span>)</span></div>
+      <div><span class="tg">@trace_lit.trace</span><span class="tw">(agent_name=<span class="ta">"my-agent"</span>)</span></div>
+      <div><span class="tp">def</span> <span class="tg">run</span><span class="tw">(query: str) -> str: ...</span></div>
       <br>
-      <div><span class="tg">@trace_lit.trace</span><span class="tw">(agent_name=<span class="ta">"my-agent"</span>, framework=<span class="ta">"langchain"</span>)</span></div>
-      <div><span class="tp">def</span> <span class="tg">run</span><span class="tw">(query: str) -> str:</span></div>
-      <div><span class="tw">    ...</span></div>
+      <div><span class="tc"># Option 2 — OpenTelemetry (LangGraph, CrewAI, zero code change)</span></div>
+      <div><span class="tw">OTEL_EXPORTER_OTLP_ENDPOINT=https://app.trace-lit.com/otlp</span></div>
+      <div><span class="tw">OTEL_EXPORTER_OTLP_HEADERS=<span class="ta">"Authorization=Bearer sk-..."</span></span></div>
       <br>
-      <div><span class="tg">✓</span> <span class="tw">trace sent</span> <span class="tc">latency=1.4s cost=$0.004 tokens=1203 status=success</span></div>
+      <div><span class="tg">✓</span> <span class="tw">trace received</span> <span class="tc">cost=$0.004 tokens=1203 status=success</span></div>
     </div>
   </div>
 </section>
@@ -176,12 +178,12 @@ body{cursor:auto}
 <section class="features-section">
   <div class="section-eyebrow">WHAT YOU GET</div>
   <div class="features-grid">
-    <div class="feat"><div class="feat-mark"></div><h3>Visual DAG traces</h3><p>See every agent hop, tool call, and LLM invocation as an interactive graph. Click any node to inspect inputs, outputs, and timing.</p></div>
-    <div class="feat"><div class="feat-mark"></div><h3>Cost attribution</h3><p>Track token spend per agent, per workflow, per team. Know exactly which pipeline is burning your budget before your CFO asks.</p></div>
-    <div class="feat"><div class="feat-mark"></div><h3>Failure classification</h3><p>Automatically classify failures as hallucination, tool error, timeout, or context overflow — with instant alerts.</p></div>
-    <div class="feat"><div class="feat-mark"></div><h3>Continuous evals</h3><p>Run quality scoring on every production trace — not just in test. Catch regressions before users do.</p></div>
-    <div class="feat"><div class="feat-mark"></div><h3>Framework-agnostic</h3><p>Works with LangChain, LlamaIndex, CrewAI, AutoGen, or any custom agent. No lock-in, ever.</p></div>
-    <div class="feat"><div class="feat-mark"></div><h3>Self-host ready</h3><p>Single <code style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent2)">docker compose up</code>. Deploy on your own infrastructure for full data control and compliance.</p></div>
+    <div class="feat"><div class="feat-mark"></div><h3>OTel native</h3><p>Point any OpenTelemetry-instrumented agent at Trace-lit with two env vars. LangGraph, CrewAI, and custom pipelines — zero code change.</p></div>
+    <div class="feat"><div class="feat-mark"></div><h3>Failure attribution</h3><p>Automatically identifies the root cause of every failure and which downstream steps cascaded from it — no external LLM, fully air-gapped.</p></div>
+    <div class="feat"><div class="feat-mark"></div><h3>Cost attribution</h3><p>Token spend and USD cost per agent, per run, per model. Broken down in the dashboard — no spreadsheets, no guessing.</p></div>
+    <div class="feat"><div class="feat-mark"></div><h3>Visual DAG</h3><p>Every agent run rendered as an execution graph. Green = success, red = root cause, orange = cascade. Readable without reading code.</p></div>
+    <div class="feat"><div class="feat-mark"></div><h3>LLM auto-patching</h3><p>One call to <code style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent2)">autopatch()</code> and every OpenAI or Anthropic call is traced automatically — model, tokens, cost, errors.</p></div>
+    <div class="feat"><div class="feat-mark"></div><h3>Fully air-gapped</h3><p>Single <code style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent2)">docker compose up</code>. No data leaves your infrastructure. Built for regulated industries from day one.</p></div>
   </div>
 </section>
 
@@ -191,19 +193,23 @@ body{cursor:auto}
     <div class="pill">LangChain</div>
     <div class="pill">LangGraph</div>
     <div class="pill">CrewAI</div>
-    <div class="pill">AutoGen</div>
-    <div class="pill">LlamaIndex</div>
-    <div class="pill">Haystack</div>
+    <div class="pill">OpenAI SDK</div>
+    <div class="pill">Anthropic SDK</div>
+    <div class="pill">Ollama</div>
+    <div class="pill">vLLM</div>
+    <div class="pill">Any OTel SDK</div>
     <div class="pill">Custom Python</div>
-    <div class="pill">Node.js</div>
   </div>
 </section>
 
 <section class="cta-section">
   <div class="cta-glow"></div>
   <h2>Ready to see inside<br>your agents?</h2>
-  <p>Join the early access program — built for teams shipping agents in production.</p>
-  <a href="https://www.linkedin.com/in/sedra-abdlbaset/" target="_blank" class="btn-main">Connect on LinkedIn →</a>
+  <p>Sign up free — no credit card, no setup fees, self-hosted in minutes.</p>
+  <a href="https://app.trace-lit.com/signup" class="btn-main">
+    Get started free
+    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 7h10M7 2l5 5-5 5"/></svg>
+  </a>
 </section>
 
 <footer>

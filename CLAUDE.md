@@ -168,13 +168,54 @@ cd sdk/python && pip install -e ".[dev]" && pytest -v
 
 ---
 
+## What's been built (as of 2026-06-07)
+
+### SDK (v0.1.4)
+- `@trace` decorator and `trace_span` context manager for manual instrumentation
+- `autopatch()` — monkey-patches openai/anthropic clients to auto-capture model, tokens, cost
+- `SpanHandle.set_tokens()`, `set_cost()`, `set_metadata()`
+- Agent name propagated via ContextVar — inner spans inherit automatically
+- LangChain, LangGraph, CrewAI framework wrappers
+
+### Ingestion
+- Kafka consumer pipeline (raw → normalize → ClickHouse + TimescaleDB)
+- OTLP/HTTP receiver on port 4318 — accepts OpenTelemetry spans directly
+  - Supports Gen AI conventions (`gen_ai.*`) and OpenInference (`llm.*`)
+  - Framework auto-detected from instrumentation scope name
+  - Auth: `Authorization: Bearer <api-key>` or `X-Tracelit-Api-Key`
+  - Accessible via nginx at `/otlp/v1/traces`
+
+### API
+- Full REST API: traces, spans, agents, costs, failures, alerts, DAG
+- Failure attribution endpoint: `GET /traces/{id}/attribution`
+- Auth: `X-Tracelit-Api-Key` (SDK) OR `X-Tracelit-Session` (dashboard)
+- Magic-link auth: `POST /auth/magic`, `GET /auth/verify`, `POST /auth/logout`
+- Settings: `GET/POST/DELETE /settings/keys` (session-authenticated SDK key management)
+- Multi-tenant: every query scoped by `org_id`; session takes priority over keyless
+
+### Dashboard
+- Magic-link sign-in (email only, 90-day sessions)
+- Route guard: unauthenticated → `/login`
+- Settings page: account info + create/revoke SDK API keys
+- Failure attribution panel + DAG blast radius (root cause ⚡, cascade ↩)
+- Step table with topological sort (parent before children)
+- OTel traces appear alongside SDK traces seamlessly
+
+### Infrastructure
+- `make deploy` on server: `git pull` + docker compose rebuild
+- TimescaleDB migrations: 001–006 (run manually on `docker exec psql`)
+- Email: Resend API (set `TRACELIT_RESEND_API_KEY`) or SMTP or stdout fallback
+
+---
+
 ## Known Constraints
 
 - `crewai` and `langgraph` have a hard pip version conflict — cannot be installed together. Use `[all-langchain]` or `[all-crewai]` extras, never `[all]`.
-- `@trace` `model=` parameter exists but token counts must be set manually (or via framework wrappers) — plain Python functions emit 0 tokens and $0.00 cost.
+- `@trace` `model=` parameter exists but token counts must be set manually (or via framework wrappers) — plain Python functions emit 0 tokens and $0.00 cost. Use `autopatch()` for openai/anthropic.
 - ClickHouse 24.x rejects aggregate expressions inside other expressions in SELECT. Derive computed fields (e.g. `status`) in Python from raw aggregates (`error_spans`).
 - `trace_summary` materialized view was removed due to ClickHouse 24.x ILLEGAL_AGGREGATION errors. The API queries `spans` directly with GROUP BY.
 - Minimum Python: 3.9 (not 3.11 as originally planned — macOS system Python constraint).
+- `TRACELIT_ALLOW_KEYLESS=true` bypasses API key checks but NOT session checks — signed-in users always see their own org's data.
 
 ---
 
