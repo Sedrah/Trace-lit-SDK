@@ -70,10 +70,7 @@ async def require_org(
     session:  Optional[str] = Security(_SESSION_HEADER),
     request:  Request       = None,  # type: ignore[assignment]
 ) -> str:
-    if _allow_keyless():
-        return "default"
-
-    # Dashboard session takes priority
+    # Dashboard session always takes priority — must check before keyless fallback
     if session:
         org_id = await _lookup_session_org(session, request)
         if org_id:
@@ -91,5 +88,9 @@ async def require_org(
             ttl_s = getattr(getattr(request.app.state, "config", None), "key_cache_ttl_s", 300)
             _cache[key_hash] = (org_id, now + ttl_s)
             return org_id
+
+    # Keyless fallback — SDK/pipeline use only, no session present
+    if _allow_keyless():
+        return "default"
 
     raise HTTPException(status_code=401, detail="Not authenticated.")
