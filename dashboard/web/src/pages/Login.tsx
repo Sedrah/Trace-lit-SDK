@@ -1,32 +1,33 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { saveApiKey } from "../api/client";
+import { Link } from "react-router-dom";
 
 export default function Login() {
-  const [key, setKey]       = useState("");
-  const [error, setError]   = useState("");
+  const [email, setEmail]     = useState("");
+  const [sent, setSent]       = useState(false);
+  const [error, setError]     = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!key.trim()) return;
+    if (!email.trim()) return;
 
     setLoading(true);
     setError("");
 
     try {
-      const res = await fetch("/api/v1/auth/me", {
-        headers: { "X-Tracelit-Api-Key": key.trim() },
+      const res = await fetch("/api/v1/auth/magic", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim() }),
       });
 
+      const data = await res.json();
       if (!res.ok) {
-        setError("Invalid API key. Please check and try again.");
+        setError(data.detail ?? "Something went wrong. Please try again.");
         return;
       }
 
-      saveApiKey(key.trim());
-      navigate("/", { replace: true });
+      setSent(true);
     } catch {
       setError("Could not reach the server. Please try again.");
     } finally {
@@ -37,51 +38,71 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
-        {/* Logo */}
         <div className="text-center mb-8">
           <span className="font-bold text-brand-600 text-2xl tracking-tight">Tracelit</span>
           <p className="text-sm text-gray-500 mt-1">Agent Monitoring & Observability</p>
         </div>
 
-        {/* Card */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
-          <h1 className="text-base font-semibold text-gray-900 mb-1">Sign in</h1>
-          <p className="text-sm text-gray-500 mb-6">Enter your API key to access the dashboard.</p>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1.5">
-                API Key
-              </label>
-              <input
-                type="password"
-                value={key}
-                onChange={e => setKey(e.target.value)}
-                placeholder="sk-…"
-                autoFocus
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent font-mono"
-              />
-            </div>
-
-            {error && (
-              <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
-                {error}
+          {sent ? (
+            <div className="text-center">
+              <div className="text-3xl mb-3">📬</div>
+              <h1 className="text-base font-semibold text-gray-900 mb-2">Check your email</h1>
+              <p className="text-sm text-gray-500">
+                We sent a sign-in link to{" "}
+                <span className="font-medium text-gray-700">{email}</span>.
               </p>
-            )}
+              <p className="text-xs text-gray-400 mt-3">Link expires in 15 minutes.</p>
+              <button
+                onClick={() => setSent(false)}
+                className="mt-4 text-xs text-brand-600 hover:underline"
+              >
+                Use a different email
+              </button>
+            </div>
+          ) : (
+            <>
+              <h1 className="text-base font-semibold text-gray-900 mb-1">Sign in</h1>
+              <p className="text-sm text-gray-500 mb-6">
+                Enter your email — we'll send you a sign-in link.
+              </p>
 
-            <button
-              type="submit"
-              disabled={loading || !key.trim()}
-              className="w-full py-2 px-4 bg-brand-600 text-white text-sm font-medium rounded-md hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {loading ? "Verifying…" : "Sign in"}
-            </button>
-          </form>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1.5">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder="you@company.com"
+                    autoFocus
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                  />
+                </div>
+
+                {error && (
+                  <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
+                    {error}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading || !email.trim()}
+                  className="w-full py-2 px-4 bg-brand-600 text-white text-sm font-medium rounded-md hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {loading ? "Sending…" : "Continue with email"}
+                </button>
+              </form>
+            </>
+          )}
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-6">
-          Don't have an account?{" "}
-          <Link to="/signup" className="text-brand-600 hover:underline">Sign up</Link>
+          New here?{" "}
+          <Link to="/signup" className="text-brand-600 hover:underline">Create an account</Link>
         </p>
       </div>
     </div>

@@ -24,20 +24,44 @@ import type {
 
 const BASE = "/api/v1";
 
+// Session token — set after magic-link verification, used for all dashboard requests
+export function getSessionToken(): string {
+  return localStorage.getItem("trace_lit_session") ?? "";
+}
+export function saveSessionToken(token: string): void {
+  localStorage.setItem("trace_lit_session", token);
+}
+export function clearSessionToken(): void {
+  localStorage.removeItem("trace_lit_session");
+}
+export function hasSession(): boolean {
+  return Boolean(localStorage.getItem("trace_lit_session"));
+}
+
+// Legacy API key helpers kept for SDK key display in Settings
 export function getApiKey(): string {
   return localStorage.getItem("trace_lit_api_key") ?? "";
+}
+export function saveApiKey(key: string): void {
+  localStorage.setItem("trace_lit_api_key", key);
+}
+export function clearApiKey(): void {
+  localStorage.removeItem("trace_lit_api_key");
+}
+export function hasApiKey(): boolean {
+  return Boolean(localStorage.getItem("trace_lit_api_key"));
 }
 
 async function request<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
-  const key = getApiKey();
+  const session = getSessionToken();
   const res = await fetch(`${BASE}${path}`, {
     ...options,
     headers: {
       "Content-Type": "application/json",
-      ...(key ? { "X-Tracelit-Api-Key": key } : {}),
+      ...(session ? { "X-Tracelit-Session": session } : {}),
       ...(options.headers ?? {}),
     },
   });
@@ -132,21 +156,6 @@ export function deleteAlert(id: number): Promise<void> {
   return request(`/alerts/${id}`, { method: "DELETE" });
 }
 
-// ---------------------------------------------------------------------------
-// API key helpers (used by Settings / ApiKeyGate)
-// ---------------------------------------------------------------------------
-
-export function saveApiKey(key: string): void {
-  localStorage.setItem("trace_lit_api_key", key);
-}
-
-export function clearApiKey(): void {
-  localStorage.removeItem("trace_lit_api_key");
-}
-
-export function hasApiKey(): boolean {
-  return Boolean(localStorage.getItem("trace_lit_api_key"));
-}
 
 // ---------------------------------------------------------------------------
 // Admin — API key management

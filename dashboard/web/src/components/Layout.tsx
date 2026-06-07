@@ -1,6 +1,6 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { clearApiKey, getApiKey } from "../api/client";
 import { useQuery } from "@tanstack/react-query";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { clearSessionToken, getSessionToken } from "../api/client";
 
 const NAV = [
   { to: "/",          label: "Overview",  icon: "⬡" },
@@ -12,16 +12,15 @@ const NAV = [
   { to: "/settings",  label: "Settings",  icon: "⚙" },
 ];
 
-function useOrgId() {
+function useMe() {
   return useQuery({
     queryKey: ["auth-me"],
     queryFn: async () => {
       const res = await fetch("/api/v1/auth/me", {
-        headers: { "X-Tracelit-Api-Key": getApiKey() },
+        headers: { "X-Tracelit-Session": getSessionToken() },
       });
       if (!res.ok) return null;
-      const data = await res.json();
-      return data.org_id as string;
+      return res.json() as Promise<{ org_id: string; email: string }>;
     },
     staleTime: Infinity,
     retry: false,
@@ -30,16 +29,22 @@ function useOrgId() {
 
 export function Layout() {
   const navigate = useNavigate();
-  const { data: orgId } = useOrgId();
+  const { data: me } = useMe();
 
-  function signOut() {
-    clearApiKey();
+  async function signOut() {
+    const token = getSessionToken();
+    if (token) {
+      await fetch("/api/v1/auth/logout", {
+        method: "POST",
+        headers: { "X-Tracelit-Session": token },
+      }).catch(() => {});
+    }
+    clearSessionToken();
     navigate("/login", { replace: true });
   }
 
   return (
     <div className="flex h-screen bg-gray-50 text-gray-900">
-      {/* Sidebar */}
       <aside className="w-56 shrink-0 bg-white border-r border-gray-200 flex flex-col">
         <div className="px-5 py-4 border-b border-gray-200">
           <span className="font-bold text-brand-600 text-lg tracking-tight">Tracelit</span>
@@ -66,12 +71,11 @@ export function Layout() {
           ))}
         </nav>
 
-        {/* Signed-in org + sign out */}
         <div className="px-4 py-3 border-t border-gray-200">
-          {orgId && (
+          {me && (
             <p className="text-xs text-gray-500 truncate mb-1.5">
               <span className="text-gray-400">Signed in as </span>
-              <span className="font-medium text-gray-700">{orgId}</span>
+              <span className="font-medium text-gray-700">{me.email ?? me.org_id}</span>
             </p>
           )}
           <button
@@ -83,7 +87,6 @@ export function Layout() {
         </div>
       </aside>
 
-      {/* Main content */}
       <main className="flex-1 overflow-auto">
         <Outlet />
       </main>

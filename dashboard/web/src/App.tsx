@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { hasApiKey } from "./api/client";
+import { hasSession } from "./api/client";
 import { Layout } from "./components/Layout";
 import Agents from "./pages/Agents";
 import Alerts from "./pages/Alerts";
@@ -25,7 +25,7 @@ const queryClient = new QueryClient({
 });
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
-  return hasApiKey() ? <>{children}</> : <Navigate to="/login" replace />;
+  return hasSession() ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
 export default function App() {
