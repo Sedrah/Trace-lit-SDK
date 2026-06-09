@@ -17,7 +17,6 @@ import logging
 import re
 import secrets
 import time
-from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Request, Security
@@ -110,27 +109,21 @@ async def magic(body: MagicRequest, request: Request) -> dict:
     pool  = request.app.state.pg_pool
     token = secrets.token_urlsafe(32)
 
-    # Upsert magic link (re-request cancels previous)
-    await pool.execute(
-        """
-        INSERT INTO magic_links (email, token, expires_at)
-        VALUES ($1, $2, NOW() + INTERVAL '15 minutes')
-        ON CONFLICT DO NOTHING
-        """,
-        email, token,
-    )
-    # If conflict (shouldn't happen with unique token), just generate a new one
-    existing = await pool.fetchval(
-        "SELECT token FROM magic_links WHERE email = $1 AND used_at IS NULL AND expires_at > NOW() ORDER BY id DESC LIMIT 1",
-        email,
-    )
-    if existing:
-        token = existing
-    else:
-        await pool.execute(
-            "INSERT INTO magic_links (email, token) VALUES ($1, $2)",
-            email, token,
-        )
+    # Invalidate all previous unused links for this email, then insert a fresh one.
+    # This ensures only the most recently requested link is ever valid.
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            await conn.execute(
+                "DELETE FROM magic_links WHERE email = $1 AND used_at IS NULL",
+                email,
+            )
+            await conn.execute(
+                """
+                INSERT INTO magic_links (email, token, expires_at)
+                VALUES ($1, $2, NOW() + INTERVAL '15 minutes')
+                """,
+                email, token,
+            )
 
     verify_url = f"{_base_url(request)}/verify?token={token}"
     send_verification_email(email, verify_url)
@@ -147,15 +140,14 @@ async def verify(token: str, request: Request) -> dict:
     pool = request.app.state.pg_pool
 
     row = await pool.fetchrow(
-        "SELECT email, used_at, expires_at FROM magic_links WHERE token = $1",
+        "SELECT email, used_at, (expires_at > NOW()) AS valid FROM magic_links WHERE token = $1",
         token,
     )
     if not row:
         raise HTTPException(status_code=404, detail="Invalid or expired link.")
     if row["used_at"]:
         raise HTTPException(status_code=410, detail="This link has already been used. Request a new one.")
-
-    if datetime.now(timezone.utc) > row["expires_at"].replace(tzinfo=timezone.utc):
+    if not row["valid"]:
         raise HTTPException(status_code=410, detail="Link expired. Request a new one.")
 
     email = row["email"]
