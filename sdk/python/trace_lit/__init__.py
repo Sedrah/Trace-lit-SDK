@@ -36,12 +36,25 @@ _atexit_registered = False
 
 __all__ = [
     "configure",
+    "get_stats",
     "trace", "trace_span", "SpanHandle",
     "autopatch", "patch_openai", "patch_anthropic",
     "get_current_trace_id",
 ]
 
 __version__ = "0.1.4"
+
+
+def get_stats() -> dict[str, Any]:
+    """Return current emitter stats: number of queued and dropped spans.
+
+    Use this to detect backpressure or data loss at runtime::
+
+        stats = trace_lit.get_stats()
+        # {"emitter": "KafkaEmitter", "queued": 0, "dropped": 0}
+    """
+    emitter = get_emitter()
+    return {"emitter": type(emitter).__name__, **emitter.get_stats()}
 
 
 def configure(
@@ -53,6 +66,7 @@ def configure(
     kafka_topic: str | None = None,
     batch_size: int | None = None,
     flush_interval_ms: int | None = None,
+    max_queue_size: int | None = None,
     sampling_rate: float | None = None,
     log_level: str | None = None,
     disabled: bool | None = None,
@@ -98,6 +112,8 @@ def configure(
         updates["batch_size"] = batch_size
     if flush_interval_ms is not None:
         updates["flush_interval_ms"] = flush_interval_ms
+    if max_queue_size is not None:
+        updates["max_queue_size"] = max_queue_size
     if sampling_rate is not None:
         updates["sampling_rate"] = sampling_rate
     if log_level is not None:
@@ -113,6 +129,7 @@ def configure(
         kafka_topic=updates.get("kafka_topic", current.kafka_topic),
         batch_size=updates.get("batch_size", current.batch_size),
         flush_interval_ms=updates.get("flush_interval_ms", current.flush_interval_ms),
+        max_queue_size=updates.get("max_queue_size", current.max_queue_size),
         sampling_rate=updates.get("sampling_rate", current.sampling_rate),
         log_level=updates.get("log_level", current.log_level),
         disabled=updates.get("disabled", current.disabled),

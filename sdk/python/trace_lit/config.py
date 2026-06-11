@@ -15,6 +15,7 @@ class Config:
     kafka_topic: str = "trace_lit.spans.raw"
     batch_size: int = 100
     flush_interval_ms: int = 500
+    max_queue_size: int = 10_000
     sampling_rate: float = 1.0
     log_level: str = "WARNING"
     disabled: bool = False
@@ -38,6 +39,7 @@ class Config:
             kafka_topic=os.getenv("TRACELIT_KAFKA_TOPIC", "trace_lit.spans.raw"),
             batch_size=int(os.getenv("TRACELIT_BATCH_SIZE", "100")),
             flush_interval_ms=int(os.getenv("TRACELIT_FLUSH_INTERVAL_MS", "500")),
+            max_queue_size=int(os.getenv("TRACELIT_MAX_QUEUE_SIZE", "10000")),
             sampling_rate=float(os.getenv("TRACELIT_SAMPLING_RATE", "1.0")),
             log_level=os.getenv("TRACELIT_LOG_LEVEL", "WARNING"),
             disabled=os.getenv("TRACELIT_DISABLED", "").lower() in ("1", "true", "yes"),
