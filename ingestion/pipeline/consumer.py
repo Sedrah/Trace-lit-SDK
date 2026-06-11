@@ -5,8 +5,8 @@ and produces normalized events to trace_lit.spans.normalized.
 Design decisions:
 - Manual offset commit: offset is committed ONLY after ClickHouse write succeeds.
   If the writer fails, the message is reprocessed on restart. No spans are silently lost.
-- Errors on a single message are logged and skipped (offset committed). A message
-  that can never be processed (e.g. invalid schema) should not block the pipeline.
+- Unprocessable messages (bad schema, persistent write failures) go to the dead letter
+  topic (trace_lit.spans.dead) rather than being dropped silently.
 - The worker runs on a single thread. To scale throughput, run multiple instances
   in the same consumer group — Kafka distributes partitions automatically.
 """
@@ -19,6 +19,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .config import PipelineConfig
+    from .dead_letter import DeadLetterProducer
     from .normalizer import Normalizer
     from .producer import NormalizedProducer
     from .writers.clickhouse import ClickHouseWriter
@@ -29,16 +30,18 @@ logger = logging.getLogger("trace_lit.pipeline")
 class IngestionWorker:
     def __init__(
         self,
-        config: PipelineConfig,
-        normalizer: Normalizer,
-        ch_writer: ClickHouseWriter,
-        producer: NormalizedProducer,
+        config: "PipelineConfig",
+        normalizer: "Normalizer",
+        ch_writer: "ClickHouseWriter",
+        producer: "NormalizedProducer",
+        dlq: "DeadLetterProducer",
     ) -> None:
-        self._config = config
+        self._config     = config
         self._normalizer = normalizer
-        self._ch_writer = ch_writer
-        self._producer = producer
-        self._running = False
+        self._ch_writer  = ch_writer
+        self._producer   = producer
+        self._dlq        = dlq
+        self._running    = False
         self._stop_event = threading.Event()
 
     def run(self) -> None:
@@ -88,7 +91,9 @@ class IngestionWorker:
 
             normalized = self._normalizer.normalize(payload, headers)
             if normalized is None:
-                # Invalid/rejected — commit offset so we don't reprocess
+                # Deliberately rejected (unknown format, missing required fields).
+                # Route to DLQ so the raw bytes are preserved for inspection.
+                self._dlq.send(msg, reason="rejected by normalizer — unknown format or missing fields")
                 consumer.commit(msg)  # type: ignore[attr-defined]
                 return
 
@@ -102,11 +107,9 @@ class IngestionWorker:
             consumer.commit(msg)  # type: ignore[attr-defined]
 
         except Exception as exc:
-            logger.error(
-                "AMO ingestion: unhandled error processing message — skipping: %s", exc
-            )
-            # Commit the offset so we don't spin on the same bad message forever.
-            # In production, route to a dead-letter topic here instead.
+            # Route to DLQ so the message isn't silently lost.
+            # Commit the offset after routing so we don't reprocess indefinitely.
+            self._dlq.send(msg, reason=str(exc))
             try:
                 consumer.commit(msg)  # type: ignore[attr-defined]
             except Exception:

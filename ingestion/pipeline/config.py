@@ -10,6 +10,7 @@ class PipelineConfig:
     kafka_brokers: list[str] = field(default_factory=lambda: ["localhost:9092"])
     raw_topic: str = "trace_lit.spans.raw"
     normalized_topic: str = "trace_lit.spans.normalized"
+    dead_letter_topic: str = "trace_lit.spans.dead"
     metrics_topic: str = "trace_lit.metrics"
     ingestion_group_id: str = "tracelit-ingestion"
     metrics_group_id: str = "tracelit-metrics"
@@ -45,6 +46,7 @@ class PipelineConfig:
             kafka_brokers=os.getenv("TRACELIT_KAFKA_BROKERS", "localhost:9092").split(","),
             raw_topic=os.getenv("TRACELIT_RAW_TOPIC", "trace_lit.spans.raw"),
             normalized_topic=os.getenv("TRACELIT_NORMALIZED_TOPIC", "trace_lit.spans.normalized"),
+            dead_letter_topic=os.getenv("TRACELIT_DEAD_LETTER_TOPIC", "trace_lit.spans.dead"),
             metrics_topic=os.getenv("TRACELIT_METRICS_TOPIC", "trace_lit.metrics"),
             ingestion_group_id=os.getenv("TRACELIT_INGESTION_GROUP_ID", "tracelit-ingestion"),
             metrics_group_id=os.getenv("TRACELIT_METRICS_GROUP_ID", "tracelit-metrics"),

@@ -28,6 +28,7 @@ import threading
 from .api_keys import ApiKeyResolver
 from .config import PipelineConfig
 from .consumer import IngestionWorker
+from .dead_letter import DeadLetterProducer
 from .metrics_worker import MetricsWorker
 from .normalizer import Normalizer
 from .otel.receiver import build_otlp_app
@@ -60,12 +61,13 @@ def main() -> None:
         cache_ttl_s=config.key_cache_ttl_s,
     )
     normalizer = Normalizer(resolver)
-    ch_writer = ClickHouseWriter(config)
-    ts_writer = TimescaleWriter(config)
-    producer = NormalizedProducer(config)
+    ch_writer  = ClickHouseWriter(config)
+    ts_writer  = TimescaleWriter(config)
+    producer   = NormalizedProducer(config)
+    dlq        = DeadLetterProducer(config)
 
     # Build Kafka workers
-    ingestion_worker = IngestionWorker(config, normalizer, ch_writer, producer)
+    ingestion_worker = IngestionWorker(config, normalizer, ch_writer, producer, dlq)
     metrics_worker = MetricsWorker(config, ts_writer)
 
     stop_event = threading.Event()
@@ -123,6 +125,7 @@ def main() -> None:
     ch_writer.close()
     ts_writer.close()
     producer.flush()
+    dlq.flush()
     resolver.close()
 
     logger.info("AMO pipeline shutdown complete. Stats: %s", normalizer.stats)
