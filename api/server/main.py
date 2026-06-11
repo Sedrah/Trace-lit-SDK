@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import logging
 import os
+from contextlib import asynccontextmanager
+from typing import AsyncIterator
 
 import asyncpg
 import clickhouse_connect
@@ -21,9 +23,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .config import ApiConfig
-from .routes import admin, agents, alerts, auth, costs, failures, settings, traces
+from .routes import admin, agents, alerts, auth, costs, failures, health, settings, traces
 
 logger = logging.getLogger("trace_lit.api")
+
 
 # ---------------------------------------------------------------------------
 # App factory
@@ -32,6 +35,24 @@ logger = logging.getLogger("trace_lit.api")
 def create_app(config: ApiConfig | None = None) -> FastAPI:
     cfg = config or ApiConfig.from_env()
 
+    @asynccontextmanager
+    async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+        logger.info("AMO API starting up")
+        _app.state.ch_client = clickhouse_connect.get_client(
+            host=cfg.clickhouse_host,
+            port=cfg.clickhouse_port,
+            database=cfg.clickhouse_database,
+            username=cfg.clickhouse_user,
+            password=cfg.clickhouse_password,
+        )
+        _app.state.pg_pool = await asyncpg.create_pool(
+            cfg.timescale_dsn, min_size=2, max_size=10
+        )
+        logger.info("AMO API ready")
+        yield
+        await _app.state.pg_pool.close()
+        logger.info("AMO API shutdown complete")
+
     app = FastAPI(
         title="AMO — Agent Monitoring & Observability",
         version="0.1.0",
@@ -39,6 +60,7 @@ def create_app(config: ApiConfig | None = None) -> FastAPI:
         docs_url="/api/docs",
         redoc_url="/api/redoc",
         openapi_url="/api/openapi.json",
+        lifespan=lifespan,
     )
 
     app.state.config = cfg
@@ -52,30 +74,6 @@ def create_app(config: ApiConfig | None = None) -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
-    # ---------------------------------------------------------------------------
-    # Lifecycle: open DB connections on startup, close on shutdown
-    # ---------------------------------------------------------------------------
-
-    @app.on_event("startup")
-    async def startup() -> None:
-        logger.info("AMO API starting up")
-        app.state.ch_client = clickhouse_connect.get_client(
-            host=cfg.clickhouse_host,
-            port=cfg.clickhouse_port,
-            database=cfg.clickhouse_database,
-            username=cfg.clickhouse_user,
-            password=cfg.clickhouse_password,
-        )
-        app.state.pg_pool = await asyncpg.create_pool(
-            cfg.timescale_dsn, min_size=2, max_size=10
-        )
-        logger.info("AMO API ready")
-
-    @app.on_event("shutdown")
-    async def shutdown() -> None:
-        await app.state.pg_pool.close()
-        logger.info("AMO API shutdown complete")
 
     # ---------------------------------------------------------------------------
     # Global error handler — never expose stack traces to callers
@@ -94,6 +92,7 @@ def create_app(config: ApiConfig | None = None) -> FastAPI:
     # ---------------------------------------------------------------------------
 
     prefix = "/api/v1"
+    app.include_router(health.router)           # /health and /health/deep (no prefix)
     app.include_router(auth.router,     prefix=prefix)
     app.include_router(traces.router,   prefix=prefix)
     app.include_router(agents.router,   prefix=prefix)
@@ -102,10 +101,6 @@ def create_app(config: ApiConfig | None = None) -> FastAPI:
     app.include_router(alerts.router,   prefix=prefix)
     app.include_router(settings.router, prefix=prefix)
     app.include_router(admin.router,    prefix=prefix)
-
-    @app.get("/health", tags=["Health"])
-    async def health() -> dict[str, str]:
-        return {"status": "ok"}
 
     return app
 

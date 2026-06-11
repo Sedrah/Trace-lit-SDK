@@ -14,6 +14,9 @@ class ApiConfig:
 
     timescale_dsn: str = "postgresql://tracelit:tracelit_pg_password@localhost:5432/trace_lit"
 
+    # Optional Kafka brokers — used only for /health/deep Kafka probe
+    kafka_brokers: str = ""
+
     # Auth key cache TTL in seconds
     key_cache_ttl_s: int = 300
 
@@ -32,6 +35,7 @@ class ApiConfig:
             timescale_dsn=os.getenv(
                 "TRACELIT_TIMESCALE_DSN", "postgresql://tracelit:tracelit_pg_password@localhost:5432/trace_lit"
             ),
+            kafka_brokers=os.getenv("TRACELIT_KAFKA_BROKERS", ""),
             key_cache_ttl_s=int(os.getenv("TRACELIT_KEY_CACHE_TTL_S", "300")),
             default_page_size=int(os.getenv("TRACELIT_DEFAULT_PAGE_SIZE", "50")),
             max_page_size=int(os.getenv("TRACELIT_MAX_PAGE_SIZE", "500")),
