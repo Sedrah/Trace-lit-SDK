@@ -34,6 +34,8 @@ async def list_traces(
     until: datetime,
     limit: int,
     offset: int,
+    prompt_name: Optional[str] = None,
+    prompt_version: Optional[int] = None,
 ) -> tuple[list[dict[str, Any]], int]:
     ch = _client(request)
 
@@ -51,6 +53,12 @@ async def list_traces(
     if framework:
         span_filters.append("framework = %(framework)s")
         params["framework"] = framework
+    if prompt_name:
+        span_filters.append("prompt_name = %(prompt_name)s")
+        params["prompt_name"] = prompt_name
+    if prompt_version is not None:
+        span_filters.append("prompt_version = %(prompt_version)s")
+        params["prompt_version"] = prompt_version
 
     where = " AND ".join(span_filters)
 
@@ -269,3 +277,91 @@ async def get_costs(
         item["avg_cost_per_call"] = float(item["total_cost_usd"]) / cc
 
     return {"total_cost_usd": total_cost, "breakdown": breakdown}
+
+
+# ---------------------------------------------------------------------------
+# Prompts
+# ---------------------------------------------------------------------------
+
+async def list_prompts(request: Any, org_id: str) -> list[dict[str, Any]]:
+    ch = _client(request)
+    result = ch.query(
+        """
+        SELECT
+            prompt_name,
+            max(version)   AS latest_version,
+            uniq(version)  AS version_count,
+            max(first_seen_at) AS last_updated_at
+        FROM trace_lit.prompt_versions
+        WHERE org_id = %(org_id)s
+        GROUP BY prompt_name
+        ORDER BY last_updated_at DESC
+        """,
+        parameters={"org_id": org_id},
+    )
+    return [dict(zip(result.column_names, row)) for row in result.result_rows]
+
+
+async def list_prompt_versions(
+    request: Any, org_id: str, prompt_name: str
+) -> list[dict[str, Any]]:
+    ch = _client(request)
+    result = ch.query(
+        """
+        SELECT
+            version,
+            prompt_hash,
+            first_seen_at,
+            substring(content, 1, 200) AS preview
+        FROM trace_lit.prompt_versions
+        WHERE org_id = %(org_id)s AND prompt_name = %(prompt_name)s
+        ORDER BY version ASC
+        """,
+        parameters={"org_id": org_id, "prompt_name": prompt_name},
+    )
+    return [dict(zip(result.column_names, row)) for row in result.result_rows]
+
+
+async def get_prompt_version(
+    request: Any, org_id: str, prompt_name: str, version: int
+) -> Optional[dict[str, Any]]:
+    ch = _client(request)
+    result = ch.query(
+        """
+        SELECT version, prompt_hash, first_seen_at, content
+        FROM trace_lit.prompt_versions
+        WHERE org_id = %(org_id)s AND prompt_name = %(prompt_name)s AND version = %(version)s
+        LIMIT 1
+        """,
+        parameters={"org_id": org_id, "prompt_name": prompt_name, "version": version},
+    )
+    if not result.result_rows:
+        return None
+    return dict(zip(result.column_names, result.result_rows[0]))
+
+
+async def get_prompt_version_metrics(
+    request: Any, org_id: str, prompt_name: str, version: int
+) -> dict[str, Any]:
+    ch = _client(request)
+    result = ch.query(
+        """
+        SELECT
+            count()                    AS span_count,
+            avg(cost_usd)               AS avg_cost_usd,
+            avg(duration_ms)            AS avg_duration_ms,
+            countIf(status = 'error')   AS error_spans
+        FROM trace_lit.spans
+        WHERE org_id = %(org_id)s AND prompt_name = %(prompt_name)s AND prompt_version = %(version)s
+        """,
+        parameters={"org_id": org_id, "prompt_name": prompt_name, "version": version},
+    )
+    row = dict(zip(result.column_names, result.result_rows[0])) if result.result_rows else {}
+    span_count = row.get("span_count") or 0
+    error_spans = row.get("error_spans") or 0
+    return {
+        "span_count": span_count,
+        "avg_cost_usd": float(row.get("avg_cost_usd") or 0),
+        "avg_duration_ms": float(row.get("avg_duration_ms") or 0),
+        "error_rate": (error_spans / span_count) if span_count else 0.0,
+    }

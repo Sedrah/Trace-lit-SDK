@@ -18,6 +18,10 @@ import type {
   CostResponse,
   DAGResponse,
   FailureListResponse,
+  PromptListResponse,
+  PromptVersionDetail,
+  PromptVersionListResponse,
+  PromptVersionMetrics,
   TraceDetailResponse,
   TraceListResponse,
 } from "../types";
@@ -226,4 +230,36 @@ export function createSettingsKey(name: string): Promise<CreateSettingsKeyRespon
 
 export function deleteSettingsKey(id: number): Promise<void> {
   return request(`/settings/keys/${id}`, { method: "DELETE" });
+}
+
+// ---------------------------------------------------------------------------
+// Prompts
+// ---------------------------------------------------------------------------
+
+export function getPrompts(): Promise<PromptListResponse> {
+  return request("/prompts");
+}
+
+export function getPromptVersions(
+  promptName: string,
+): Promise<PromptVersionListResponse> {
+  return request(`/prompts/${encodeURIComponent(promptName)}/versions`);
+}
+
+export function getPromptVersion(
+  promptName: string,
+  version: number,
+): Promise<PromptVersionDetail> {
+  return request(
+    `/prompts/${encodeURIComponent(promptName)}/versions/${version}`,
+  );
+}
+
+export function getPromptVersionMetrics(
+  promptName: string,
+  version: number,
+): Promise<PromptVersionMetrics> {
+  return request(
+    `/prompts/${encodeURIComponent(promptName)}/versions/${version}/metrics`,
+  );
 }

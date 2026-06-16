@@ -220,3 +220,41 @@ export interface ApiKeyCreateRequest {
   name: string;
   expires_at?: string | null;
 }
+
+// Prompts
+export interface PromptSummary {
+  prompt_name: string;
+  latest_version: number;
+  version_count: number;
+  last_updated_at: string;
+}
+
+export interface PromptListResponse {
+  items: PromptSummary[];
+}
+
+export interface PromptVersionSummary {
+  version: number;
+  prompt_hash: string;
+  first_seen_at: string;
+  preview: string;
+}
+
+export interface PromptVersionListResponse {
+  prompt_name: string;
+  items: PromptVersionSummary[];
+}
+
+export interface PromptVersionDetail {
+  version: number;
+  prompt_hash: string;
+  first_seen_at: string;
+  content: string;
+}
+
+export interface PromptVersionMetrics {
+  span_count: number;
+  avg_cost_usd: number;
+  avg_duration_ms: number;
+  error_rate: number;
+}

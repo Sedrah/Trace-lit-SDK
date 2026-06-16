@@ -47,10 +47,13 @@ async def list_traces(
     until: datetime = Query(default_factory=_default_until),
     page: int = Query(1, ge=1),
     page_size: int = Query(50, ge=1, le=500),
+    prompt_name: Optional[str] = Query(None),
+    prompt_version: Optional[int] = Query(None),
 ) -> TraceListResponse:
     offset = (page - 1) * page_size
     rows, total = await ch.list_traces(
-        request, org_id, agent_name, status, framework, since, until, page_size, offset
+        request, org_id, agent_name, status, framework, since, until, page_size, offset,
+        prompt_name=prompt_name, prompt_version=prompt_version,
     )
     return TraceListResponse(
         items=[TraceResponse(**r) for r in rows],
