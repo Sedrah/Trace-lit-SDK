@@ -263,3 +263,44 @@ class ApiKeyCreateResponse(ApiKeyResponse):
 
 class ApiKeyListResponse(BaseModel):
     items: List[ApiKeyResponse]
+
+
+# ---------------------------------------------------------------------------
+# Prompts
+# ---------------------------------------------------------------------------
+
+class PromptSummary(BaseModel):
+    prompt_name: str
+    latest_version: int
+    version_count: int
+    last_updated_at: datetime
+
+
+class PromptListResponse(BaseModel):
+    items: List[PromptSummary]
+
+
+class PromptVersionSummary(BaseModel):
+    version: int
+    prompt_hash: str
+    first_seen_at: datetime
+    preview: str
+
+
+class PromptVersionListResponse(BaseModel):
+    prompt_name: str
+    items: List[PromptVersionSummary]
+
+
+class PromptVersionDetail(BaseModel):
+    version: int
+    prompt_hash: str
+    first_seen_at: datetime
+    content: str
+
+
+class PromptVersionMetrics(BaseModel):
+    span_count: int
+    avg_cost_usd: float
+    avg_duration_ms: float
+    error_rate: float        # 0.0–1.0

@@ -148,3 +148,41 @@ export function useDeleteAdminKey(adminKey: string) {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-keys"] }),
   });
 }
+
+// ---------------------------------------------------------------------------
+// Prompts
+// ---------------------------------------------------------------------------
+
+export function usePrompts() {
+  return useQuery({
+    queryKey: ["prompts"],
+    queryFn: api.getPrompts,
+  });
+}
+
+export function usePromptVersions(promptName: string) {
+  return useQuery({
+    queryKey: ["prompt-versions", promptName],
+    queryFn: () => api.getPromptVersions(promptName),
+    enabled: Boolean(promptName),
+  });
+}
+
+export function usePromptVersion(promptName: string, version: number | null) {
+  return useQuery({
+    queryKey: ["prompt-version", promptName, version],
+    queryFn: () => api.getPromptVersion(promptName, version as number),
+    enabled: Boolean(promptName) && version !== null,
+  });
+}
+
+export function usePromptVersionMetrics(
+  promptName: string,
+  version: number | null,
+) {
+  return useQuery({
+    queryKey: ["prompt-version-metrics", promptName, version],
+    queryFn: () => api.getPromptVersionMetrics(promptName, version as number),
+    enabled: Boolean(promptName) && version !== null,
+  });
+}

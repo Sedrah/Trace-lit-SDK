@@ -8,6 +8,7 @@ import Costs from "./pages/Costs";
 import Failures from "./pages/Failures";
 import Login from "./pages/Login";
 import Overview from "./pages/Overview";
+import Prompts from "./pages/Prompts";
 import Signup from "./pages/Signup";
 import Verify from "./pages/Verify";
 import Settings from "./pages/Settings";
@@ -48,6 +49,7 @@ export default function App() {
             <Route path="/traces/:traceId"     element={<TraceDetail />} />
             <Route path="/agents"              element={<Agents />} />
             <Route path="/costs"               element={<Costs />} />
+            <Route path="/prompts"             element={<Prompts />} />
             <Route path="/failures"            element={<Failures />} />
             <Route path="/alerts"              element={<Alerts />} />
             <Route path="/settings"            element={<Settings />} />
