@@ -8,7 +8,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
-from ..attribution import attribute_failures
+from ..attribution_engine import attribute_failures
 from ..auth import require_org
 from ..db import clickhouse as ch
 from ..models import (

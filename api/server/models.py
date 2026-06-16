@@ -220,6 +220,7 @@ class RootCause(BaseModel):
     classification: str       # e.g. "llm_timeout", "tool_empty_result"
     description: str          # plain-English sentence
     cascaded_to: List[str]    # span_ids of spans that failed because of this
+    summary: Optional[str] = None   # LLM-generated summary — enterprise v2 only, None on v1
 
 
 class CascadeFailure(BaseModel):
