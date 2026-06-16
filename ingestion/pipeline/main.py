@@ -33,6 +33,7 @@ from .metrics_worker import MetricsWorker
 from .normalizer import Normalizer
 from .otel.receiver import build_otlp_app
 from .producer import NormalizedProducer
+from .prompt_registry import PromptRegistry
 from .writers.clickhouse import ClickHouseWriter
 from .writers.timescale import TimescaleWriter
 
@@ -60,7 +61,8 @@ def main() -> None:
         timescale_dsn=config.timescale_dsn,
         cache_ttl_s=config.key_cache_ttl_s,
     )
-    normalizer = Normalizer(resolver)
+    prompt_registry = PromptRegistry(config)
+    normalizer = Normalizer(resolver, prompt_registry)
     ch_writer  = ClickHouseWriter(config)
     ts_writer  = TimescaleWriter(config)
     producer   = NormalizedProducer(config)

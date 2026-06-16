@@ -48,6 +48,8 @@ class SpanHandle:
         self._tokens: dict[str, int] = {}
         self._cost: float | None = None
         self._metadata: dict[str, Any] = {}
+        self._prompt_name: str = ""
+        self._prompt_content: str | None = None
 
     def set_tokens(self, input_tokens: int = 0, output_tokens: int = 0) -> None:
         self._tokens = {"input_tokens": input_tokens, "output_tokens": output_tokens}
@@ -57,6 +59,12 @@ class SpanHandle:
 
     def set_metadata(self, **kwargs: Any) -> None:
         self._metadata.update(kwargs)
+
+    def set_prompt(self, name: str, content: str) -> None:
+        """Tag this span with a named prompt. Version is detected automatically
+        server-side from the content — no need to track version numbers yourself."""
+        self._prompt_name = name
+        self._prompt_content = content
 
 
 class trace_span:
@@ -131,6 +139,9 @@ class trace_span:
         }
         if self._handle._cost is not None:
             extra["cost_usd"] = self._handle._cost
+        if self._handle._prompt_name:
+            extra["prompt_name"] = self._handle._prompt_name
+            extra["prompt_content"] = self._handle._prompt_content
 
         if exc is not None:
             extra["status"] = "error"

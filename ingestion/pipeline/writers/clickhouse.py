@@ -42,6 +42,9 @@ _COLUMNS = [
     "error_type",
     "error_msg",
     "metadata",
+    "prompt_name",
+    "prompt_hash",
+    "prompt_version",
 ]
 
 
@@ -64,6 +67,9 @@ def _event_to_row(event: TraceEvent) -> list[Any]:
         event.error.error_type if event.error else "",
         event.error.message if event.error else "",
         event.model_dump_json(include={"metadata"}).replace('{"metadata":', "").rstrip("}"),
+        event.prompt_name,
+        event.prompt_hash,
+        event.prompt_version,
     ]
 
 

@@ -45,6 +45,14 @@ class TraceEvent(BaseModel):
     cost_usd: float = 0.0  # calculated by ingestion pipeline from token counts + model pricing
     model: str | None = None
 
+    # Prompt versioning — prompt_content is transient: the ingestion pipeline hashes it
+    # to detect mutations and never persists it onto the span itself. prompt_hash and
+    # prompt_version are populated server-side; the SDK never sets them directly.
+    prompt_name: str = ""
+    prompt_content: str | None = None
+    prompt_hash: str = ""
+    prompt_version: int = 0
+
     # Arbitrary extra data
     metadata: dict[str, Any] = Field(default_factory=dict)
 
