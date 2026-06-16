@@ -15,8 +15,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from trace_lit.attribution_graph import build_attribution_graph
-
 
 # ---------------------------------------------------------------------------
 # Rule-based classifier
@@ -58,22 +56,48 @@ def attribute_failures(spans: list[dict[str, Any]]) -> dict[str, Any]:
 
     Returns a dict matching the AttributionResponse model shape.
     """
-    raw_root_causes, cascades = build_attribution_graph(spans)
+    error_spans: dict[Any, dict[str, Any]] = {
+        s["span_id"]: s for s in spans if s.get("status") == "error"
+    }
 
-    if not raw_root_causes and not cascades:
+    if not error_spans:
         return {"has_failures": False, "root_causes": [], "cascades": []}
 
     root_causes = []
-    for rc in raw_root_causes:
-        classification, description = _classify(rc["error_type"], rc["error_msg"])
-        root_causes.append({
-            "span_id": str(rc["span_id"]),
-            "agent_name": rc["agent_name"],
-            "action": rc["action"],
-            "classification": classification,
-            "description": description,
-            "cascaded_to": rc["cascaded_to"],
-        })
+    cascades = []
+
+    for span_id, span in error_spans.items():
+        parent_id = span.get("parent_span_id")
+        parent_failed = bool(parent_id and parent_id in error_spans)
+
+        if parent_failed:
+            cascades.append({
+                "span_id": str(span_id),
+                "agent_name": span["agent_name"],
+                "action": span["action"],
+                "caused_by_span_id": str(parent_id),
+                "caused_by_agent": error_spans[parent_id]["agent_name"],
+                "caused_by_action": error_spans[parent_id]["action"],
+            })
+        else:
+            # Find spans that directly cascaded from this root cause
+            cascaded_to = [
+                str(s["span_id"])
+                for s in error_spans.values()
+                if s.get("parent_span_id") == span_id
+            ]
+            classification, description = _classify(
+                span.get("error_type") or "",
+                span.get("error_msg") or "",
+            )
+            root_causes.append({
+                "span_id": str(span_id),
+                "agent_name": span["agent_name"],
+                "action": span["action"],
+                "classification": classification,
+                "description": description,
+                "cascaded_to": cascaded_to,
+            })
 
     return {
         "has_failures": True,
