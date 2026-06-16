@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import ValidationError
 
@@ -24,13 +24,15 @@ from trace_lit.models import TraceEvent
 
 from .api_keys import ApiKeyResolver
 from .cost import calculate_cost
+from .prompt_registry import PromptRegistry
 
 logger = logging.getLogger("trace_lit.pipeline")
 
 
 class Normalizer:
-    def __init__(self, resolver: ApiKeyResolver) -> None:
+    def __init__(self, resolver: ApiKeyResolver, prompt_registry: Optional[PromptRegistry] = None) -> None:
         self._resolver = resolver
+        self._prompt_registry = prompt_registry
         self._accepted = 0
         self._rejected_schema = 0
         self._rejected_auth = 0
@@ -87,9 +89,18 @@ class Normalizer:
         if cost == 0.0 and (event.input_tokens > 0 or event.output_tokens > 0):
             cost = calculate_cost(event.model, event.input_tokens, event.output_tokens)
 
-        # 5. Return enriched, immutable event
+        # 5. Resolve prompt version if the span carried prompt content
+        updates: dict[str, Any] = {"org_id": org_id, "cost_usd": cost}
+        if event.prompt_content and self._prompt_registry is not None:
+            prompt_hash, version = self._prompt_registry.resolve(
+                org_id, event.prompt_name, event.prompt_content
+            )
+            updates["prompt_hash"] = prompt_hash
+            updates["prompt_version"] = version
+
+        # 6. Return enriched, immutable event
         self._accepted += 1
-        return event.model_copy(update={"org_id": org_id, "cost_usd": cost})
+        return event.model_copy(update=updates)
 
     @property
     def stats(self) -> dict[str, int]:
