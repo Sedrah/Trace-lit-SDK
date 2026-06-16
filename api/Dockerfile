@@ -6,6 +6,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev gcc \
     && rm -rf /var/lib/apt/lists/*
 
+# Copy SDK first (api depends on it for shared types/attribution logic)
+COPY sdk/python/ /sdk/python/
+RUN pip install --no-cache-dir /sdk/python/
+
 # Install API package and dependencies
 COPY api/ /app/
 RUN pip install --no-cache-dir -e "."

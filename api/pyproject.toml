@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "AMO REST API — FastAPI server serving traces, metrics, costs, failures, and alerts"
 requires-python = ">=3.9"
 dependencies = [
+    "Tracelit-SDK>=0.1.0",
     "fastapi>=0.110",
     "uvicorn[standard]>=0.27",
     "clickhouse-connect>=0.7",
