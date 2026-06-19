@@ -1,0 +1,51 @@
+# Enterprise overlay — extend the base stack with paid modules.
+#
+# Usage (on the server, after installing trace-lit-enterprise in the api image):
+#   docker compose -f infra/docker-compose.yml \
+#                  -f infra/docker-compose.enterprise.yml up -d
+#
+# First run: Ollama pulls the model automatically (~4.5 GB).
+# Subsequent runs: model is cached in the named volume.
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    volumes:
+      - ollama_models:/root/.ollama
+    # GPU passthrough (optional — remove if running CPU-only)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  # Pull the model on first start, then exit — runs as a one-shot init container.
+  ollama-init:
+    image: ollama/ollama:latest
+    depends_on:
+      - ollama
+    entrypoint: >
+      sh -c "
+        until ollama list --host http://ollama:11434 >/dev/null 2>&1; do
+          echo 'waiting for ollama...'; sleep 2;
+        done &&
+        OLLAMA_HOST=http://ollama:11434 ollama pull ${TRACELIT_OLLAMA_MODEL:-qwen2.5:7b-instruct}
+      "
+    volumes:
+      - ollama_models:/root/.ollama
+    restart: "no"
+
+  # Override the api service to add Ollama env vars and the enterprise package
+  api:
+    environment:
+      TRACELIT_OLLAMA_URL: http://ollama:11434
+      TRACELIT_OLLAMA_MODEL: ${TRACELIT_OLLAMA_MODEL:-qwen2.5:7b-instruct}
+      TRACELIT_OLLAMA_TIMEOUT: ${TRACELIT_OLLAMA_TIMEOUT:-5}
+    depends_on:
+      - ollama
+
+volumes:
+  ollama_models:

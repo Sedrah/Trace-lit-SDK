@@ -35,6 +35,15 @@ function AttributionPanel({ data }: { data: AttributionResponse }) {
               </span>
             </div>
             <p className="text-sm text-red-700">{rc.description}</p>
+            {rc.summary && rc.summary !== rc.description && (
+              <div className="mt-3 pt-3 border-t border-red-200">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className="text-xs font-medium text-gray-500">AI analysis</span>
+                  <span className="inline-flex px-1.5 py-0.5 rounded text-xs bg-purple-100 text-purple-700">✦ Enterprise</span>
+                </div>
+                <p className="text-sm text-gray-700 leading-relaxed">{rc.summary}</p>
+              </div>
+            )}
             {rc.cascaded_to.length > 0 && (
               <p className="text-xs text-gray-500 mt-2">
                 Cascaded to {rc.cascaded_to.length} downstream{" "}

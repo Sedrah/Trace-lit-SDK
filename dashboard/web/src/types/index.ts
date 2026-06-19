@@ -180,6 +180,7 @@ export interface RootCause {
   classification: string;
   description: string;
   cascaded_to: string[];
+  summary?: string | null;   // populated by Attribution v2 (enterprise), null/absent on v1
 }
 
 export interface CascadeFailure {
