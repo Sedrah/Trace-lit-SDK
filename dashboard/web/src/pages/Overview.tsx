@@ -52,6 +52,44 @@ export default function Overview() {
       />
 
       <div className="p-6 space-y-6">
+        {/* Getting started banner — shown only when there are no traces yet */}
+        {!traces.isLoading && traceCount === 0 && (
+          <div className="rounded-lg border border-brand-200 bg-brand-50 p-5">
+            <p className="text-sm font-semibold text-brand-800 mb-3">
+              Welcome — send your first trace in 3 steps
+            </p>
+            <ol className="space-y-2 text-sm text-brand-700">
+              <li>
+                <span className="font-medium">1. Install the SDK</span>
+                <code className="ml-2 text-xs bg-white border border-brand-200 rounded px-1.5 py-0.5 font-mono">
+                  pip install tracelit-sdk
+                </code>
+              </li>
+              <li>
+                <span className="font-medium">2. Create an API key</span>
+                {" — "}
+                <a href="/settings" className="underline hover:text-brand-900">
+                  Settings → Create key
+                </a>
+              </li>
+              <li>
+                <span className="font-medium">3. Instrument your agent</span>
+                <code className="ml-2 text-xs bg-white border border-brand-200 rounded px-1.5 py-0.5 font-mono">
+                  @trace_lit.trace(agent_name="my-agent")
+                </code>
+              </li>
+            </ol>
+            <a
+              href="https://github.com/Sedrah/Trace-lit-SDK#quickstart"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-block text-xs text-brand-600 underline hover:text-brand-800"
+            >
+              Full quickstart guide →
+            </a>
+          </div>
+        )}
+
         {/* Stat cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
@@ -93,20 +131,29 @@ export default function Overview() {
             ) : chartData.length === 0 ? (
               <EmptyState message="No cost data yet." />
             ) : (
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={chartData} margin={{ left: 8, right: 8 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <ResponsiveContainer width="100%" height={Math.max(180, chartData.length * 36)}>
+                <BarChart
+                  layout="vertical"
+                  data={chartData}
+                  margin={{ left: 8, right: 24, top: 4, bottom: 4 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" horizontal={false} />
                   <XAxis
+                    type="number"
+                    tick={{ fontSize: 11 }}
+                    tickFormatter={(v) => `$${v}`}
+                  />
+                  <YAxis
+                    type="category"
                     dataKey="name"
                     tick={{ fontSize: 11 }}
-                    interval={0}
-                    angle={-20}
-                    textAnchor="end"
-                    height={40}
+                    width={140}
+                    tickFormatter={(name: string) =>
+                      name.length > 18 ? name.slice(0, 17) + "…" : name
+                    }
                   />
-                  <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `$${v}`} />
                   <Tooltip formatter={(v: number) => [formatCost(v), "Cost"]} />
-                  <Bar dataKey="cost" fill="#4f6ef7" radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="cost" fill="#4f6ef7" radius={[0, 3, 3, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}

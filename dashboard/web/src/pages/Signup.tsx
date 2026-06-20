@@ -53,7 +53,7 @@ export default function Signup() {
                 We sent a verification link to <span className="font-medium text-gray-700">{email}</span>.
                 Click it to get your API key.
               </p>
-              <p className="text-xs text-gray-400 mt-4">Link expires in 24 hours.</p>
+              <p className="text-xs text-gray-400 mt-4">Link expires in 15 minutes.</p>
             </div>
           ) : (
             <>

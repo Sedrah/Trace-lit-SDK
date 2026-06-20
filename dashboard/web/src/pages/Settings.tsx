@@ -77,16 +77,37 @@ function SdkKeys() {
       </div>
 
       {newKey && (
-        <div className="mx-5 mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-          <p className="text-xs font-medium text-amber-800 mb-1">
-            Save this key — it won't be shown again
-          </p>
-          <CopyBox value={newKey.api_key} />
+        <div className="mx-5 mt-4 space-y-4">
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <p className="text-xs font-medium text-amber-800 mb-1">
+              Save this key — it won't be shown again
+            </p>
+            <CopyBox value={newKey.api_key} />
+          </div>
+
+          <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg space-y-3">
+            <p className="text-xs font-semibold text-gray-700">Connect your agent in 3 steps</p>
+
+            <div>
+              <p className="text-xs text-gray-500 mb-1">1. Install the SDK</p>
+              <CopyBox value="pip install tracelit-sdk" />
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-500 mb-1">2. Add to your agent</p>
+              <CopyBox value={`import trace_lit\n\ntrace_lit.configure(\n    kafka_brokers=["app.trace-lit.com:9093"],\n    api_key="${newKey.api_key}",\n)\n\n@trace_lit.trace(agent_name="my-agent")\ndef run(query):\n    ...`} />
+            </div>
+
+            <div>
+              <p className="text-xs text-gray-500 mb-1">3. Run your agent — traces appear here automatically</p>
+            </div>
+          </div>
+
           <button
             onClick={() => setNewKey(null)}
-            className="mt-3 text-xs text-amber-700 hover:underline"
+            className="mx-0 text-xs text-gray-400 hover:text-gray-600"
           >
-            I've saved it
+            Done, dismiss
           </button>
         </div>
       )}
