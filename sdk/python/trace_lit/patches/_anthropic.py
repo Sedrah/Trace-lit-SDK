@@ -56,6 +56,7 @@ def patch_anthropic() -> bool:
 
         if not stream:
             _grab_anthropic_tokens(handle, response)
+            _grab_anthropic_io(handle, kwargs, response)
             span_cm._exit(None)
         else:
             # Streaming: emit span with model name only; tokens are not yet available
@@ -79,6 +80,7 @@ def patch_anthropic() -> bool:
 
         if not stream:
             _grab_anthropic_tokens(handle, response)
+            _grab_anthropic_io(handle, kwargs, response)
             span_cm._exit(None)
         else:
             handle.set_metadata(streaming=True)
@@ -91,6 +93,23 @@ def patch_anthropic() -> bool:
     _patched = True
     logger.info("trace_lit: anthropic patched")
     return True
+
+
+def _grab_anthropic_io(handle: Any, kwargs: Any, response: Any) -> None:
+    import json
+    messages = kwargs.get("messages")
+    if messages:
+        try:
+            handle.set_input(json.dumps(messages, ensure_ascii=False))
+        except Exception:
+            pass
+    try:
+        block = response.content[0]
+        text = getattr(block, "text", None)
+        if text:
+            handle.set_output(text)
+    except Exception:
+        pass
 
 
 def _grab_anthropic_tokens(handle: Any, response: Any) -> None:

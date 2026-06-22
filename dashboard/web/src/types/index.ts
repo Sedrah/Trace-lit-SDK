@@ -40,6 +40,8 @@ export interface SpanResponse {
   error_type: string | null;
   error_msg: string | null;
   metadata: Record<string, unknown>;
+  input_text: string | null;
+  output_text: string | null;
 }
 
 export interface TraceDetailResponse extends TraceResponse {

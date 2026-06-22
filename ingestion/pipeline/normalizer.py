@@ -98,7 +98,12 @@ class Normalizer:
             updates["prompt_hash"] = prompt_hash
             updates["prompt_version"] = version
 
-        # 6. Return enriched, immutable event
+        # 6. Apply redaction if enterprise module is available (passthrough otherwise)
+        redacted = _redact(event.input_text, event.output_text)
+        updates["input_text"]  = redacted[0]
+        updates["output_text"] = redacted[1]
+
+        # 7. Return enriched, immutable event
         self._accepted += 1
         return event.model_copy(update=updates)
 
@@ -122,3 +127,27 @@ def _extract_api_key(headers: list[tuple[str, bytes]] | None) -> str:
             except Exception:
                 return ""
     return ""
+
+
+# ---------------------------------------------------------------------------
+# Redaction plugin seam — enterprise module replaces this at import time
+# ---------------------------------------------------------------------------
+
+try:
+    from trace_lit_enterprise.redaction import redact_io as _redact_io  # type: ignore[import]
+    logger.info("trace_lit pipeline: enterprise redaction engine loaded")
+except ImportError:
+    _redact_io = None
+
+
+def _redact(
+    input_text: str | None,
+    output_text: str | None,
+) -> tuple[str | None, str | None]:
+    if _redact_io is None:
+        return input_text, output_text
+    try:
+        return _redact_io(input_text, output_text)
+    except Exception as exc:
+        logger.warning("trace_lit pipeline: redaction error — storing as-is: %s", exc)
+        return input_text, output_text

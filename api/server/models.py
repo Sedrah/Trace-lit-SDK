@@ -55,6 +55,8 @@ class SpanResponse(BaseModel):
     error_type: Optional[str]
     error_msg: Optional[str]
     metadata: dict[str, Any]
+    input_text: Optional[str] = None
+    output_text: Optional[str] = None
 
 
 class TraceResponse(BaseModel):

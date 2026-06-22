@@ -4,6 +4,7 @@
  * duration, tokens, and cost.
  */
 
+import { useState } from "react";
 import type { SpanResponse } from "../types";
 import { formatCost, formatDuration } from "./ui";
 
@@ -57,6 +58,8 @@ const STATUS_COLOURS: Record<string, { dot: string; row: string }> = {
 export function SpanTimeline({ spans }: { spans: SpanResponse[]; totalMs: number }) {
   if (spans.length === 0) return null;
 
+  const [expanded, setExpanded] = useState<string | null>(null);
+
   const sorted = sortSpans(spans);
   const parentMap = Object.fromEntries(sorted.map((s) => [s.span_id, s.parent_span_id ?? null]));
   const depthCache: Record<string, number> = {};
@@ -80,12 +83,15 @@ export function SpanTimeline({ spans }: { spans: SpanResponse[]; totalMs: number
             const depth = getDepth(span.span_id, parentMap, depthCache);
             const { dot, row } = STATUS_COLOURS[span.status] ?? { dot: "bg-gray-400", row: "" };
             const hasTokens = span.input_tokens > 0 || span.output_tokens > 0;
+            const hasIO = !!(span.input_text || span.output_text);
+            const isExpanded = expanded === span.span_id;
 
             return (
               <>
                 <tr
                   key={span.span_id}
-                  className={`border-b border-gray-100 hover:bg-gray-50 ${row}`}
+                  onClick={() => hasIO && setExpanded(isExpanded ? null : span.span_id)}
+                  className={`border-b border-gray-100 ${hasIO ? "cursor-pointer" : ""} hover:bg-gray-50 ${row}`}
                 >
                   <td className="px-4 py-2.5 text-xs text-gray-300 font-mono">{idx + 1}</td>
 
@@ -95,6 +101,9 @@ export function SpanTimeline({ spans }: { spans: SpanResponse[]; totalMs: number
                       {depth > 0 && <span className="text-gray-300 text-xs">↳</span>}
                       <span className={`w-2 h-2 rounded-full shrink-0 ${dot}`} />
                       <span className="font-medium text-gray-900">{span.action}</span>
+                      {hasIO && (
+                        <span className="text-xs text-gray-400 ml-1">{isExpanded ? "▴" : "▾"}</span>
+                      )}
                     </div>
                     {span.error_msg && (
                       <p className="text-xs text-red-500 mt-0.5 pl-6" style={{ paddingLeft: depth * 20 + 24 }}>
@@ -129,6 +138,29 @@ export function SpanTimeline({ spans }: { spans: SpanResponse[]; totalMs: number
                     {span.cost_usd > 0 ? formatCost(span.cost_usd) : <span className="text-gray-300">—</span>}
                   </td>
                 </tr>
+                {isExpanded && (
+                  <tr key={`${span.span_id}-io`} className="bg-gray-50 border-b border-gray-200">
+                    <td />
+                    <td colSpan={6} className="px-4 py-3 space-y-3">
+                      {span.input_text && (
+                        <div>
+                          <p className="text-xs font-semibold text-gray-500 mb-1">Input</p>
+                          <pre className="text-xs text-gray-700 bg-white border border-gray-200 rounded p-2 overflow-x-auto whitespace-pre-wrap break-words max-h-48">
+                            {span.input_text}
+                          </pre>
+                        </div>
+                      )}
+                      {span.output_text && (
+                        <div>
+                          <p className="text-xs font-semibold text-gray-500 mb-1">Output</p>
+                          <pre className="text-xs text-gray-700 bg-white border border-gray-200 rounded p-2 overflow-x-auto whitespace-pre-wrap break-words max-h-48">
+                            {span.output_text}
+                          </pre>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                )}
               </>
             );
           })}
