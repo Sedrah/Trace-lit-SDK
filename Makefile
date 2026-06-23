@@ -30,5 +30,5 @@ build:
 ## Pull latest code and redeploy (same as CI)
 deploy:
 	git pull origin main
-	$(COMPOSE_CTX) $(COMPOSE) up -d --build
+	$(COMPOSE_CTX) $(COMPOSE) up -d --build --remove-orphans
 	docker image prune -f
