@@ -188,3 +188,117 @@ async def delete_api_key(request: Any, key_id: int) -> bool:
     pool = _pool(request)
     result = await pool.execute("DELETE FROM api_keys WHERE id = $1", key_id)
     return result == "DELETE 1"
+
+
+# ---------------------------------------------------------------------------
+# Datasets
+# ---------------------------------------------------------------------------
+
+async def list_datasets(request: Any, org_id: str) -> list[dict[str, Any]]:
+    pool = _pool(request)
+    rows = await pool.fetch(
+        """
+        SELECT d.id, d.name, d.description, d.created_at,
+               COUNT(i.id) AS item_count
+        FROM datasets d
+        LEFT JOIN dataset_items i ON i.dataset_id = d.id
+        WHERE d.org_id = $1
+        GROUP BY d.id
+        ORDER BY d.created_at DESC
+        """,
+        org_id,
+    )
+    return [dict(r) for r in rows]
+
+
+async def create_dataset(
+    request: Any, org_id: str, name: str, description: Optional[str]
+) -> dict[str, Any]:
+    pool = _pool(request)
+    row = await pool.fetchrow(
+        """
+        INSERT INTO datasets (org_id, name, description)
+        VALUES ($1, $2, $3)
+        RETURNING id, name, description, created_at
+        """,
+        org_id, name, description,
+    )
+    return {**dict(row), "item_count": 0}
+
+
+async def delete_dataset(request: Any, org_id: str, dataset_id: str) -> bool:
+    pool = _pool(request)
+    result = await pool.execute(
+        "DELETE FROM datasets WHERE id = $1 AND org_id = $2",
+        dataset_id, org_id,
+    )
+    return result == "DELETE 1"
+
+
+async def get_dataset(request: Any, org_id: str, dataset_id: str) -> Optional[dict[str, Any]]:
+    pool = _pool(request)
+    row = await pool.fetchrow(
+        """
+        SELECT d.id, d.name, d.description, d.created_at,
+               COUNT(i.id) AS item_count
+        FROM datasets d
+        LEFT JOIN dataset_items i ON i.dataset_id = d.id
+        WHERE d.id = $1 AND d.org_id = $2
+        GROUP BY d.id
+        """,
+        dataset_id, org_id,
+    )
+    return dict(row) if row else None
+
+
+async def list_dataset_items(
+    request: Any, org_id: str, dataset_id: str
+) -> list[dict[str, Any]]:
+    pool = _pool(request)
+    rows = await pool.fetch(
+        """
+        SELECT id, dataset_id, trace_id, span_id, label, notes,
+               agent_name, action, model, input_text, output_text, created_at
+        FROM dataset_items
+        WHERE dataset_id = $1 AND org_id = $2
+        ORDER BY created_at DESC
+        """,
+        dataset_id, org_id,
+    )
+    return [dict(r) for r in rows]
+
+
+async def add_dataset_item(
+    request: Any, org_id: str, dataset_id: str, data: dict[str, Any]
+) -> dict[str, Any]:
+    pool = _pool(request)
+    row = await pool.fetchrow(
+        """
+        INSERT INTO dataset_items
+            (dataset_id, org_id, trace_id, span_id, label, notes,
+             agent_name, action, model, input_text, output_text)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        ON CONFLICT (dataset_id, span_id) DO UPDATE
+            SET label = EXCLUDED.label,
+                notes = EXCLUDED.notes
+        RETURNING id, dataset_id, trace_id, span_id, label, notes,
+                  agent_name, action, model, input_text, output_text, created_at
+        """,
+        dataset_id, org_id,
+        data["trace_id"], data["span_id"], data["label"],
+        data.get("notes"),
+        data.get("agent_name"), data.get("action"), data.get("model"),
+        data.get("input_text"), data.get("output_text"),
+    )
+    return dict(row)
+
+
+async def delete_dataset_item(
+    request: Any, org_id: str, dataset_id: str, item_id: str
+) -> bool:
+    pool = _pool(request)
+    result = await pool.execute(
+        "DELETE FROM dataset_items WHERE id = $1 AND dataset_id = $2 AND org_id = $3",
+        item_id, dataset_id, org_id,
+    )
+    return result == "DELETE 1"

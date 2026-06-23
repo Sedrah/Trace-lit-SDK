@@ -167,7 +167,7 @@ export default function TraceDetail() {
               </p>
             </div>
             <div className="p-5">
-              <SpanTimeline spans={trace.spans} totalMs={trace.total_duration_ms} />
+              <SpanTimeline spans={trace.spans} totalMs={trace.total_duration_ms} traceId={traceId} />
             </div>
           </div>
         )}

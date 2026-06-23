@@ -307,3 +307,57 @@ class PromptVersionMetrics(BaseModel):
     avg_cost_usd: float
     avg_duration_ms: float
     error_rate: float        # 0.0–1.0
+
+
+# ---------------------------------------------------------------------------
+# Datasets
+# ---------------------------------------------------------------------------
+
+class DatasetCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+
+
+class DatasetResponse(BaseModel):
+    id: UUID
+    name: str
+    description: Optional[str]
+    created_at: datetime
+    item_count: int = 0
+
+
+class DatasetListResponse(BaseModel):
+    items: List[DatasetResponse]
+
+
+class DatasetItemCreate(BaseModel):
+    trace_id: str
+    span_id: str
+    label: str          # "good" | "bad" | "neutral"
+    notes: Optional[str] = None
+    # Snapshot fields — caller provides these so the item is self-contained
+    agent_name: Optional[str] = None
+    action: Optional[str] = None
+    model: Optional[str] = None
+    input_text: Optional[str] = None
+    output_text: Optional[str] = None
+
+
+class DatasetItemResponse(BaseModel):
+    id: UUID
+    dataset_id: UUID
+    trace_id: str
+    span_id: str
+    label: str
+    notes: Optional[str]
+    agent_name: Optional[str]
+    action: Optional[str]
+    model: Optional[str]
+    input_text: Optional[str]
+    output_text: Optional[str]
+    created_at: datetime
+
+
+class DatasetItemListResponse(BaseModel):
+    dataset: DatasetResponse
+    items: List[DatasetItemResponse]

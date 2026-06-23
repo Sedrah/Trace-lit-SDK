@@ -261,3 +261,36 @@ export interface PromptVersionMetrics {
   avg_duration_ms: number;
   error_rate: number;
 }
+
+// Datasets
+export interface DatasetResponse {
+  id: string;
+  name: string;
+  description: string | null;
+  created_at: string;
+  item_count: number;
+}
+
+export interface DatasetListResponse {
+  items: DatasetResponse[];
+}
+
+export interface DatasetItemResponse {
+  id: string;
+  dataset_id: string;
+  trace_id: string;
+  span_id: string;
+  label: "good" | "bad" | "neutral";
+  notes: string | null;
+  agent_name: string | null;
+  action: string | null;
+  model: string | null;
+  input_text: string | null;
+  output_text: string | null;
+  created_at: string;
+}
+
+export interface DatasetItemListResponse {
+  dataset: DatasetResponse;
+  items: DatasetItemResponse[];
+}

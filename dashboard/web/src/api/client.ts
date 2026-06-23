@@ -17,6 +17,10 @@ import type {
   AttributionResponse,
   CostResponse,
   DAGResponse,
+  DatasetItemListResponse,
+  DatasetItemResponse,
+  DatasetListResponse,
+  DatasetResponse,
   FailureListResponse,
   PromptListResponse,
   PromptVersionDetail,
@@ -262,4 +266,64 @@ export function getPromptVersionMetrics(
   return request(
     `/prompts/${encodeURIComponent(promptName)}/versions/${version}/metrics`,
   );
+}
+
+// Datasets
+export function getDatasets(): Promise<DatasetListResponse> {
+  return request("/datasets");
+}
+
+export function createDataset(name: string, description?: string): Promise<DatasetResponse> {
+  return request("/datasets", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, description }),
+  });
+}
+
+export function deleteDataset(id: string): Promise<void> {
+  return request(`/datasets/${id}`, { method: "DELETE" });
+}
+
+export function getDatasetItems(datasetId: string): Promise<DatasetItemListResponse> {
+  return request(`/datasets/${datasetId}/items`);
+}
+
+export function addDatasetItem(
+  datasetId: string,
+  item: {
+    trace_id: string;
+    span_id: string;
+    label: string;
+    notes?: string;
+    agent_name?: string;
+    action?: string;
+    model?: string | null;
+    input_text?: string | null;
+    output_text?: string | null;
+  },
+): Promise<DatasetItemResponse> {
+  return request(`/datasets/${datasetId}/items`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(item),
+  });
+}
+
+export function deleteDatasetItem(datasetId: string, itemId: string): Promise<void> {
+  return request(`/datasets/${datasetId}/items/${itemId}`, { method: "DELETE" });
+}
+
+export async function downloadDatasetExport(datasetId: string, filename: string): Promise<void> {
+  const res = await fetch(`${BASE}/datasets/${datasetId}/export`, {
+    headers: { "X-Tracelit-Session": getSessionToken() },
+  });
+  if (!res.ok) throw new Error("Export failed");
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 }
