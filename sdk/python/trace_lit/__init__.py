@@ -70,6 +70,7 @@ def configure(
     sampling_rate: float | None = None,
     log_level: str | None = None,
     disabled: bool | None = None,
+    capture_io: bool | None = None,
 ) -> None:
     """
     Configure the AMO SDK. Call once at application startup before any @trace decorators fire.
@@ -120,6 +121,8 @@ def configure(
         updates["log_level"] = log_level
     if disabled is not None:
         updates["disabled"] = disabled
+    if capture_io is not None:
+        updates["capture_io"] = capture_io
 
     # Build new frozen config from current + overrides
     new_config = Config(
@@ -133,6 +136,7 @@ def configure(
         sampling_rate=updates.get("sampling_rate", current.sampling_rate),
         log_level=updates.get("log_level", current.log_level),
         disabled=updates.get("disabled", current.disabled),
+        capture_io=updates.get("capture_io", current.capture_io),
     )
 
     _set_config(new_config)

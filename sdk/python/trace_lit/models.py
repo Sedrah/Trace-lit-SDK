@@ -45,6 +45,11 @@ class TraceEvent(BaseModel):
     cost_usd: float = 0.0  # calculated by ingestion pipeline from token counts + model pricing
     model: str | None = None
 
+    # I/O capture — only populated when capture_io=True in SDK config.
+    # Transient fields: ingestion may redact before writing to storage.
+    input_text: str | None = None
+    output_text: str | None = None
+
     # Prompt versioning — prompt_content is transient: the ingestion pipeline hashes it
     # to detect mutations and never persists it onto the span itself. prompt_hash and
     # prompt_version are populated server-side; the SDK never sets them directly.

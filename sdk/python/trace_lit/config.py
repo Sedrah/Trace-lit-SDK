@@ -19,6 +19,7 @@ class Config:
     sampling_rate: float = 1.0
     log_level: str = "WARNING"
     disabled: bool = False
+    capture_io: bool = False   # opt-in — off by default to avoid accidental PII capture
 
     def __post_init__(self) -> None:
         if not 0.0 <= self.sampling_rate <= 1.0:
@@ -43,6 +44,7 @@ class Config:
             sampling_rate=float(os.getenv("TRACELIT_SAMPLING_RATE", "1.0")),
             log_level=os.getenv("TRACELIT_LOG_LEVEL", "WARNING"),
             disabled=os.getenv("TRACELIT_DISABLED", "").lower() in ("1", "true", "yes"),
+            capture_io=os.getenv("TRACELIT_CAPTURE_IO", "").lower() in ("1", "true", "yes"),
         )
 
 

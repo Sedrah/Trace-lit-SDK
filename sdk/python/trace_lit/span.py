@@ -50,6 +50,8 @@ class SpanHandle:
         self._metadata: dict[str, Any] = {}
         self._prompt_name: str = ""
         self._prompt_content: str | None = None
+        self._input_text: str | None = None
+        self._output_text: str | None = None
 
     def set_tokens(self, input_tokens: int = 0, output_tokens: int = 0) -> None:
         self._tokens = {"input_tokens": input_tokens, "output_tokens": output_tokens}
@@ -65,6 +67,18 @@ class SpanHandle:
         server-side from the content — no need to track version numbers yourself."""
         self._prompt_name = name
         self._prompt_content = content
+
+    def set_input(self, text: str) -> None:
+        """Capture the input sent to this step (e.g. the prompt messages).
+        Only stored when capture_io=True in SDK config — no-op otherwise."""
+        if get_config().capture_io:
+            self._input_text = text
+
+    def set_output(self, text: str) -> None:
+        """Capture the output from this step (e.g. the model completion).
+        Only stored when capture_io=True in SDK config — no-op otherwise."""
+        if get_config().capture_io:
+            self._output_text = text
 
 
 class trace_span:
@@ -142,6 +156,10 @@ class trace_span:
         if self._handle._prompt_name:
             extra["prompt_name"] = self._handle._prompt_name
             extra["prompt_content"] = self._handle._prompt_content
+        if self._handle._input_text is not None:
+            extra["input_text"] = self._handle._input_text
+        if self._handle._output_text is not None:
+            extra["output_text"] = self._handle._output_text
 
         if exc is not None:
             extra["status"] = "error"

@@ -154,7 +154,8 @@ async def get_spans(
         SELECT span_id, parent_span_id, timestamp, duration_ms,
                agent_name, action, status, framework, model,
                input_tokens, output_tokens, cost_usd,
-               error_type, error_msg, metadata
+               error_type, error_msg, metadata,
+               input_text, output_text
         FROM trace_lit.spans
         WHERE org_id = %(org_id)s AND trace_id = %(trace_id)s
         ORDER BY timestamp ASC

@@ -57,6 +57,7 @@ def patch_openai() -> bool:
 
         if not stream:
             _grab_openai_tokens(handle, response)
+            _grab_openai_io(handle, kwargs, response)
             span_cm._exit(None)
             return response
 
@@ -78,6 +79,7 @@ def patch_openai() -> bool:
 
         if not stream:
             _grab_openai_tokens(handle, response)
+            _grab_openai_io(handle, kwargs, response)
             span_cm._exit(None)
             return response
 
@@ -93,6 +95,22 @@ def patch_openai() -> bool:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+def _grab_openai_io(handle: Any, kwargs: Any, response: Any) -> None:
+    import json
+    messages = kwargs.get("messages")
+    if messages:
+        try:
+            handle.set_input(json.dumps(messages, ensure_ascii=False))
+        except Exception:
+            pass
+    try:
+        content = response.choices[0].message.content
+        if content:
+            handle.set_output(content)
+    except Exception:
+        pass
+
 
 def _grab_openai_tokens(handle: Any, response: Any) -> None:
     usage = getattr(response, "usage", None)

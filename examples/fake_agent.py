@@ -10,6 +10,7 @@
 #
 # 3. FAILURE ATTRIBUTION — the server classifies root causes and cascades.
 
+import os
 import time
 from unittest.mock import MagicMock
 
@@ -18,7 +19,7 @@ from trace_lit import trace_span
 
 amo.configure(
     kafka_brokers=["app.trace-lit.com:9093"],
-    api_key="sk-demo-abc123",
+    api_key=os.environ.get("TRACELIT_API_KEY", "sk-demo-abc123"),
 )
 
 

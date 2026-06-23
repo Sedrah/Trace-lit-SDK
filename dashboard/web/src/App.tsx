@@ -8,6 +8,7 @@ import Costs from "./pages/Costs";
 import Failures from "./pages/Failures";
 import Login from "./pages/Login";
 import Overview from "./pages/Overview";
+import Datasets from "./pages/Datasets";
 import Prompts from "./pages/Prompts";
 import Signup from "./pages/Signup";
 import Verify from "./pages/Verify";
@@ -52,6 +53,7 @@ export default function App() {
             <Route path="/prompts"             element={<Prompts />} />
             <Route path="/failures"            element={<Failures />} />
             <Route path="/alerts"              element={<Alerts />} />
+            <Route path="/datasets"            element={<Datasets />} />
             <Route path="/settings"            element={<Settings />} />
           </Route>
         </Routes>

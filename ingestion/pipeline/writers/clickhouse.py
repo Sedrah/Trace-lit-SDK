@@ -45,6 +45,8 @@ _COLUMNS = [
     "prompt_name",
     "prompt_hash",
     "prompt_version",
+    "input_text",
+    "output_text",
 ]
 
 
@@ -70,6 +72,8 @@ def _event_to_row(event: TraceEvent) -> list[Any]:
         event.prompt_name,
         event.prompt_hash,
         event.prompt_version,
+        event.input_text,
+        event.output_text,
     ]
 
 
