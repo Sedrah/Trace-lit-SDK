@@ -10,6 +10,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY sdk/python/ /sdk/python/
 RUN pip install --no-cache-dir /sdk/python/
 
+# Copy eval engine alongside api code so it's importable from /app
+COPY eval/ /app/eval/
+
 # Install API package and dependencies
 COPY api/ /app/
 RUN pip install --no-cache-dir -e "."

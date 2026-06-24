@@ -361,3 +361,34 @@ class DatasetItemResponse(BaseModel):
 class DatasetItemListResponse(BaseModel):
     dataset: DatasetResponse
     items: List[DatasetItemResponse]
+
+
+# ---------------------------------------------------------------------------
+# Eval runs
+# ---------------------------------------------------------------------------
+
+class EvalRunRequest(BaseModel):
+    prompt_name: str
+    prompt_version: int
+    baseline_version: Optional[int] = None   # None = use dataset good-label baseline
+    threshold: float = 0.8
+
+
+class EvalRunResponse(BaseModel):
+    id: UUID
+    dataset_id: Optional[UUID]
+    prompt_name: str
+    prompt_version: int
+    baseline_version: Optional[int]
+    status: str           # "passed" | "failed" | "error"
+    score: float
+    threshold: float
+    new_spans: int
+    baseline_spans: int
+    message: str
+    detail: dict[str, Any]
+    created_at: datetime
+
+
+class EvalRunListResponse(BaseModel):
+    items: List[EvalRunResponse]

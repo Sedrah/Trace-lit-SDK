@@ -175,6 +175,65 @@ async def get_spans(
 
 
 # ---------------------------------------------------------------------------
+# Eval — fetch spans by prompt version for scoring
+# ---------------------------------------------------------------------------
+
+async def get_spans_for_prompt_version(
+    request: Any,
+    org_id: str,
+    prompt_name: str,
+    prompt_version: int,
+    limit: int = 500,
+) -> list[dict[str, Any]]:
+    """Return spans tagged with a specific prompt version, used by the eval engine."""
+    ch = _client(request)
+    result = ch.query(
+        """
+        SELECT span_id, status, cost_usd, duration_ms,
+               input_text, output_text, model
+        FROM trace_lit.spans
+        WHERE org_id = %(org_id)s
+          AND prompt_name = %(prompt_name)s
+          AND prompt_version = %(prompt_version)s
+        ORDER BY timestamp DESC
+        LIMIT %(limit)s
+        """,
+        parameters={
+            "org_id": org_id,
+            "prompt_name": prompt_name,
+            "prompt_version": prompt_version,
+            "limit": limit,
+        },
+    )
+    return [dict(zip(result.column_names, row)) for row in result.result_rows]
+
+
+async def get_spans_by_ids(
+    request: Any,
+    org_id: str,
+    span_ids: list[str],
+) -> list[dict[str, Any]]:
+    """Fetch specific spans by ID — used to resolve dataset item baselines."""
+    if not span_ids:
+        return []
+    ch = _client(request)
+    placeholders = ", ".join(f"%(id_{i})s" for i in range(len(span_ids)))
+    params: dict[str, Any] = {"org_id": org_id}
+    for i, sid in enumerate(span_ids):
+        params[f"id_{i}"] = sid
+    result = ch.query(
+        f"""
+        SELECT span_id, status, cost_usd, duration_ms,
+               input_text, output_text, model
+        FROM trace_lit.spans
+        WHERE org_id = %(org_id)s AND span_id IN ({placeholders})
+        """,
+        parameters=params,
+    )
+    return [dict(zip(result.column_names, row)) for row in result.result_rows]
+
+
+# ---------------------------------------------------------------------------
 # Failures
 # ---------------------------------------------------------------------------
 

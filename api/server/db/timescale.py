@@ -302,3 +302,73 @@ async def delete_dataset_item(
         item_id, dataset_id, org_id,
     )
     return result == "DELETE 1"
+
+
+# ---------------------------------------------------------------------------
+# Eval runs
+# ---------------------------------------------------------------------------
+
+async def create_eval_run(
+    request: Any, org_id: str, data: dict[str, Any]
+) -> dict[str, Any]:
+    pool = _pool(request)
+    row = await pool.fetchrow(
+        """
+        INSERT INTO eval_runs
+            (org_id, dataset_id, prompt_name, prompt_version, baseline_version,
+             status, score, threshold, new_spans, baseline_spans,
+             error_rate_new, error_rate_base, cost_new, cost_base,
+             duration_new, duration_base, message)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
+        RETURNING *
+        """,
+        org_id,
+        data.get("dataset_id"),
+        data["prompt_name"],
+        data["prompt_version"],
+        data.get("baseline_version"),
+        data["status"],
+        data["score"],
+        data["threshold"],
+        data["new_spans"],
+        data["baseline_spans"],
+        data["detail"].get("error_rate_new"),
+        data["detail"].get("error_rate_base"),
+        data["detail"].get("cost_new"),
+        data["detail"].get("cost_base"),
+        data["detail"].get("duration_new"),
+        data["detail"].get("duration_base"),
+        data["message"],
+    )
+    d = dict(row)
+    d["detail"] = data["detail"]
+    return d
+
+
+async def list_eval_runs(
+    request: Any, org_id: str, dataset_id: str
+) -> list[dict[str, Any]]:
+    pool = _pool(request)
+    rows = await pool.fetch(
+        """
+        SELECT id, dataset_id, prompt_name, prompt_version, baseline_version,
+               status, score, threshold, new_spans, baseline_spans,
+               error_rate_new, error_rate_base, cost_new, cost_base,
+               duration_new, duration_base, message, created_at
+        FROM eval_runs
+        WHERE org_id = $1 AND dataset_id = $2
+        ORDER BY created_at DESC
+        LIMIT 50
+        """,
+        org_id, dataset_id,
+    )
+    result = []
+    for r in rows:
+        d = dict(r)
+        d["detail"] = {
+            k: d.pop(k) for k in
+            ["error_rate_new", "error_rate_base", "cost_new", "cost_base",
+             "duration_new", "duration_base"]
+        }
+        result.append(d)
+    return result

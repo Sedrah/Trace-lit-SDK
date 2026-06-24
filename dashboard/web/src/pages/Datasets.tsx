@@ -8,8 +8,10 @@ import {
   getDatasetItems,
   deleteDatasetItem,
   downloadDatasetExport,
+  runEval,
+  getEvalRuns,
 } from "../api/client";
-import type { DatasetResponse, DatasetItemResponse } from "../types";
+import type { DatasetResponse, DatasetItemResponse, EvalRunResponse } from "../types";
 
 const LABEL_STYLES: Record<string, string> = {
   good:    "bg-green-100 text-green-700",
@@ -297,20 +299,231 @@ function DatasetItems({ datasetId }: { datasetId: string }) {
 }
 
 // ---------------------------------------------------------------------------
+// Eval panel
+// ---------------------------------------------------------------------------
+
+const STATUS_STYLES: Record<string, string> = {
+  passed: "bg-green-100 text-green-700",
+  failed: "bg-red-100 text-red-600",
+  error:  "bg-gray-100 text-gray-500",
+};
+
+function EvalPanel({ datasetId }: { datasetId: string }) {
+  const qc = useQueryClient();
+  const [promptName, setPromptName]       = useState("");
+  const [promptVersion, setPromptVersion] = useState("");
+  const [baselineVersion, setBaselineVersion] = useState("");
+  const [threshold, setThreshold]         = useState("0.8");
+  const [lastResult, setLastResult]       = useState<EvalRunResponse | null>(null);
+
+  const { data: runsData } = useQuery({
+    queryKey: ["eval-runs", datasetId],
+    queryFn: () => getEvalRuns(datasetId),
+  });
+
+  const runMutation = useMutation({
+    mutationFn: () => runEval(datasetId, {
+      prompt_name: promptName.trim(),
+      prompt_version: parseInt(promptVersion, 10),
+      baseline_version: baselineVersion ? parseInt(baselineVersion, 10) : undefined,
+      threshold: parseFloat(threshold) || 0.8,
+    }),
+    onSuccess: (result) => {
+      setLastResult(result);
+      qc.invalidateQueries({ queryKey: ["eval-runs", datasetId] });
+    },
+  });
+
+  const canRun = promptName.trim() && promptVersion && !runMutation.isPending;
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="px-5 py-3 border-b border-gray-100">
+        <h2 className="text-sm font-semibold text-gray-800">Quality gate</h2>
+        <p className="text-xs text-gray-400 mt-0.5">
+          Score a prompt version against this dataset's labeled examples.
+        </p>
+      </div>
+
+      {/* Run form */}
+      <div className="p-5 border-b border-gray-100 space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Prompt name</label>
+            <input
+              type="text"
+              value={promptName}
+              onChange={e => setPromptName(e.target.value)}
+              placeholder="e.g. system-prompt"
+              className="w-full text-sm px-2.5 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-brand-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">New version #</label>
+            <input
+              type="number"
+              value={promptVersion}
+              onChange={e => setPromptVersion(e.target.value)}
+              placeholder="e.g. 3"
+              className="w-full text-sm px-2.5 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-brand-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              Baseline version # <span className="text-gray-300 font-normal">(leave blank = use dataset)</span>
+            </label>
+            <input
+              type="number"
+              value={baselineVersion}
+              onChange={e => setBaselineVersion(e.target.value)}
+              placeholder="optional"
+              className="w-full text-sm px-2.5 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-brand-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Pass threshold</label>
+            <input
+              type="number"
+              min="0"
+              max="1"
+              step="0.05"
+              value={threshold}
+              onChange={e => setThreshold(e.target.value)}
+              className="w-full text-sm px-2.5 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-brand-500"
+            />
+          </div>
+        </div>
+
+        <button
+          onClick={() => runMutation.mutate()}
+          disabled={!canRun}
+          className="px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded hover:bg-brand-700 disabled:opacity-50"
+        >
+          {runMutation.isPending ? "Running…" : "Run eval"}
+        </button>
+
+        {/* Inline result */}
+        {lastResult && (
+          <div className={`rounded-lg border p-4 ${lastResult.status === "passed" ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"}`}>
+            <div className="flex items-center gap-2 mb-1">
+              <span className={`inline-flex px-2 py-0.5 rounded text-xs font-bold ${STATUS_STYLES[lastResult.status]}`}>
+                {lastResult.status.toUpperCase()}
+              </span>
+              <span className="text-sm font-semibold text-gray-800">
+                Score {(lastResult.score * 100).toFixed(0)}% (threshold {(lastResult.threshold * 100).toFixed(0)}%)
+              </span>
+            </div>
+            <p className="text-xs text-gray-600">{lastResult.message}</p>
+          </div>
+        )}
+
+        {runMutation.isError && (
+          <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
+            Eval failed — check that the prompt name and version exist in traces.
+          </p>
+        )}
+      </div>
+
+      {/* CI snippet */}
+      <div className="px-5 py-4 border-b border-gray-100">
+        <p className="text-xs font-semibold text-gray-600 mb-2">Use in CI (GitHub Actions)</p>
+        <pre className="text-xs bg-gray-900 text-green-400 rounded p-3 overflow-x-auto whitespace-pre">{`- name: Quality gate
+  run: |
+    curl -sf -X POST \\
+      https://app.trace-lit.com/api/v1/datasets/${datasetId}/eval \\
+      -H "X-Tracelit-Api-Key: \${{ secrets.TRACELIT_API_KEY }}" \\
+      -H "Content-Type: application/json" \\
+      -d '{"prompt_name":"${promptName || "your-prompt"}","prompt_version":\$VERSION,"threshold":${threshold}}'`}</pre>
+      </div>
+
+      {/* Run history */}
+      <div className="flex-1 overflow-y-auto">
+        <p className="px-5 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide border-b border-gray-100">
+          Run history
+        </p>
+        {!runsData?.items.length ? (
+          <p className="px-5 py-4 text-sm text-gray-400">No eval runs yet.</p>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wide">
+                <th className="px-4 py-2 text-left">Result</th>
+                <th className="px-4 py-2 text-left">Prompt</th>
+                <th className="px-4 py-2 text-right">Score</th>
+                <th className="px-4 py-2 text-right">Spans</th>
+                <th className="px-4 py-2 text-left">When</th>
+              </tr>
+            </thead>
+            <tbody>
+              {runsData.items.map((run: EvalRunResponse) => (
+                <tr key={run.id} className="border-b border-gray-50 hover:bg-gray-50">
+                  <td className="px-4 py-2.5">
+                    <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${STATUS_STYLES[run.status]}`}>
+                      {run.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-2.5 text-xs text-gray-700">
+                    {run.prompt_name} <span className="text-gray-400">v{run.prompt_version}</span>
+                  </td>
+                  <td className="px-4 py-2.5 text-right text-xs font-mono text-gray-700">
+                    {(run.score * 100).toFixed(0)}%
+                  </td>
+                  <td className="px-4 py-2.5 text-right text-xs text-gray-400">
+                    {run.new_spans} new / {run.baseline_spans} base
+                  </td>
+                  <td className="px-4 py-2.5 text-xs text-gray-400">
+                    {format(new Date(run.created_at), "MMM d HH:mm")}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Page
 // ---------------------------------------------------------------------------
 
+type Tab = "examples" | "eval";
+
 export default function Datasets() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [tab, setTab]               = useState<Tab>("examples");
 
   return (
     <div className="flex h-[calc(100vh-56px)]">
       <div className="w-64 shrink-0">
-        <DatasetList selected={selectedId} onSelect={setSelectedId} />
+        <DatasetList selected={selectedId} onSelect={(id) => { setSelectedId(id); setTab("examples"); }} />
       </div>
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden flex flex-col">
         {selectedId ? (
-          <DatasetItems datasetId={selectedId} />
+          <>
+            {/* Tab bar */}
+            <div className="flex border-b border-gray-200 bg-white shrink-0">
+              {(["examples", "eval"] as Tab[]).map(t => (
+                <button
+                  key={t}
+                  onClick={() => setTab(t)}
+                  className={`px-5 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
+                    tab === t
+                      ? "border-brand-600 text-brand-700"
+                      : "border-transparent text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  {t === "examples" ? "Examples" : "Quality gate"}
+                </button>
+              ))}
+            </div>
+            <div className="flex-1 overflow-hidden">
+              {tab === "examples"
+                ? <DatasetItems datasetId={selectedId} />
+                : <EvalPanel datasetId={selectedId} />}
+            </div>
+          </>
         ) : (
           <div className="flex items-center justify-center h-full text-sm text-gray-400">
             Select a dataset or create a new one.
