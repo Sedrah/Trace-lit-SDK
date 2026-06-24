@@ -21,6 +21,8 @@ import type {
   DatasetItemResponse,
   DatasetListResponse,
   DatasetResponse,
+  EvalRunListResponse,
+  EvalRunResponse,
   FailureListResponse,
   PromptListResponse,
   PromptVersionDetail,
@@ -312,6 +314,21 @@ export function addDatasetItem(
 
 export function deleteDatasetItem(datasetId: string, itemId: string): Promise<void> {
   return request(`/datasets/${datasetId}/items/${itemId}`, { method: "DELETE" });
+}
+
+export function runEval(
+  datasetId: string,
+  params: { prompt_name: string; prompt_version: number; baseline_version?: number; threshold?: number },
+): Promise<EvalRunResponse> {
+  return request(`/datasets/${datasetId}/eval`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+  });
+}
+
+export function getEvalRuns(datasetId: string): Promise<EvalRunListResponse> {
+  return request(`/datasets/${datasetId}/eval/runs`);
 }
 
 export async function downloadDatasetExport(datasetId: string, filename: string): Promise<void> {

@@ -294,3 +294,24 @@ export interface DatasetItemListResponse {
   dataset: DatasetResponse;
   items: DatasetItemResponse[];
 }
+
+// Eval runs
+export interface EvalRunResponse {
+  id: string;
+  dataset_id: string | null;
+  prompt_name: string;
+  prompt_version: number;
+  baseline_version: number | null;
+  status: "passed" | "failed" | "error";
+  score: number;
+  threshold: number;
+  new_spans: number;
+  baseline_spans: number;
+  message: string;
+  detail: Record<string, number | null>;
+  created_at: string;
+}
+
+export interface EvalRunListResponse {
+  items: EvalRunResponse[];
+}
