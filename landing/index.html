@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trace-lit — Agent Observability</title>
+<meta name="description" content="Trace every step, attribute every failure, version every prompt, and gate every release. Full-stack AI agent observability — self-hosted or cloud.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -12,29 +13,31 @@
 --bg:#08080a;--bg2:#0f0f12;--bg3:#16161a;
 --border:#1e1e24;--border2:#2e2e38;
 --text:#f4f4f0;--muted:#6b6b78;--accent:#7c6df0;--accent2:#a99ff5;
---green:#22c55e;--amber:#f59e0b;
+--green:#22c55e;--amber:#f59e0b;--red:#ef4444;
 }
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;overflow-x:hidden;cursor:none}
 
-/* custom cursor */
+/* cursor */
 .cursor{position:fixed;width:8px;height:8px;background:var(--accent2);border-radius:50%;pointer-events:none;z-index:9999;transition:transform .15s ease;mix-blend-mode:screen}
 .cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(169,159,245,0.3);border-radius:50%;pointer-events:none;z-index:9998;transition:transform .08s ease}
 
-/* grain overlay */
+/* grain */
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:1;opacity:0.4}
 
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(8,8,10,0.85);backdrop-filter:blur(20px)}
-.logo{font-size:17px;font-weight:700;letter-spacing:-0.04em;display:flex;align-items:center;gap:8px}
+.logo{font-size:17px;font-weight:700;letter-spacing:-0.04em;display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--text)}
 .logo-dot{width:7px;height:7px;background:var(--accent2);border-radius:50%;animation:logopulse 2.5s ease-in-out infinite}
 @keyframes logopulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.7)}}
 .logo span{color:var(--accent2)}
 .nav-links{display:flex;align-items:center;gap:12px}
-.nav-contact{background:transparent;color:var(--accent2);border:1px solid rgba(169,159,245,0.3);padding:8px 22px;border-radius:4px;font-size:13px;font-family:'Syne',sans-serif;font-weight:600;cursor:none;text-decoration:none;transition:all .2s;letter-spacing:0.02em}
-.nav-contact:hover{background:rgba(169,159,245,0.08);border-color:var(--accent2)}
-.nav-discord{background:transparent;color:var(--muted);border:1px solid var(--border2);padding:8px 18px;border-radius:4px;font-size:13px;font-family:'Syne',sans-serif;font-weight:600;cursor:none;text-decoration:none;transition:all .2s;letter-spacing:0.02em;display:flex;align-items:center;gap:7px}
-.nav-discord:hover{color:var(--text);border-color:var(--border2)}
+.nav-link{color:var(--muted);font-size:13px;font-weight:600;text-decoration:none;padding:6px 12px;transition:color .2s;letter-spacing:0.02em}
+.nav-link:hover{color:var(--text)}
+.nav-ghost{background:transparent;color:var(--accent2);border:1px solid rgba(169,159,245,0.3);padding:8px 22px;border-radius:4px;font-size:13px;font-family:'Syne',sans-serif;font-weight:600;cursor:none;text-decoration:none;transition:all .2s;letter-spacing:0.02em}
+.nav-ghost:hover{background:rgba(169,159,245,0.08);border-color:var(--accent2)}
+.nav-icon{background:transparent;color:var(--muted);border:1px solid var(--border2);padding:8px 14px;border-radius:4px;font-size:13px;font-family:'Syne',sans-serif;font-weight:600;cursor:none;text-decoration:none;transition:all .2s;letter-spacing:0.02em;display:flex;align-items:center;gap:7px}
+.nav-icon:hover{color:var(--text);border-color:var(--border2)}
 
 /* HERO */
 .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 48px 80px;text-align:center;position:relative;overflow:hidden}
@@ -45,11 +48,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 48px;display:fl
 .badge-dot{width:5px;height:5px;background:var(--accent2);border-radius:50%;animation:logopulse 2s ease-in-out infinite}
 h1{font-size:clamp(42px,6vw,80px);font-weight:800;letter-spacing:-0.05em;line-height:1.0;margin-bottom:24px;max-width:820px;animation:fadein .8s .1s ease both}
 h1 em{font-style:normal;color:var(--accent2)}
-.hero-sub{font-size:17px;color:var(--muted);max-width:480px;margin:0 auto 48px;line-height:1.75;font-weight:400;animation:fadein .8s .2s ease both}
-.hero-cta{animation:fadein .8s .3s ease both}
+.hero-sub{font-size:17px;color:var(--muted);max-width:520px;margin:0 auto 48px;line-height:1.75;font-weight:400;animation:fadein .8s .2s ease both}
+.hero-cta{display:flex;align-items:center;gap:12px;justify-content:center;animation:fadein .8s .3s ease both}
 .btn-main{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;border:none;padding:14px 32px;border-radius:4px;font-size:14px;font-family:'Syne',sans-serif;font-weight:700;cursor:none;text-decoration:none;transition:all .2s;letter-spacing:0.02em}
 .btn-main:hover{background:#6b5de0;transform:translateY(-1px)}
 .btn-main svg{width:14px;height:14px}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--muted);border:1px solid var(--border2);padding:14px 24px;border-radius:4px;font-size:14px;font-family:'Syne',sans-serif;font-weight:600;cursor:none;text-decoration:none;transition:all .2s;letter-spacing:0.02em}
+.btn-ghost:hover{color:var(--text);border-color:var(--border2)}
 
 /* TERMINAL */
 .terminal-section{padding:0 48px 100px;display:flex;justify-content:center;animation:fadein .8s .4s ease both}
@@ -66,15 +71,57 @@ h1 em{font-style:normal;color:var(--accent2)}
 .stat-num{font-size:32px;font-weight:800;letter-spacing:-0.04em;margin-bottom:6px}
 .stat-label{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:0.06em}
 
+/* SECTION SHARED */
+.section-eyebrow{text-align:center;font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);letter-spacing:0.12em;margin-bottom:48px}
+.section-title{text-align:center;font-size:clamp(28px,3.5vw,44px);font-weight:800;letter-spacing:-0.04em;margin-bottom:16px}
+.section-sub{text-align:center;color:var(--muted);font-size:15px;max-width:520px;margin:0 auto 56px;line-height:1.75}
+
 /* FEATURES */
 .features-section{padding:0 48px 100px}
-.section-eyebrow{text-align:center;font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);letter-spacing:0.12em;margin-bottom:48px}
 .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;max-width:960px;margin:0 auto}
 .feat{background:var(--bg2);padding:36px 32px;transition:background .2s}
 .feat:hover{background:var(--bg3)}
 .feat-mark{width:28px;height:2px;background:var(--accent2);margin-bottom:20px}
 .feat h3{font-size:15px;font-weight:600;margin-bottom:10px;letter-spacing:-0.02em}
 .feat p{font-size:13px;color:var(--muted);line-height:1.75}
+.feat-tag{display:inline-flex;margin-top:12px;padding:3px 8px;border-radius:2px;font-size:10px;font-family:'DM Mono',monospace;font-weight:600;letter-spacing:0.06em}
+.tag-enterprise{background:rgba(124,109,240,0.12);color:var(--accent2);border:1px solid rgba(124,109,240,0.2)}
+.tag-free{background:rgba(34,197,94,0.1);color:var(--green);border:1px solid rgba(34,197,94,0.2)}
+
+/* LIFECYCLE */
+.lifecycle-section{padding:0 48px 100px}
+.lifecycle-steps{display:flex;align-items:flex-start;justify-content:center;gap:0;max-width:960px;margin:0 auto;position:relative}
+.lifecycle-steps::before{content:'';position:absolute;top:20px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--border2),var(--border2),var(--border2),transparent);z-index:0}
+.lstep{flex:1;text-align:center;padding:0 16px;position:relative;z-index:1}
+.lstep-num{width:40px;height:40px;border-radius:50%;background:var(--bg2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:var(--accent2);transition:all .2s}
+.lstep:hover .lstep-num{background:var(--accent);border-color:var(--accent);color:#fff}
+.lstep h4{font-size:13px;font-weight:700;letter-spacing:-0.01em;margin-bottom:8px}
+.lstep p{font-size:12px;color:var(--muted);line-height:1.65}
+
+/* PRICING */
+.pricing-section{padding:0 48px 100px}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;max-width:960px;margin:0 auto}
+.plan{background:var(--bg2);padding:40px 36px;position:relative;display:flex;flex-direction:column}
+.plan-featured{background:var(--bg3)}
+.plan-badge{position:absolute;top:-1px;right:32px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:4px 12px;border-radius:0 0 4px 4px;letter-spacing:0.08em;font-family:'DM Mono',monospace}
+.plan-name{font-size:11px;font-weight:700;letter-spacing:0.1em;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:16px}
+.plan-price{font-size:42px;font-weight:800;letter-spacing:-0.05em;margin-bottom:4px;line-height:1}
+.plan-price span{font-size:16px;font-weight:400;color:var(--muted);letter-spacing:0}
+.plan-desc{font-size:13px;color:var(--muted);margin-bottom:32px;line-height:1.6;min-height:44px}
+.plan-cta{display:block;text-align:center;padding:11px 0;border-radius:4px;font-size:13px;font-weight:700;font-family:'Syne',sans-serif;text-decoration:none;transition:all .2s;letter-spacing:0.02em;margin-bottom:32px}
+.cta-solid{background:var(--accent);color:#fff}
+.cta-solid:hover{background:#6b5de0}
+.cta-outline{background:transparent;color:var(--accent2);border:1px solid rgba(169,159,245,0.3)}
+.cta-outline:hover{background:rgba(169,159,245,0.08)}
+.cta-muted{background:transparent;color:var(--muted);border:1px solid var(--border2)}
+.cta-muted:hover{border-color:var(--border2);color:var(--text)}
+.plan-divider{height:1px;background:var(--border);margin-bottom:24px}
+.plan-features{list-style:none;flex:1}
+.plan-features li{font-size:13px;color:var(--muted);padding:5px 0;display:flex;align-items:flex-start;gap:10px;line-height:1.5}
+.plan-features li::before{content:'✓';color:var(--green);font-weight:700;font-size:12px;flex-shrink:0;margin-top:1px}
+.plan-features li.dim::before{content:'✓';color:var(--border2)}
+.plan-features li.dim{color:var(--border2)}
+.plan-features li strong{color:var(--text);font-weight:600}
 
 /* FRAMEWORKS */
 .compat-section{padding:0 48px 100px;text-align:center}
@@ -87,19 +134,27 @@ h1 em{font-style:normal;color:var(--accent2)}
 .cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(124,109,240,0.08) 0%,transparent 70%);pointer-events:none}
 .cta-section h2{font-size:clamp(32px,4vw,56px);font-weight:800;letter-spacing:-0.04em;margin-bottom:14px;position:relative}
 .cta-section p{color:var(--muted);font-size:15px;margin-bottom:36px;position:relative}
-.cta-section a{position:relative}
 
 /* FOOTER */
 footer{padding:24px 48px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted);font-family:'DM Mono',monospace}
+.footer-links{display:flex;gap:24px}
+.footer-links a{color:var(--muted);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--text)}
 
 @media(max-width:768px){
 nav{padding:16px 24px}
+.nav-link{display:none}
 .hero{padding:100px 24px 60px}
+.hero-cta{flex-direction:column}
 h1{font-size:38px}
-.terminal-section,.stats-section,.features-section,.compat-section,.cta-section{padding-left:24px;padding-right:24px}
+.terminal-section,.stats-section,.features-section,.lifecycle-section,.pricing-section,.compat-section,.cta-section{padding-left:24px;padding-right:24px}
 .stats-inner{grid-template-columns:repeat(2,1fr)}
 .features-grid{grid-template-columns:1fr}
-footer{flex-direction:column;gap:8px;text-align:center}
+.lifecycle-steps{flex-direction:column;gap:32px}
+.lifecycle-steps::before{display:none}
+.pricing-grid{grid-template-columns:1fr}
+footer{flex-direction:column;gap:12px;text-align:center}
+.footer-links{justify-content:center;flex-wrap:wrap}
 body{cursor:auto}
 .cursor,.cursor-ring{display:none}
 }
@@ -111,34 +166,37 @@ body{cursor:auto}
 <div class="cursor-ring" id="cursorRing"></div>
 
 <nav>
-  <div class="logo"><div class="logo-dot"></div>trace<span>-lit</span></div>
+  <a href="/" class="logo"><div class="logo-dot"></div>trace<span>-lit</span></a>
   <div class="nav-links">
-    <a href="https://github.com/Sedrah/Trace-lit-SDK" target="_blank" class="nav-discord">
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#pricing" class="nav-link">Pricing</a>
+    <a href="https://github.com/Sedrah/Trace-lit-SDK" target="_blank" class="nav-icon">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
       GitHub
     </a>
-    <a href="https://discord.gg/XqDEFthE" target="_blank" class="nav-discord">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.032.055a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-      Discord
-    </a>
-    <a href="https://www.linkedin.com/in/sedra-abdlbaset/" target="_blank" class="nav-contact">Get in touch →</a>
+    <a href="https://app.trace-lit.com/signup" class="nav-ghost">Get started free →</a>
   </div>
 </nav>
 
+<!-- HERO -->
 <section class="hero">
   <div class="hero-glow"></div>
   <div class="hero-glow2"></div>
-  <div class="badge"><span class="badge-dot"></span>OPEN BETA · SDK v0.1.4</div>
-  <h1>Visibility into your<br><em>AI agents</em></h1>
-  <p class="hero-sub">Trace every hop, attribute every failure, monitor every dollar — across any agent framework. Fully air-gapped.</p>
+  <div class="badge"><span class="badge-dot"></span>OPEN SOURCE · SDK v0.1.4</div>
+  <h1>The full loop for<br><em>AI agent teams</em></h1>
+  <p class="hero-sub">Observe every run. Attribute every failure. Version every prompt. Ship with confidence. One platform — self-hosted or cloud.</p>
   <div class="hero-cta">
-    <a href="https://app.trace-lit.com" class="btn-main">
+    <a href="https://app.trace-lit.com/signup" class="btn-main">
       Start for free
       <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 7h10M7 2l5 5-5 5"/></svg>
+    </a>
+    <a href="https://github.com/Sedrah/Trace-lit-SDK" target="_blank" class="btn-ghost">
+      View on GitHub
     </a>
   </div>
 </section>
 
+<!-- TERMINAL -->
 <section class="terminal-section">
   <div class="terminal-wrap">
     <div class="term-bar">
@@ -147,7 +205,7 @@ body{cursor:auto}
       <div class="tdot" style="background:#22c55e"></div>
     </div>
     <div class="term-body">
-      <div><span class="tc"># Option 1 — Python SDK (any agent)</span></div>
+      <div><span class="tc"># Option 1 — Python SDK (any agent, one line)</span></div>
       <div><span class="tw">pip install tracelit-sdk</span></div>
       <br>
       <div><span class="tp">import</span> <span class="tw">trace_lit</span></div>
@@ -157,36 +215,192 @@ body{cursor:auto}
       <div><span class="tg">@trace_lit.trace</span><span class="tw">(agent_name=<span class="ta">"my-agent"</span>)</span></div>
       <div><span class="tp">def</span> <span class="tg">run</span><span class="tw">(query: str) -> str: ...</span></div>
       <br>
-      <div><span class="tc"># Option 2 — OpenTelemetry (LangGraph, CrewAI, zero code change)</span></div>
-      <div><span class="tw">OTEL_EXPORTER_OTLP_ENDPOINT=https://app.trace-lit.com/otlp</span></div>
+      <div><span class="tc"># Option 2 — OpenTelemetry (LangGraph, CrewAI, zero code)</span></div>
+      <div><span class="tw">OTEL_EXPORTER_OTLP_ENDPOINT=https://app.trace-lit.com/otlp \</span></div>
       <div><span class="tw">OTEL_EXPORTER_OTLP_HEADERS=<span class="ta">"Authorization=Bearer sk-..."</span></span></div>
       <br>
-      <div><span class="tg">✓</span> <span class="tw">trace received</span> <span class="tc">cost=$0.004 tokens=1203 status=success</span></div>
+      <div><span class="tg">✓</span> <span class="tw">trace received</span> <span class="tc">cost=$0.004  tokens=1,203  status=success</span></div>
     </div>
   </div>
 </section>
 
+<!-- STATS -->
 <section class="stats-section">
   <div class="stats-inner">
     <div class="stat"><div class="stat-num" style="color:var(--accent2)">1</div><div class="stat-label">LINE TO INSTRUMENT</div></div>
     <div class="stat"><div class="stat-num" style="color:var(--green)">&lt;50ms</div><div class="stat-label">TRACE OVERHEAD</div></div>
-    <div class="stat"><div class="stat-num">10+</div><div class="stat-label">FRAMEWORKS</div></div>
+    <div class="stat"><div class="stat-num">5</div><div class="stat-label">STEP PIPELINE</div></div>
     <div class="stat"><div class="stat-num">100%</div><div class="stat-label">SELF-HOSTABLE</div></div>
   </div>
 </section>
 
-<section class="features-section">
-  <div class="section-eyebrow">WHAT YOU GET</div>
-  <div class="features-grid">
-    <div class="feat"><div class="feat-mark"></div><h3>OTel native</h3><p>Point any OpenTelemetry-instrumented agent at Trace-lit with two env vars. LangGraph, CrewAI, and custom pipelines — zero code change.</p></div>
-    <div class="feat"><div class="feat-mark"></div><h3>Failure attribution</h3><p>Automatically identifies the root cause of every failure and which downstream steps cascaded from it — no external LLM, fully air-gapped.</p></div>
-    <div class="feat"><div class="feat-mark"></div><h3>Cost attribution</h3><p>Token spend and USD cost per agent, per run, per model. Broken down in the dashboard — no spreadsheets, no guessing.</p></div>
-    <div class="feat"><div class="feat-mark"></div><h3>Visual DAG</h3><p>Every agent run rendered as an execution graph. Green = success, red = root cause, orange = cascade. Readable without reading code.</p></div>
-    <div class="feat"><div class="feat-mark"></div><h3>LLM auto-patching</h3><p>One call to <code style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent2)">autopatch()</code> and every OpenAI or Anthropic call is traced automatically — model, tokens, cost, errors.</p></div>
-    <div class="feat"><div class="feat-mark"></div><h3>Fully air-gapped</h3><p>Single <code style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent2)">docker compose up</code>. No data leaves your infrastructure. Built for regulated industries from day one.</p></div>
+<!-- LIFECYCLE -->
+<section class="lifecycle-section">
+  <div class="section-eyebrow">THE FULL LOOP</div>
+  <h2 class="section-title">From deploy to ship — continuously</h2>
+  <p class="section-sub">Most tools stop at observability. Trace-lit covers the entire improvement cycle.</p>
+  <div class="lifecycle-steps">
+    <div class="lstep">
+      <div class="lstep-num">01</div>
+      <h4>Observe</h4>
+      <p>Every agent step, model call, token count, and cost — in real time.</p>
+    </div>
+    <div class="lstep">
+      <div class="lstep-num">02</div>
+      <h4>Debug</h4>
+      <p>Automatic root cause attribution — know which step broke and what cascaded.</p>
+    </div>
+    <div class="lstep">
+      <div class="lstep-num">03</div>
+      <h4>Version</h4>
+      <p>Every prompt change tracked automatically. Compare versions side by side.</p>
+    </div>
+    <div class="lstep">
+      <div class="lstep-num">04</div>
+      <h4>Curate</h4>
+      <p>Tag real runs as good or bad examples. Build a labeled dataset from production traces.</p>
+    </div>
+    <div class="lstep">
+      <div class="lstep-num">05</div>
+      <h4>Gate</h4>
+      <p>Score new versions against your dataset in CI. Fail the build if quality drops.</p>
+    </div>
   </div>
 </section>
 
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div class="section-eyebrow">WHAT YOU GET</div>
+  <div class="features-grid">
+    <div class="feat">
+      <div class="feat-mark"></div>
+      <h3>OTel native</h3>
+      <p>Point any OpenTelemetry-instrumented agent at Trace-lit with two env vars. LangGraph, CrewAI — zero code change.</p>
+      <div class="feat-tag tag-free">FREE</div>
+    </div>
+    <div class="feat">
+      <div class="feat-mark"></div>
+      <h3>Failure attribution</h3>
+      <p>Automatically identifies the root cause of every failure and which downstream steps cascaded — fully air-gapped, no external LLM needed.</p>
+      <div class="feat-tag tag-free">FREE</div>
+    </div>
+    <div class="feat">
+      <div class="feat-mark"></div>
+      <h3>Cost attribution</h3>
+      <p>Token spend and USD cost per agent, per run, per model. Broken down in the dashboard — no spreadsheets.</p>
+      <div class="feat-tag tag-free">FREE</div>
+    </div>
+    <div class="feat">
+      <div class="feat-mark"></div>
+      <h3>Prompt versioning</h3>
+      <p>Every prompt change tracked via content hash — no version numbers to manage. Compare any two versions with a line diff.</p>
+      <div class="feat-tag tag-free">FREE</div>
+    </div>
+    <div class="feat">
+      <div class="feat-mark"></div>
+      <h3>Dataset builder</h3>
+      <p>Tag spans as good, bad, or neutral directly from the trace detail. Export as JSONL for fine-tuning or external eval.</p>
+      <div class="feat-tag tag-free">FREE</div>
+    </div>
+    <div class="feat">
+      <div class="feat-mark"></div>
+      <h3>CI quality gate</h3>
+      <p>Score a new prompt version against your labeled dataset in CI. One <code style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent2)">curl</code> command — pass or fail.</p>
+      <div class="feat-tag tag-free">FREE</div>
+    </div>
+    <div class="feat">
+      <div class="feat-mark"></div>
+      <h3>AI failure analysis</h3>
+      <p>LLM-assisted root cause summaries using a local Ollama model. Plain-English explanations, no data leaves your environment.</p>
+      <div class="feat-tag tag-enterprise">ENTERPRISE</div>
+    </div>
+    <div class="feat">
+      <div class="feat-mark"></div>
+      <h3>I/O capture + redaction</h3>
+      <p>Capture the full input and output of every LLM call. Enterprise redaction strips PII and secrets before storage — compliance-ready.</p>
+      <div class="feat-tag tag-enterprise">ENTERPRISE</div>
+    </div>
+    <div class="feat">
+      <div class="feat-mark"></div>
+      <h3>Fully air-gapped</h3>
+      <p>Single <code style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent2)">docker compose up</code>. Your data never leaves your infrastructure. Built for regulated industries from day one.</p>
+      <div class="feat-tag tag-free">ALL PLANS</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <div class="section-eyebrow">PRICING</div>
+  <h2 class="section-title">Simple, transparent tiers</h2>
+  <p class="section-sub">Start free, self-hosted forever. Upgrade when you need managed infrastructure or enterprise compliance features.</p>
+  <div class="pricing-grid">
+
+    <!-- Community -->
+    <div class="plan">
+      <div class="plan-name">COMMUNITY</div>
+      <div class="plan-price">$0<span> / forever</span></div>
+      <div class="plan-desc">Self-hosted. Full platform, no limits, no expiry.</div>
+      <a href="https://github.com/Sedrah/Trace-lit-SDK" target="_blank" class="plan-cta cta-muted">Deploy yourself →</a>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>Unlimited agents &amp; traces</li>
+        <li>DAG visualization</li>
+        <li>Failure attribution (rule-based)</li>
+        <li>Cost &amp; token tracking</li>
+        <li>Prompt versioning &amp; diff</li>
+        <li>Dataset builder + JSONL export</li>
+        <li>CI quality gate</li>
+        <li>OTel / autopatch integration</li>
+        <li>Self-hosted via Docker Compose</li>
+      </ul>
+    </div>
+
+    <!-- Cloud -->
+    <div class="plan plan-featured">
+      <div class="plan-badge">POPULAR</div>
+      <div class="plan-name">CLOUD</div>
+      <div class="plan-price">$49<span> / month</span></div>
+      <div class="plan-desc">Fully managed. No infra to run — connect and go.</div>
+      <a href="https://app.trace-lit.com/signup" class="plan-cta cta-solid">Start free trial →</a>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li><strong>Everything in Community</strong></li>
+        <li>Managed hosting (no ops)</li>
+        <li>99.9% uptime SLA</li>
+        <li>Automatic backups</li>
+        <li>Up to 5 team members</li>
+        <li>Email support</li>
+        <li class="dim">AI failure analysis</li>
+        <li class="dim">I/O capture + redaction</li>
+        <li class="dim">SSO / audit logs</li>
+      </ul>
+    </div>
+
+    <!-- Enterprise -->
+    <div class="plan">
+      <div class="plan-name">ENTERPRISE</div>
+      <div class="plan-price" style="font-size:32px">Custom</div>
+      <div class="plan-desc">Air-gapped deployments, compliance features, and dedicated support.</div>
+      <a href="mailto:en.sedra@gmail.com?subject=Trace-lit Enterprise" class="plan-cta cta-outline">Talk to us →</a>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li><strong>Everything in Cloud</strong></li>
+        <li>AI failure analysis (local Ollama)</li>
+        <li>I/O capture + PII redaction engine</li>
+        <li>LLM-as-judge eval scoring</li>
+        <li>Air-gapped self-host support</li>
+        <li>SSO &amp; audit logs</li>
+        <li>Unlimited team members</li>
+        <li>Custom data retention</li>
+        <li>Dedicated support + SLA</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- FRAMEWORKS -->
 <section class="compat-section">
   <div class="section-eyebrow" style="margin-bottom:24px">WORKS WITH EVERY MAJOR FRAMEWORK</div>
   <div class="pills">
@@ -202,18 +416,28 @@ body{cursor:auto}
   </div>
 </section>
 
+<!-- FINAL CTA -->
 <section class="cta-section">
   <div class="cta-glow"></div>
   <h2>Ready to see inside<br>your agents?</h2>
-  <p>Sign up free — no credit card, no setup fees, self-hosted in minutes.</p>
-  <a href="https://app.trace-lit.com/signup" class="btn-main">
-    Get started free
-    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 7h10M7 2l5 5-5 5"/></svg>
-  </a>
+  <p>Sign up free — no credit card required. Self-hosted in under 5 minutes.</p>
+  <div style="display:flex;gap:12px;justify-content:center">
+    <a href="https://app.trace-lit.com/signup" class="btn-main">
+      Get started free
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 7h10M7 2l5 5-5 5"/></svg>
+    </a>
+    <a href="mailto:en.sedra@gmail.com?subject=Trace-lit Enterprise" class="btn-ghost">Talk to sales</a>
+  </div>
 </section>
 
 <footer>
   <span>© 2026 Trace-lit</span>
+  <div class="footer-links">
+    <a href="https://github.com/Sedrah/Trace-lit-SDK" target="_blank">GitHub</a>
+    <a href="https://github.com/Sedrah/Trace-lit-SDK/blob/main/README.md" target="_blank">Docs</a>
+    <a href="#pricing">Pricing</a>
+    <a href="mailto:en.sedra@gmail.com">Contact</a>
+  </div>
   <span>Built in Berlin</span>
 </footer>
 
@@ -224,10 +448,6 @@ let mx=0,my=0,rx=0,ry=0;
 document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.transform=`translate(${mx-4}px,${my-4}px)`;});
 function animRing(){rx+=(mx-rx-16)*.12;ry+=(my-ry-16)*.12;ring.style.transform=`translate(${rx}px,${ry}px)`;requestAnimationFrame(animRing);}
 animRing();
-document.querySelectorAll('a,button').forEach(el=>{
-  el.addEventListener('mouseenter',()=>{cursor.style.transform+=` scale(2)`;ring.style.transform+=` scale(1.5)`;});
-  el.addEventListener('mouseleave',()=>{});
-});
 </script>
 </body>
 </html>
