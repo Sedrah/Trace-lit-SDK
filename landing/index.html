@@ -87,7 +87,7 @@
 </script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -97,7 +97,7 @@
 --green:#22c55e;--amber:#f59e0b;--red:#ef4444;
 }
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;overflow-x:hidden;cursor:none}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden;cursor:none}
 
 /* cursor */
 .cursor{position:fixed;width:8px;height:8px;background:var(--accent2);border-radius:50%;pointer-events:none;z-index:9999;transition:transform .15s ease;mix-blend-mode:screen}
@@ -115,40 +115,56 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 48px;display:fl
 .nav-links{display:flex;align-items:center;gap:12px}
 .nav-link{color:var(--muted);font-size:13px;font-weight:600;text-decoration:none;padding:6px 12px;transition:color .2s;letter-spacing:0.02em}
 .nav-link:hover{color:var(--text)}
-.nav-ghost{background:transparent;color:var(--accent2);border:1px solid rgba(169,159,245,0.3);padding:8px 22px;border-radius:4px;font-size:13px;font-family:'Syne',sans-serif;font-weight:600;cursor:none;text-decoration:none;transition:all .2s;letter-spacing:0.02em}
+.nav-ghost{background:transparent;color:var(--accent2);border:1px solid rgba(169,159,245,0.3);padding:8px 22px;border-radius:4px;font-size:13px;font-family:'Inter',sans-serif;font-weight:600;cursor:none;text-decoration:none;transition:all .2s;letter-spacing:0.02em}
 .nav-ghost:hover{background:rgba(169,159,245,0.08);border-color:var(--accent2)}
-.nav-icon{background:transparent;color:var(--muted);border:1px solid var(--border2);padding:8px 14px;border-radius:4px;font-size:13px;font-family:'Syne',sans-serif;font-weight:600;cursor:none;text-decoration:none;transition:all .2s;letter-spacing:0.02em;display:flex;align-items:center;gap:7px}
+.nav-icon{background:transparent;color:var(--muted);border:1px solid var(--border2);padding:8px 14px;border-radius:4px;font-size:13px;font-family:'Inter',sans-serif;font-weight:600;cursor:none;text-decoration:none;transition:all .2s;letter-spacing:0.02em;display:flex;align-items:center;gap:7px}
 .nav-icon:hover{color:var(--text);border-color:var(--border2)}
 
 /* HERO */
 .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 48px 80px;text-align:center;position:relative;overflow:hidden}
 .hero-glow{position:absolute;top:20%;left:50%;transform:translateX(-50%);width:700px;height:500px;background:radial-gradient(ellipse,rgba(124,109,240,0.12) 0%,transparent 65%);pointer-events:none}
 .hero-glow2{position:absolute;bottom:-100px;left:20%;width:400px;height:400px;background:radial-gradient(ellipse,rgba(124,109,240,0.06) 0%,transparent 70%);pointer-events:none}
-.badge{display:inline-flex;align-items:center;gap:7px;background:rgba(124,109,240,0.1);border:1px solid rgba(124,109,240,0.25);color:var(--accent2);font-size:11px;font-weight:600;padding:5px 14px;border-radius:2px;letter-spacing:0.1em;margin-bottom:32px;font-family:'DM Mono',monospace;animation:fadein .8s ease forwards}
-@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.badge-dot{width:5px;height:5px;background:var(--accent2);border-radius:50%;animation:logopulse 2s ease-in-out infinite}
-h1{font-size:clamp(42px,6vw,80px);font-weight:800;letter-spacing:-0.05em;line-height:1.0;margin-bottom:24px;max-width:820px;animation:fadein .8s .1s ease both}
+@keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* Audience toggle */
+.audience-tabs{display:flex;gap:6px;margin-bottom:40px;background:var(--bg2);border:1px solid var(--border);border-radius:100px;padding:5px;animation:fadein .6s ease both}
+.aud-tab{padding:10px 24px;border-radius:100px;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .2s}
+.aud-tab.aud-active{background:var(--bg3);color:var(--text);border:1px solid var(--border2);box-shadow:0 1px 4px rgba(0,0,0,0.3)}
+.aud-panel{width:100%;max-width:920px;animation:fadein .4s ease both}
+
+/* Hero content */
+.hero-label{font-size:11px;font-weight:600;letter-spacing:0.1em;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:20px}
+h1{font-size:clamp(36px,5vw,68px);font-weight:800;letter-spacing:-0.04em;line-height:1.05;margin-bottom:20px}
 h1 em{font-style:normal;color:var(--accent2)}
-.hero-sub{font-size:17px;color:var(--muted);max-width:520px;margin:0 auto 48px;line-height:1.75;font-weight:400;animation:fadein .8s .2s ease both}
-.hero-cta{display:flex;align-items:center;gap:12px;justify-content:center;animation:fadein .8s .3s ease both}
-.btn-main{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;border:none;padding:14px 32px;border-radius:4px;font-size:14px;font-family:'Syne',sans-serif;font-weight:700;cursor:none;text-decoration:none;transition:all .2s;letter-spacing:0.02em}
+.hero-sub{font-size:18px;color:var(--muted);max-width:540px;margin:0 auto 40px;line-height:1.7;font-weight:400}
+
+/* 3 steps in hero */
+.hero-steps{display:flex;align-items:stretch;justify-content:center;gap:0;margin:0 auto 40px;max-width:860px}
+.hero-step{flex:1;background:var(--bg2);border:1px solid var(--border);padding:24px 22px;text-align:left;position:relative}
+.hero-step:first-child{border-radius:8px 0 0 8px}
+.hero-step:last-child{border-radius:0 8px 8px 0}
+.hstep-highlight{background:rgba(124,109,240,0.07);border-color:rgba(124,109,240,0.25)}
+.hero-step-arrow{display:flex;align-items:center;padding:0;color:var(--border2);font-size:16px;flex-shrink:0}
+.hstep-you{font-size:10px;font-weight:700;letter-spacing:0.08em;color:var(--accent2);font-family:'DM Mono',monospace;margin-bottom:10px;display:block}
+.hstep-dev{font-size:10px;font-weight:700;letter-spacing:0.08em;color:var(--amber);font-family:'DM Mono',monospace;margin-bottom:10px;display:block}
+.hstep-title{font-size:16px;font-weight:700;margin-bottom:8px;color:var(--text)}
+.hstep-desc{font-size:13px;color:var(--muted);line-height:1.65}
+
+/* dev hero code */
+.hero-code{width:100%;max-width:600px;margin:0 auto 36px;border:1px solid var(--border2);border-radius:8px;overflow:hidden;background:var(--bg2);text-align:left}
+.hero-code-bar{background:var(--bg3);padding:10px 16px;display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--border)}
+.hero-code-body{padding:20px 24px;font-family:'DM Mono',monospace;font-size:13px;line-height:1.9}
+.tc{color:var(--muted)}.tp{color:var(--accent2)}.tg{color:var(--green)}.ta{color:var(--amber)}.tw{color:var(--text)}
+.tdot{width:10px;height:10px;border-radius:50%}
+
+.hero-cta{display:flex;align-items:center;gap:12px;justify-content:center}
+.btn-main{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;border:none;padding:14px 32px;border-radius:6px;font-size:15px;font-family:'Inter',sans-serif;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s}
 .btn-main:hover{background:#6b5de0;transform:translateY(-1px)}
 .btn-main svg{width:14px;height:14px}
-.btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--muted);border:1px solid var(--border2);padding:14px 24px;border-radius:4px;font-size:14px;font-family:'Syne',sans-serif;font-weight:600;cursor:none;text-decoration:none;transition:all .2s;letter-spacing:0.02em}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--muted);border:1px solid var(--border2);padding:14px 24px;border-radius:6px;font-size:15px;font-family:'Inter',sans-serif;font-weight:600;cursor:pointer;text-decoration:none;transition:all .2s}
 .btn-ghost:hover{color:var(--text);border-color:var(--border2)}
 
-/* HOW IT WORKS */
-.howto-section{padding:0 48px 100px;text-align:center}
-.howto-steps{display:flex;align-items:flex-start;justify-content:center;gap:0;max-width:960px;margin:0 auto}
-.howto-step{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:32px 28px;text-align:left;transition:border-color .2s}
-.howto-step:hover{border-color:var(--border2)}
-.howto-connector{flex-shrink:0;width:40px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:18px;padding-top:48px}
-.howto-icon{width:36px;height:36px;border-radius:50%;background:rgba(124,109,240,0.12);border:1px solid rgba(124,109,240,0.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:'DM Mono',monospace;color:var(--accent2);margin-bottom:16px}
-.howto-content h3{font-size:15px;font-weight:700;letter-spacing:-0.02em;margin-bottom:10px}
-.howto-content p{font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:16px}
-.howto-action{margin-top:4px}
-.howto-chip{display:inline-flex;padding:4px 12px;border-radius:2px;font-size:11px;font-family:'DM Mono',monospace;font-weight:600;letter-spacing:0.06em;background:rgba(107,107,120,0.15);color:var(--muted);border:1px solid var(--border2)}
-.howto-chip-green{background:rgba(34,197,94,0.1);color:var(--green);border-color:rgba(34,197,94,0.2)}
+/* (howto section removed — merged into hero) */
 
 /* STATS */
 .stats-section{padding:0 48px 100px}
@@ -187,7 +203,7 @@ h1 em{font-style:normal;color:var(--accent2)}
 /* PRICING */
 .pricing-section{padding:0 48px 100px}
 .pricing-tabs{display:flex;gap:4px;justify-content:center;margin-bottom:48px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:4px;width:fit-content;margin-left:auto;margin-right:auto}
-.pricing-tab{padding:8px 28px;border-radius:4px;font-size:13px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .2s;letter-spacing:0.02em}
+.pricing-tab{padding:8px 28px;border-radius:4px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .2s;letter-spacing:0.02em}
 .pricing-tab.active{background:var(--bg3);color:var(--text);border:1px solid var(--border2)}
 .pricing-panel{display:none}.pricing-panel.active{display:block}
 .pricing-label{text-align:center;font-size:12px;color:var(--muted);margin-bottom:20px;font-family:'DM Mono',monospace;letter-spacing:0.06em}
@@ -199,7 +215,7 @@ h1 em{font-style:normal;color:var(--accent2)}
 .plan-price{font-size:42px;font-weight:800;letter-spacing:-0.05em;margin-bottom:4px;line-height:1}
 .plan-price span{font-size:16px;font-weight:400;color:var(--muted);letter-spacing:0}
 .plan-desc{font-size:13px;color:var(--muted);margin-bottom:32px;line-height:1.6;min-height:44px}
-.plan-cta{display:block;text-align:center;padding:11px 0;border-radius:4px;font-size:13px;font-weight:700;font-family:'Syne',sans-serif;text-decoration:none;transition:all .2s;letter-spacing:0.02em;margin-bottom:32px}
+.plan-cta{display:block;text-align:center;padding:11px 0;border-radius:4px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;text-decoration:none;transition:all .2s;letter-spacing:0.02em;margin-bottom:32px}
 .cta-solid{background:var(--accent);color:#fff}
 .cta-solid:hover{background:#6b5de0}
 .cta-outline{background:transparent;color:var(--accent2);border:1px solid rgba(169,159,245,0.3)}
@@ -235,18 +251,20 @@ footer{padding:24px 48px;border-top:1px solid var(--border);display:flex;align-i
 @media(max-width:768px){
 nav{padding:16px 24px}
 .nav-link{display:none}
-.hero{padding:100px 24px 60px}
+.hero{padding:100px 20px 60px}
+.audience-tabs{flex-direction:column;border-radius:12px}
+.hero-steps{flex-direction:column}
+.hero-step{border-radius:8px !important}
+.hero-step-arrow{display:none}
 .hero-cta{flex-direction:column}
-h1{font-size:38px}
-.howto-section,.stats-section,.features-section,.lifecycle-section,.pricing-section,.compat-section,.cta-section{padding-left:24px;padding-right:24px}
+h1{font-size:34px}
+.stats-section,.features-section,.lifecycle-section,.pricing-section,.compat-section,.cta-section{padding-left:24px;padding-right:24px}
 .stats-inner{grid-template-columns:repeat(2,1fr)}
 .features-grid{grid-template-columns:1fr}
 .lifecycle-steps{flex-direction:column;gap:32px}
 .lifecycle-steps::before{display:none}
 .pricing-grid{grid-template-columns:1fr !important}
-.howto-steps{display:flex;flex-direction:column;gap:16px}
-.howto-connector{display:none}
-.pricing-tabs{flex-direction:column;width:calc(100% - 48px)}
+.pricing-tabs{flex-direction:column;width:100%}
 footer{flex-direction:column;gap:12px;text-align:center}
 .footer-links{justify-content:center;flex-wrap:wrap}
 body{cursor:auto}
@@ -276,57 +294,83 @@ body{cursor:auto}
 <section class="hero">
   <div class="hero-glow"></div>
   <div class="hero-glow2"></div>
-  <div class="badge"><span class="badge-dot"></span>NO CODING REQUIRED ON YOUR END</div>
-  <h1>Finally know what your<br><em>AI agents are doing</em></h1>
-  <p class="hero-sub">See every run, every failure, and every dollar spent — in plain English. Sign up in 30 seconds, share one email with your developer, and your dashboard is live.</p>
-  <div class="hero-cta">
-    <a href="https://app.trace-lit.com/signup" class="btn-main">
-      Start free — no card needed
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 7h10M7 2l5 5-5 5"/></svg>
-    </a>
-    <a href="#pricing" class="btn-ghost">
-      See pricing
-    </a>
-  </div>
-</section>
 
-<!-- HOW IT WORKS -->
-<section class="howto-section">
-  <div class="section-eyebrow">HOW IT WORKS</div>
-  <h2 class="section-title">Three steps. You only do two.</h2>
-  <p class="section-sub">You don't need to write a single line of code. Your developer handles the one-time setup — then the dashboard is yours.</p>
-  <div class="howto-steps">
-    <div class="howto-step">
-      <div class="howto-icon">01</div>
-      <div class="howto-content">
-        <h3>Sign up &amp; get your key</h3>
-        <p>Create your account in 30 seconds. You'll get a personal API key — one short string of text.</p>
-        <div class="howto-action">
-          <a href="https://app.trace-lit.com/signup" class="btn-main" style="font-size:13px;padding:10px 22px">
-            Sign up free →
-          </a>
-        </div>
+  <!-- Audience toggle — FIRST THING on the page -->
+  <div class="audience-tabs">
+    <button class="aud-tab aud-active" onclick="switchAudience('ntech',this)">👤 I manage AI — I don't code</button>
+    <button class="aud-tab" onclick="switchAudience('dev',this)">👩‍💻 I build AI agents</button>
+  </div>
+
+  <!-- ── NON-TECH VIEW (default) ─────────────────────────────── -->
+  <div class="aud-panel" id="aud-ntech">
+    <div class="hero-label">FOR PRODUCT MANAGERS · OPS TEAMS · BUSINESS OWNERS</div>
+    <h1>Your AI agents are running.<br><em>Do you know if they're working?</em></h1>
+    <p class="hero-sub">See what they did, what went wrong, and what it cost — all in plain English. No coding. No log files. No asking your developer.</p>
+
+    <!-- 3 steps inline — visible without scrolling -->
+    <div class="hero-steps">
+      <div class="hero-step">
+        <span class="hstep-you">YOU DO THIS</span>
+        <div class="hstep-title">Sign up</div>
+        <div class="hstep-desc">30 seconds. You get one key — a short string of text. That's it from you for now.</div>
+      </div>
+      <div class="hero-step-arrow">→</div>
+      <div class="hero-step">
+        <span class="hstep-dev">YOUR DEVELOPER DOES THIS ONCE</span>
+        <div class="hstep-title">Paste 2 settings</div>
+        <div class="hstep-desc">No new code. Just two env vars in their deploy panel. Takes 5 minutes. Never needs touching again.</div>
+      </div>
+      <div class="hero-step-arrow">→</div>
+      <div class="hero-step hstep-highlight">
+        <span class="hstep-you">THEN IT'S ALL YOURS</span>
+        <div class="hstep-title">Open your dashboard</div>
+        <div class="hstep-desc">Every run, failure, and cost — live. Plain English. You own it. No dev required, ever again.</div>
       </div>
     </div>
-    <div class="howto-connector">→</div>
-    <div class="howto-step">
-      <div class="howto-icon">02</div>
-      <div class="howto-content">
-        <h3>Forward one email to your developer</h3>
-        <p>Inside the dashboard, click "Setup guide." It generates a ready-to-send email with your key pre-filled. Your developer adds two lines to the agent — done. One time, ever.</p>
-        <div class="howto-chip">Your developer spends ~5 minutes. You spend 0.</div>
-      </div>
-    </div>
-    <div class="howto-connector">→</div>
-    <div class="howto-step">
-      <div class="howto-icon">03</div>
-      <div class="howto-content">
-        <h3>Open your dashboard</h3>
-        <p>Every agent run appears in real time. See what ran, what failed, what it cost — all in plain English. No logs. No code. No guessing.</p>
-        <div class="howto-chip howto-chip-green">Live within minutes</div>
-      </div>
+
+    <div class="hero-cta">
+      <a href="https://app.trace-lit.com/signup" class="btn-main">
+        Start free — no card needed
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 7h10M7 2l5 5-5 5"/></svg>
+      </a>
+      <a href="#pricing" class="btn-ghost">Plans from $9 / month</a>
     </div>
   </div>
+
+  <!-- ── DEVELOPER VIEW ──────────────────────────────────────── -->
+  <div class="aud-panel" id="aud-dev" style="display:none">
+    <div class="hero-label">FOR DEVELOPERS BUILDING AI AGENTS</div>
+    <h1>Full observability for<br><em>LangChain, LangGraph, CrewAI</em></h1>
+    <p class="hero-sub">Trace every span, attribute every failure, version every prompt. One SDK or any OTel exporter — self-hosted or cloud.</p>
+
+    <div class="hero-code">
+      <div class="hero-code-bar">
+        <div class="tdot" style="background:#ef4444"></div>
+        <div class="tdot" style="background:#f59e0b"></div>
+        <div class="tdot" style="background:#22c55e"></div>
+      </div>
+      <div class="hero-code-body">
+        <div><span class="tc"># Option A — Python SDK (2 lines)</span></div>
+        <div><span class="tw">pip install tracelit-sdk</span></div>
+        <div><span class="tw">trace_lit.configure(api_key=<span class="ta">"sk-..."</span>); trace_lit.autopatch()</span></div>
+        <br>
+        <div><span class="tc"># Option B — OTel env vars (zero code, any framework)</span></div>
+        <div><span class="tp">OTEL_EXPORTER_OTLP_ENDPOINT</span><span class="tw">=https://app.trace-lit.com/otlp</span></div>
+        <div><span class="tp">OTEL_EXPORTER_OTLP_HEADERS</span><span class="tw">="Authorization=Bearer sk-..."</span></div>
+        <br>
+        <div><span class="tg">✓</span> <span class="tw">trace received</span> <span class="tc">cost=$0.004  tokens=1,203  status=ok</span></div>
+      </div>
+    </div>
+
+    <div class="hero-cta">
+      <a href="https://github.com/Sedrah/Trace-lit-SDK" target="_blank" class="btn-main">
+        View on GitHub
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 7h10M7 2l5 5-5 5"/></svg>
+      </a>
+      <a href="https://app.trace-lit.com/signup" class="btn-ghost">Start free</a>
+    </div>
+  </div>
+
 </section>
 
 <!-- STATS -->
@@ -630,6 +674,12 @@ body{cursor:auto}
 </footer>
 
 <script>
+function switchAudience(aud, btn) {
+  document.querySelectorAll('.aud-tab').forEach(t => t.classList.remove('aud-active'));
+  document.querySelectorAll('.aud-panel').forEach(p => { p.style.display='none'; });
+  btn.classList.add('aud-active');
+  document.getElementById('aud-' + aud).style.display = 'block';
+}
 function switchTab(tab, btn) {
   document.querySelectorAll('.pricing-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.pricing-panel').forEach(p => p.classList.remove('active'));
