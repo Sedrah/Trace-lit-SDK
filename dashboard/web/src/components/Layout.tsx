@@ -12,6 +12,7 @@ const NAV = [
   { to: "/failures",  label: "Failures",  icon: "⚠" },
   { to: "/alerts",    label: "Alerts",    icon: "🔔" },
   { to: "/settings",  label: "Settings",  icon: "⚙" },
+  { to: "/setup",     label: "Setup guide", icon: "→" },
 ];
 
 function useMe() {

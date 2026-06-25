@@ -238,6 +238,15 @@ export function deleteSettingsKey(id: number): Promise<void> {
   return request(`/settings/keys/${id}`, { method: "DELETE" });
 }
 
+export async function checkHasTraces(): Promise<boolean> {
+  try {
+    const data = await request<{ items: unknown[] }>("/traces?limit=1");
+    return (data.items?.length ?? 0) > 0;
+  } catch {
+    return false;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Prompts
 // ---------------------------------------------------------------------------
