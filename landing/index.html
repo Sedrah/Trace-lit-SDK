@@ -186,7 +186,12 @@ h1 em{font-style:normal;color:var(--accent2)}
 
 /* PRICING */
 .pricing-section{padding:0 48px 100px}
-.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;max-width:960px;margin:0 auto}
+.pricing-tabs{display:flex;gap:4px;justify-content:center;margin-bottom:48px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:4px;width:fit-content;margin-left:auto;margin-right:auto}
+.pricing-tab{padding:8px 28px;border-radius:4px;font-size:13px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .2s;letter-spacing:0.02em}
+.pricing-tab.active{background:var(--bg3);color:var(--text);border:1px solid var(--border2)}
+.pricing-panel{display:none}.pricing-panel.active{display:block}
+.pricing-label{text-align:center;font-size:12px;color:var(--muted);margin-bottom:20px;font-family:'DM Mono',monospace;letter-spacing:0.06em}
+.pricing-grid{display:grid;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;max-width:960px;margin:0 auto}
 .plan{background:var(--bg2);padding:40px 36px;position:relative;display:flex;flex-direction:column}
 .plan-featured{background:var(--bg3)}
 .plan-badge{position:absolute;top:-1px;right:32px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:4px 12px;border-radius:0 0 4px 4px;letter-spacing:0.08em;font-family:'DM Mono',monospace}
@@ -238,9 +243,10 @@ h1{font-size:38px}
 .features-grid{grid-template-columns:1fr}
 .lifecycle-steps{flex-direction:column;gap:32px}
 .lifecycle-steps::before{display:none}
-.pricing-grid,.howto-steps{grid-template-columns:1fr}
+.pricing-grid{grid-template-columns:1fr !important}
 .howto-steps{display:flex;flex-direction:column;gap:16px}
 .howto-connector{display:none}
+.pricing-tabs{flex-direction:column;width:calc(100% - 48px)}
 footer{flex-direction:column;gap:12px;text-align:center}
 .footer-links{justify-content:center;flex-wrap:wrap}
 body{cursor:auto}
@@ -431,81 +437,155 @@ body{cursor:auto}
 <!-- PRICING -->
 <section class="pricing-section" id="pricing">
   <div class="section-eyebrow">PRICING</div>
-  <h2 class="section-title">Less than a coffee per week</h2>
-  <p class="section-sub">Start free. No credit card. No setup fees. Cancel any time.</p>
-  <div class="pricing-grid" style="grid-template-columns:repeat(4,1fr)">
+  <h2 class="section-title">Simple, honest pricing</h2>
+  <p class="section-sub">Two ways to run Trace-lit. Pick what fits your team.</p>
 
-    <!-- Hobby -->
-    <div class="plan">
-      <div class="plan-name">HOBBY</div>
-      <div class="plan-price">$0<span> / forever</span></div>
-      <div class="plan-desc">Try it free on our cloud. No installation needed.</div>
-      <a href="https://app.trace-lit.com/signup" class="plan-cta cta-muted">Start free →</a>
-      <div class="plan-divider"></div>
-      <ul class="plan-features">
-        <li>10,000 runs/month</li>
-        <li>14 days history</li>
-        <li>1 user</li>
-        <li>All core features</li>
-        <li>Setup guide for your developer</li>
-      </ul>
-    </div>
-
-    <!-- Cloud -->
-    <div class="plan plan-featured">
-      <div class="plan-badge">MOST POPULAR</div>
-      <div class="plan-name">CLOUD</div>
-      <div class="plan-price">$9<span> / month</span></div>
-      <div class="plan-desc">Everything you need. Nothing to install or manage.</div>
-      <a href="https://app.trace-lit.com/signup" class="plan-cta cta-solid">Start free trial →</a>
-      <div class="plan-divider"></div>
-      <ul class="plan-features">
-        <li><strong>Unlimited runs</strong></li>
-        <li>90 days history</li>
-        <li>Up to 5 team members</li>
-        <li>All core features</li>
-        <li>Failure alerts by email</li>
-        <li>Managed hosting — no ops</li>
-        <li>99.9% uptime</li>
-        <li>Email support</li>
-      </ul>
-    </div>
-
-    <!-- Open Source -->
-    <div class="plan">
-      <div class="plan-name">OPEN SOURCE</div>
-      <div class="plan-price">$0<span> / forever</span></div>
-      <div class="plan-desc">Self-hosted on your own servers. Full control, no limits.</div>
-      <a href="https://github.com/Sedrah/Trace-lit-SDK" target="_blank" class="plan-cta cta-muted">Deploy yourself →</a>
-      <div class="plan-divider"></div>
-      <ul class="plan-features">
-        <li>Unlimited runs &amp; users</li>
-        <li>Unlimited history</li>
-        <li>All core features</li>
-        <li>Your data, your servers</li>
-        <li>Community support</li>
-      </ul>
-    </div>
-
-    <!-- Enterprise -->
-    <div class="plan">
-      <div class="plan-name">ENTERPRISE</div>
-      <div class="plan-price" style="font-size:28px">Custom</div>
-      <div class="plan-desc">Compliance, privacy controls, and hands-on support for regulated teams.</div>
-      <a href="mailto:en.sedra@gmail.com?subject=Trace-lit Enterprise" class="plan-cta cta-outline">Talk to us →</a>
-      <div class="plan-divider"></div>
-      <ul class="plan-features">
-        <li><strong>Everything in Cloud</strong></li>
-        <li>Plain-English AI failure reports</li>
-        <li>Conversation history + PII redaction</li>
-        <li>Air-gapped private deployment</li>
-        <li>SSO &amp; audit logs</li>
-        <li>Unlimited team members</li>
-        <li>Dedicated support + SLA</li>
-      </ul>
-    </div>
-
+  <div class="pricing-tabs">
+    <button class="pricing-tab active" onclick="switchTab('cloud',this)">☁ Cloud — no setup</button>
+    <button class="pricing-tab" onclick="switchTab('selfhost',this)">⚙ Self-hosted — your servers</button>
   </div>
+
+  <!-- CLOUD PLANS -->
+  <div class="pricing-panel active" id="tab-cloud">
+    <p class="pricing-label">MANAGED BY TRACE-LIT · NO INSTALLATION · PROXY SETUP IN 2 MINUTES</p>
+    <div class="pricing-grid" style="grid-template-columns:repeat(3,1fr)">
+
+      <!-- Hobby -->
+      <div class="plan">
+        <div class="plan-name">HOBBY</div>
+        <div class="plan-price">$0<span> / forever</span></div>
+        <div class="plan-desc">Try it free. No credit card, no installation.</div>
+        <a href="https://app.trace-lit.com/signup" class="plan-cta cta-muted">Start free →</a>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>10,000 runs / month</li>
+          <li>14 days history</li>
+          <li>1 user</li>
+          <li>All core features</li>
+          <li>2-minute proxy setup — no code</li>
+          <li>Setup guide for your developer</li>
+        </ul>
+      </div>
+
+      <!-- Cloud -->
+      <div class="plan plan-featured">
+        <div class="plan-badge">MOST POPULAR</div>
+        <div class="plan-name">CLOUD</div>
+        <div class="plan-price">$9<span> / month</span></div>
+        <div class="plan-desc">Unlimited runs, more history, more team members.</div>
+        <a href="https://app.trace-lit.com/signup" class="plan-cta cta-solid">Start free trial →</a>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><strong>Unlimited runs</strong></li>
+          <li>90 days history</li>
+          <li>Up to 5 team members</li>
+          <li>All core features</li>
+          <li>2-minute proxy setup — no code</li>
+          <li>Failure alerts by email</li>
+          <li>99.9% uptime SLA</li>
+          <li>Email support</li>
+        </ul>
+      </div>
+
+      <!-- Enterprise Cloud -->
+      <div class="plan">
+        <div class="plan-name">ENTERPRISE</div>
+        <div class="plan-price" style="font-size:28px">Custom</div>
+        <div class="plan-desc">Compliance features and hands-on support for larger teams.</div>
+        <a href="mailto:en.sedra@gmail.com?subject=Trace-lit Enterprise" class="plan-cta cta-outline">Talk to us →</a>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><strong>Everything in Cloud</strong></li>
+          <li>Unlimited team members</li>
+          <li>Plain-English AI failure reports</li>
+          <li>Full conversation history</li>
+          <li>PII redaction before storage</li>
+          <li>SSO &amp; audit logs</li>
+          <li>Dedicated support + SLA</li>
+          <li>Custom data retention</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Proxy setup snippet -->
+    <div style="max-width:680px;margin:32px auto 0;border:1px solid var(--border2);border-radius:8px;overflow:hidden;background:var(--bg2)">
+      <div style="background:var(--bg3);padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)">
+        <span style="font-size:11px;font-family:'DM Mono',monospace;color:var(--muted)">CLOUD SETUP — TWO ENV VARS. NO CODE CHANGES.</span>
+      </div>
+      <div style="padding:20px 24px;font-family:'DM Mono',monospace;font-size:13px;line-height:2">
+        <div style="color:var(--muted)"># OpenAI — paste into Vercel / Railway / Render / .env</div>
+        <div><span style="color:var(--accent2)">OPENAI_BASE_URL</span><span style="color:var(--text)">=https://app.trace-lit.com/proxy/openai/v1</span></div>
+        <div><span style="color:var(--accent2)">OPENAI_API_KEY</span><span style="color:var(--text)">=&lt;your-tracelit-key&gt;||&lt;your-openai-key&gt;</span></div>
+        <br>
+        <div style="color:var(--muted)"># Anthropic</div>
+        <div><span style="color:var(--accent2)">ANTHROPIC_BASE_URL</span><span style="color:var(--text)">=https://app.trace-lit.com/proxy/anthropic/v1</span></div>
+        <div><span style="color:var(--accent2)">ANTHROPIC_API_KEY</span><span style="color:var(--text)">=&lt;your-tracelit-key&gt;||&lt;your-anthropic-key&gt;</span></div>
+        <br>
+        <div><span style="color:var(--green)">✓</span><span style="color:var(--text)"> Every run now appears in your dashboard. That's it.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SELF-HOSTED PLANS -->
+  <div class="pricing-panel" id="tab-selfhost">
+    <p class="pricing-label">YOUR SERVERS · YOUR DATA · FULL CONTROL · NEVER LEAVES YOUR INFRASTRUCTURE</p>
+    <div class="pricing-grid" style="grid-template-columns:repeat(2,1fr);max-width:640px">
+
+      <!-- Open Source -->
+      <div class="plan">
+        <div class="plan-name">OPEN SOURCE</div>
+        <div class="plan-price">$0<span> / forever</span></div>
+        <div class="plan-desc">Full platform on your own infrastructure. No limits, no expiry, no data sharing.</div>
+        <a href="https://github.com/Sedrah/Trace-lit-SDK" target="_blank" class="plan-cta cta-muted">View on GitHub →</a>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>Unlimited runs &amp; users</li>
+          <li>Unlimited history</li>
+          <li>All core features</li>
+          <li>Single <code style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2)">docker compose up</code></li>
+          <li>Data never leaves your servers</li>
+          <li>Community support (GitHub)</li>
+        </ul>
+      </div>
+
+      <!-- Enterprise Self-hosted -->
+      <div class="plan plan-featured">
+        <div class="plan-name">ENTERPRISE</div>
+        <div class="plan-price" style="font-size:28px">Custom</div>
+        <div class="plan-desc">Full air-gap, compliance features, and dedicated support for regulated industries.</div>
+        <a href="mailto:en.sedra@gmail.com?subject=Trace-lit Enterprise Self-hosted" class="plan-cta cta-outline">Talk to us →</a>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><strong>Everything in Open Source</strong></li>
+          <li>Plain-English AI failure reports</li>
+          <li>PII redaction engine</li>
+          <li>LLM-as-judge eval scoring</li>
+          <li>Air-gapped deployment support</li>
+          <li>SSO &amp; audit logs</li>
+          <li>Custom data retention policies</li>
+          <li>Dedicated support + uptime SLA</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Self-host setup snippet -->
+    <div style="max-width:680px;margin:32px auto 0;border:1px solid var(--border2);border-radius:8px;overflow:hidden;background:var(--bg2)">
+      <div style="background:var(--bg3);padding:10px 16px;border-bottom:1px solid var(--border)">
+        <span style="font-size:11px;font-family:'DM Mono',monospace;color:var(--muted)">SELF-HOSTED SETUP — ONE COMMAND</span>
+      </div>
+      <div style="padding:20px 24px;font-family:'DM Mono',monospace;font-size:13px;line-height:2">
+        <div style="color:var(--muted)"># Clone and start the full stack (Kafka, ClickHouse, API, dashboard)</div>
+        <div><span style="color:var(--accent2)">git clone</span><span style="color:var(--text)"> https://github.com/Sedrah/Trace-lit-SDK</span></div>
+        <div><span style="color:var(--accent2)">docker compose</span><span style="color:var(--text)"> -f infra/docker-compose.yml up -d</span></div>
+        <br>
+        <div style="color:var(--muted)"># Dashboard at http://localhost:3000 · API at http://localhost:8000</div>
+        <div><span style="color:var(--green)">✓</span><span style="color:var(--text)"> Full platform running on your own machine.</span></div>
+      </div>
+    </div>
+  </div>
+
 </section>
 
 <!-- FRAMEWORKS -->
@@ -550,6 +630,12 @@ body{cursor:auto}
 </footer>
 
 <script>
+function switchTab(tab, btn) {
+  document.querySelectorAll('.pricing-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.pricing-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
 const cursor = document.getElementById('cursor');
 const ring = document.getElementById('cursorRing');
 let mx=0,my=0,rx=0,ry=0;
