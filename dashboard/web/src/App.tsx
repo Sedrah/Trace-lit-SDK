@@ -13,6 +13,7 @@ import Prompts from "./pages/Prompts";
 import Signup from "./pages/Signup";
 import Verify from "./pages/Verify";
 import Settings from "./pages/Settings";
+import Setup from "./pages/Setup";
 import TraceDetail from "./pages/TraceDetail";
 import Traces from "./pages/Traces";
 
@@ -55,6 +56,7 @@ export default function App() {
             <Route path="/alerts"              element={<Alerts />} />
             <Route path="/datasets"            element={<Datasets />} />
             <Route path="/settings"            element={<Settings />} />
+            <Route path="/setup"               element={<Setup />} />
           </Route>
         </Routes>
       </BrowserRouter>

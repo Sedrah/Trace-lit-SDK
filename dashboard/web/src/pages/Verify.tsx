@@ -28,7 +28,8 @@ export default function Verify() {
         saveSessionToken(data.session_token);
         setState("success");
         // Short delay so the user sees the success state, then redirect
-        setTimeout(() => navigate("/", { replace: true }), 1500);
+        const dest = localStorage.getItem("setup_complete") ? "/" : "/setup";
+        setTimeout(() => navigate(dest, { replace: true }), 1500);
       })
       .catch(err => {
         setError(err.message);
