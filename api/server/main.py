@@ -23,7 +23,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .config import ApiConfig
-from .routes import admin, agents, alerts, auth, costs, datasets, evals, failures, health, prompts, settings, traces
+from .routes import admin, agents, alerts, auth, costs, datasets, evals, failures, health, prompts, proxy, settings, traces
 
 logger = logging.getLogger("trace_lit.api")
 
@@ -104,6 +104,7 @@ def create_app(config: ApiConfig | None = None) -> FastAPI:
     app.include_router(prompts.router,   prefix=prefix)
     app.include_router(datasets.router,  prefix=prefix)
     app.include_router(evals.router,     prefix=prefix)
+    app.include_router(proxy.router)     # no prefix — /proxy/openai/v1/... at root
 
     return app
 
