@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Primary SEO -->
-<title>Trace-lit — AI Agent Observability & Monitoring Platform</title>
-<meta name="description" content="Observe, debug, version, and gate every AI agent run. Full-stack observability for LangChain, LangGraph, CrewAI and OpenTelemetry — self-hosted or cloud. Free open-source tier.">
+<title>Trace-lit — See What Your AI Agents Are Doing</title>
+<meta name="description" content="Know what your AI agents are doing, why they fail, and what they cost — without writing a single line of code. Sign up free, forward one email to your developer, and your dashboard is live.">
 <meta name="keywords" content="AI agent observability, LLM monitoring, LangChain tracing, LangGraph observability, CrewAI monitoring, OpenTelemetry AI, prompt versioning, agent debugging, LLM cost tracking, open source observability">
 <link rel="canonical" href="https://trace-lit.com/">
 <meta name="robots" content="index, follow">
@@ -137,13 +137,18 @@ h1 em{font-style:normal;color:var(--accent2)}
 .btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--muted);border:1px solid var(--border2);padding:14px 24px;border-radius:4px;font-size:14px;font-family:'Syne',sans-serif;font-weight:600;cursor:none;text-decoration:none;transition:all .2s;letter-spacing:0.02em}
 .btn-ghost:hover{color:var(--text);border-color:var(--border2)}
 
-/* TERMINAL */
-.terminal-section{padding:0 48px 100px;display:flex;justify-content:center;animation:fadein .8s .4s ease both}
-.terminal-wrap{width:100%;max-width:680px;border:1px solid var(--border2);border-radius:8px;overflow:hidden;background:var(--bg2)}
-.term-bar{background:var(--bg3);padding:12px 16px;display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--border)}
-.tdot{width:10px;height:10px;border-radius:50%}
-.term-body{padding:24px 28px;font-family:'DM Mono',monospace;font-size:13px;line-height:2}
-.tc{color:var(--muted)}.tp{color:var(--accent2)}.tg{color:var(--green)}.ta{color:var(--amber)}.tw{color:var(--text)}
+/* HOW IT WORKS */
+.howto-section{padding:0 48px 100px;text-align:center}
+.howto-steps{display:flex;align-items:flex-start;justify-content:center;gap:0;max-width:960px;margin:0 auto}
+.howto-step{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:32px 28px;text-align:left;transition:border-color .2s}
+.howto-step:hover{border-color:var(--border2)}
+.howto-connector{flex-shrink:0;width:40px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:18px;padding-top:48px}
+.howto-icon{width:36px;height:36px;border-radius:50%;background:rgba(124,109,240,0.12);border:1px solid rgba(124,109,240,0.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:'DM Mono',monospace;color:var(--accent2);margin-bottom:16px}
+.howto-content h3{font-size:15px;font-weight:700;letter-spacing:-0.02em;margin-bottom:10px}
+.howto-content p{font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:16px}
+.howto-action{margin-top:4px}
+.howto-chip{display:inline-flex;padding:4px 12px;border-radius:2px;font-size:11px;font-family:'DM Mono',monospace;font-weight:600;letter-spacing:0.06em;background:rgba(107,107,120,0.15);color:var(--muted);border:1px solid var(--border2)}
+.howto-chip-green{background:rgba(34,197,94,0.1);color:var(--green);border-color:rgba(34,197,94,0.2)}
 
 /* STATS */
 .stats-section{padding:0 48px 100px}
@@ -228,12 +233,14 @@ nav{padding:16px 24px}
 .hero{padding:100px 24px 60px}
 .hero-cta{flex-direction:column}
 h1{font-size:38px}
-.terminal-section,.stats-section,.features-section,.lifecycle-section,.pricing-section,.compat-section,.cta-section{padding-left:24px;padding-right:24px}
+.howto-section,.stats-section,.features-section,.lifecycle-section,.pricing-section,.compat-section,.cta-section{padding-left:24px;padding-right:24px}
 .stats-inner{grid-template-columns:repeat(2,1fr)}
 .features-grid{grid-template-columns:1fr}
 .lifecycle-steps{flex-direction:column;gap:32px}
 .lifecycle-steps::before{display:none}
-.pricing-grid{grid-template-columns:1fr}
+.pricing-grid,.howto-steps{grid-template-columns:1fr}
+.howto-steps{display:flex;flex-direction:column;gap:16px}
+.howto-connector{display:none}
 footer{flex-direction:column;gap:12px;text-align:center}
 .footer-links{justify-content:center;flex-wrap:wrap}
 body{cursor:auto}
@@ -263,44 +270,55 @@ body{cursor:auto}
 <section class="hero">
   <div class="hero-glow"></div>
   <div class="hero-glow2"></div>
-  <div class="badge"><span class="badge-dot"></span>OPEN SOURCE · SDK v0.1.4</div>
-  <h1>The full loop for<br><em>AI agent teams</em></h1>
-  <p class="hero-sub">Observe every run. Attribute every failure. Version every prompt. Ship with confidence. One platform — self-hosted or cloud.</p>
+  <div class="badge"><span class="badge-dot"></span>NO CODING REQUIRED ON YOUR END</div>
+  <h1>Finally know what your<br><em>AI agents are doing</em></h1>
+  <p class="hero-sub">See every run, every failure, and every dollar spent — in plain English. Sign up in 30 seconds, share one email with your developer, and your dashboard is live.</p>
   <div class="hero-cta">
     <a href="https://app.trace-lit.com/signup" class="btn-main">
-      Start for free
+      Start free — no card needed
       <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 7h10M7 2l5 5-5 5"/></svg>
     </a>
-    <a href="https://github.com/Sedrah/Trace-lit-SDK" target="_blank" class="btn-ghost">
-      View on GitHub
+    <a href="#pricing" class="btn-ghost">
+      See pricing
     </a>
   </div>
 </section>
 
-<!-- TERMINAL -->
-<section class="terminal-section">
-  <div class="terminal-wrap">
-    <div class="term-bar">
-      <div class="tdot" style="background:#ef4444"></div>
-      <div class="tdot" style="background:#f59e0b"></div>
-      <div class="tdot" style="background:#22c55e"></div>
+<!-- HOW IT WORKS -->
+<section class="howto-section">
+  <div class="section-eyebrow">HOW IT WORKS</div>
+  <h2 class="section-title">Three steps. You only do two.</h2>
+  <p class="section-sub">You don't need to write a single line of code. Your developer handles the one-time setup — then the dashboard is yours.</p>
+  <div class="howto-steps">
+    <div class="howto-step">
+      <div class="howto-icon">01</div>
+      <div class="howto-content">
+        <h3>Sign up &amp; get your key</h3>
+        <p>Create your account in 30 seconds. You'll get a personal API key — one short string of text.</p>
+        <div class="howto-action">
+          <a href="https://app.trace-lit.com/signup" class="btn-main" style="font-size:13px;padding:10px 22px">
+            Sign up free →
+          </a>
+        </div>
+      </div>
     </div>
-    <div class="term-body">
-      <div><span class="tc"># Option 1 — Python SDK (any agent, one line)</span></div>
-      <div><span class="tw">pip install tracelit-sdk</span></div>
-      <br>
-      <div><span class="tp">import</span> <span class="tw">trace_lit</span></div>
-      <div><span class="tw">trace_lit.configure(api_key=<span class="ta">"sk-..."</span>)</span></div>
-      <div><span class="tw">trace_lit.autopatch()  </span><span class="tc"># wraps openai/anthropic automatically</span></div>
-      <br>
-      <div><span class="tg">@trace_lit.trace</span><span class="tw">(agent_name=<span class="ta">"my-agent"</span>)</span></div>
-      <div><span class="tp">def</span> <span class="tg">run</span><span class="tw">(query: str) -> str: ...</span></div>
-      <br>
-      <div><span class="tc"># Option 2 — OpenTelemetry (LangGraph, CrewAI, zero code)</span></div>
-      <div><span class="tw">OTEL_EXPORTER_OTLP_ENDPOINT=https://app.trace-lit.com/otlp \</span></div>
-      <div><span class="tw">OTEL_EXPORTER_OTLP_HEADERS=<span class="ta">"Authorization=Bearer sk-..."</span></span></div>
-      <br>
-      <div><span class="tg">✓</span> <span class="tw">trace received</span> <span class="tc">cost=$0.004  tokens=1,203  status=success</span></div>
+    <div class="howto-connector">→</div>
+    <div class="howto-step">
+      <div class="howto-icon">02</div>
+      <div class="howto-content">
+        <h3>Forward one email to your developer</h3>
+        <p>Inside the dashboard, click "Setup guide." It generates a ready-to-send email with your key pre-filled. Your developer adds two lines to the agent — done. One time, ever.</p>
+        <div class="howto-chip">Your developer spends ~5 minutes. You spend 0.</div>
+      </div>
+    </div>
+    <div class="howto-connector">→</div>
+    <div class="howto-step">
+      <div class="howto-icon">03</div>
+      <div class="howto-content">
+        <h3>Open your dashboard</h3>
+        <p>Every agent run appears in real time. See what ran, what failed, what it cost — all in plain English. No logs. No code. No guessing.</p>
+        <div class="howto-chip howto-chip-green">Live within minutes</div>
+      </div>
     </div>
   </div>
 </section>
@@ -308,43 +326,43 @@ body{cursor:auto}
 <!-- STATS -->
 <section class="stats-section">
   <div class="stats-inner">
-    <div class="stat"><div class="stat-num" style="color:var(--accent2)">1</div><div class="stat-label">LINE TO INSTRUMENT</div></div>
-    <div class="stat"><div class="stat-num" style="color:var(--green)">&lt;50ms</div><div class="stat-label">TRACE OVERHEAD</div></div>
-    <div class="stat"><div class="stat-num">5</div><div class="stat-label">STEP PIPELINE</div></div>
-    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">SELF-HOSTABLE</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--accent2)">$9</div><div class="stat-label">PER MONTH, ALL-IN</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--green)">5 min</div><div class="stat-label">AVERAGE SETUP TIME</div></div>
+    <div class="stat"><div class="stat-num">0</div><div class="stat-label">LINES OF CODE FOR YOU</div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">YOUR DATA, YOUR CONTROL</div></div>
   </div>
 </section>
 
 <!-- LIFECYCLE -->
 <section class="lifecycle-section">
-  <div class="section-eyebrow">THE FULL LOOP</div>
-  <h2 class="section-title">From deploy to ship — continuously</h2>
-  <p class="section-sub">Most tools stop at observability. Trace-lit covers the entire improvement cycle.</p>
+  <div class="section-eyebrow">THE FULL PICTURE</div>
+  <h2 class="section-title">Everything your team needs to trust their AI</h2>
+  <p class="section-sub">Most tools just collect logs. Trace-lit tells you what happened, why it failed, what it cost, and how to make it better.</p>
   <div class="lifecycle-steps">
     <div class="lstep">
       <div class="lstep-num">01</div>
-      <h4>Observe</h4>
-      <p>Every agent step, model call, token count, and cost — in real time.</p>
+      <h4>See every run</h4>
+      <p>Every agent step, AI call, and action — live. Know exactly what your agent did and in what order.</p>
     </div>
     <div class="lstep">
       <div class="lstep-num">02</div>
-      <h4>Debug</h4>
-      <p>Automatic root cause attribution — know which step broke and what cascaded.</p>
+      <h4>Understand failures</h4>
+      <p>When something breaks, Trace-lit tells you which step caused it and what else it affected — in plain English.</p>
     </div>
     <div class="lstep">
       <div class="lstep-num">03</div>
-      <h4>Version</h4>
-      <p>Every prompt change tracked automatically. Compare versions side by side.</p>
+      <h4>Track every change</h4>
+      <p>Every update to your AI's instructions is saved automatically. Compare any two versions side by side.</p>
     </div>
     <div class="lstep">
       <div class="lstep-num">04</div>
-      <h4>Curate</h4>
-      <p>Tag real runs as good or bad examples. Build a labeled dataset from production traces.</p>
+      <h4>Save good &amp; bad examples</h4>
+      <p>Bookmark real runs as good or bad with one click. Build a library of examples your team can learn from.</p>
     </div>
     <div class="lstep">
       <div class="lstep-num">05</div>
-      <h4>Gate</h4>
-      <p>Score new versions against your dataset in CI. Fail the build if quality drops.</p>
+      <h4>Prevent bad updates</h4>
+      <p>Before a change goes live, Trace-lit automatically checks if it's better or worse than what you had before.</p>
     </div>
   </div>
 </section>
@@ -355,56 +373,56 @@ body{cursor:auto}
   <div class="features-grid">
     <div class="feat">
       <div class="feat-mark"></div>
-      <h3>OTel native</h3>
-      <p>Point any OpenTelemetry-instrumented agent at Trace-lit with two env vars. LangGraph, CrewAI — zero code change.</p>
-      <div class="feat-tag tag-free">FREE</div>
+      <h3>Works with any AI framework</h3>
+      <p>Your developer connects it once — whether they use LangChain, CrewAI, OpenAI, or anything else. No lock-in.</p>
+      <div class="feat-tag tag-free">ALL PLANS</div>
     </div>
     <div class="feat">
       <div class="feat-mark"></div>
-      <h3>Failure attribution</h3>
-      <p>Automatically identifies the root cause of every failure and which downstream steps cascaded — fully air-gapped, no external LLM needed.</p>
-      <div class="feat-tag tag-free">FREE</div>
+      <h3>Automatic failure alerts</h3>
+      <p>When an agent fails, Trace-lit identifies exactly which step caused it and what else broke as a result — no digging through logs.</p>
+      <div class="feat-tag tag-free">ALL PLANS</div>
     </div>
     <div class="feat">
       <div class="feat-mark"></div>
-      <h3>Cost attribution</h3>
-      <p>Token spend and USD cost per agent, per run, per model. Broken down in the dashboard — no spreadsheets.</p>
-      <div class="feat-tag tag-free">FREE</div>
+      <h3>Know exactly what you're spending</h3>
+      <p>See the real dollar cost of every agent run, broken down by step. No surprise bills — just a clear dashboard.</p>
+      <div class="feat-tag tag-free">ALL PLANS</div>
     </div>
     <div class="feat">
       <div class="feat-mark"></div>
-      <h3>Prompt versioning</h3>
-      <p>Every prompt change tracked via content hash — no version numbers to manage. Compare any two versions with a line diff.</p>
-      <div class="feat-tag tag-free">FREE</div>
+      <h3>Track every AI update</h3>
+      <p>Every change your team makes to the AI's instructions is saved and dated automatically. Compare any two versions with a click.</p>
+      <div class="feat-tag tag-free">ALL PLANS</div>
     </div>
     <div class="feat">
       <div class="feat-mark"></div>
-      <h3>Dataset builder</h3>
-      <p>Tag spans as good, bad, or neutral directly from the trace detail. Export as JSONL for fine-tuning or external eval.</p>
-      <div class="feat-tag tag-free">FREE</div>
+      <h3>Save &amp; label real examples</h3>
+      <p>Bookmark runs as good or bad directly from the dashboard. Your team builds a shared library of what works — no extra tools.</p>
+      <div class="feat-tag tag-free">ALL PLANS</div>
     </div>
     <div class="feat">
       <div class="feat-mark"></div>
-      <h3>CI quality gate</h3>
-      <p>Score a new prompt version against your labeled dataset in CI. One <code style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent2)">curl</code> command — pass or fail.</p>
-      <div class="feat-tag tag-free">FREE</div>
+      <h3>Never ship a broken update</h3>
+      <p>Before any AI change goes live, Trace-lit scores it against your saved examples. If it's worse, the release is blocked automatically.</p>
+      <div class="feat-tag tag-free">ALL PLANS</div>
     </div>
     <div class="feat">
       <div class="feat-mark"></div>
-      <h3>AI failure analysis</h3>
-      <p>LLM-assisted root cause summaries using a local Ollama model. Plain-English explanations, no data leaves your environment.</p>
+      <h3>Plain-English failure reports</h3>
+      <p>Instead of cryptic error codes, get a one-sentence explanation of what went wrong — written for humans, not engineers.</p>
       <div class="feat-tag tag-enterprise">ENTERPRISE</div>
     </div>
     <div class="feat">
       <div class="feat-mark"></div>
-      <h3>I/O capture + redaction</h3>
-      <p>Capture the full input and output of every LLM call. Enterprise redaction strips PII and secrets before storage — compliance-ready.</p>
+      <h3>Full conversation history + privacy</h3>
+      <p>See every message your AI sent and received. Enterprise automatically redacts names, cards, and sensitive data before it's stored.</p>
       <div class="feat-tag tag-enterprise">ENTERPRISE</div>
     </div>
     <div class="feat">
       <div class="feat-mark"></div>
-      <h3>Fully air-gapped</h3>
-      <p>Single <code style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent2)">docker compose up</code>. Your data never leaves your infrastructure. Built for regulated industries from day one.</p>
+      <h3>Your data stays on your servers</h3>
+      <p>Deploy on your own infrastructure with one command. Nothing leaves your environment — built for teams in regulated industries.</p>
       <div class="feat-tag tag-free">ALL PLANS</div>
     </div>
   </div>
@@ -413,67 +431,76 @@ body{cursor:auto}
 <!-- PRICING -->
 <section class="pricing-section" id="pricing">
   <div class="section-eyebrow">PRICING</div>
-  <h2 class="section-title">Simple, transparent tiers</h2>
-  <p class="section-sub">Start free, self-hosted forever. Upgrade when you need managed infrastructure or enterprise compliance features.</p>
-  <div class="pricing-grid">
+  <h2 class="section-title">Less than a coffee per week</h2>
+  <p class="section-sub">Start free. No credit card. No setup fees. Cancel any time.</p>
+  <div class="pricing-grid" style="grid-template-columns:repeat(4,1fr)">
 
-    <!-- Community -->
+    <!-- Hobby -->
     <div class="plan">
-      <div class="plan-name">COMMUNITY</div>
+      <div class="plan-name">HOBBY</div>
       <div class="plan-price">$0<span> / forever</span></div>
-      <div class="plan-desc">Self-hosted. Full platform, no limits, no expiry.</div>
-      <a href="https://github.com/Sedrah/Trace-lit-SDK" target="_blank" class="plan-cta cta-muted">Deploy yourself →</a>
+      <div class="plan-desc">Try it free on our cloud. No installation needed.</div>
+      <a href="https://app.trace-lit.com/signup" class="plan-cta cta-muted">Start free →</a>
       <div class="plan-divider"></div>
       <ul class="plan-features">
-        <li>Unlimited agents &amp; traces</li>
-        <li>DAG visualization</li>
-        <li>Failure attribution (rule-based)</li>
-        <li>Cost &amp; token tracking</li>
-        <li>Prompt versioning &amp; diff</li>
-        <li>Dataset builder + JSONL export</li>
-        <li>CI quality gate</li>
-        <li>OTel / autopatch integration</li>
-        <li>Self-hosted via Docker Compose</li>
+        <li>10,000 runs/month</li>
+        <li>14 days history</li>
+        <li>1 user</li>
+        <li>All core features</li>
+        <li>Setup guide for your developer</li>
       </ul>
     </div>
 
     <!-- Cloud -->
     <div class="plan plan-featured">
-      <div class="plan-badge">POPULAR</div>
+      <div class="plan-badge">MOST POPULAR</div>
       <div class="plan-name">CLOUD</div>
-      <div class="plan-price">$49<span> / month</span></div>
-      <div class="plan-desc">Fully managed. No infra to run — connect and go.</div>
+      <div class="plan-price">$9<span> / month</span></div>
+      <div class="plan-desc">Everything you need. Nothing to install or manage.</div>
       <a href="https://app.trace-lit.com/signup" class="plan-cta cta-solid">Start free trial →</a>
       <div class="plan-divider"></div>
       <ul class="plan-features">
-        <li><strong>Everything in Community</strong></li>
-        <li>Managed hosting (no ops)</li>
-        <li>99.9% uptime SLA</li>
-        <li>Automatic backups</li>
+        <li><strong>Unlimited runs</strong></li>
+        <li>90 days history</li>
         <li>Up to 5 team members</li>
+        <li>All core features</li>
+        <li>Failure alerts by email</li>
+        <li>Managed hosting — no ops</li>
+        <li>99.9% uptime</li>
         <li>Email support</li>
-        <li class="dim">AI failure analysis</li>
-        <li class="dim">I/O capture + redaction</li>
-        <li class="dim">SSO / audit logs</li>
+      </ul>
+    </div>
+
+    <!-- Open Source -->
+    <div class="plan">
+      <div class="plan-name">OPEN SOURCE</div>
+      <div class="plan-price">$0<span> / forever</span></div>
+      <div class="plan-desc">Self-hosted on your own servers. Full control, no limits.</div>
+      <a href="https://github.com/Sedrah/Trace-lit-SDK" target="_blank" class="plan-cta cta-muted">Deploy yourself →</a>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li>Unlimited runs &amp; users</li>
+        <li>Unlimited history</li>
+        <li>All core features</li>
+        <li>Your data, your servers</li>
+        <li>Community support</li>
       </ul>
     </div>
 
     <!-- Enterprise -->
     <div class="plan">
       <div class="plan-name">ENTERPRISE</div>
-      <div class="plan-price" style="font-size:32px">Custom</div>
-      <div class="plan-desc">Air-gapped deployments, compliance features, and dedicated support.</div>
+      <div class="plan-price" style="font-size:28px">Custom</div>
+      <div class="plan-desc">Compliance, privacy controls, and hands-on support for regulated teams.</div>
       <a href="mailto:en.sedra@gmail.com?subject=Trace-lit Enterprise" class="plan-cta cta-outline">Talk to us →</a>
       <div class="plan-divider"></div>
       <ul class="plan-features">
         <li><strong>Everything in Cloud</strong></li>
-        <li>AI failure analysis (local Ollama)</li>
-        <li>I/O capture + PII redaction engine</li>
-        <li>LLM-as-judge eval scoring</li>
-        <li>Air-gapped self-host support</li>
+        <li>Plain-English AI failure reports</li>
+        <li>Conversation history + PII redaction</li>
+        <li>Air-gapped private deployment</li>
         <li>SSO &amp; audit logs</li>
         <li>Unlimited team members</li>
-        <li>Custom data retention</li>
         <li>Dedicated support + SLA</li>
       </ul>
     </div>
@@ -500,8 +527,8 @@ body{cursor:auto}
 <!-- FINAL CTA -->
 <section class="cta-section">
   <div class="cta-glow"></div>
-  <h2>Ready to see inside<br>your agents?</h2>
-  <p>Sign up free — no credit card required. Self-hosted in under 5 minutes.</p>
+  <h2>See what your AI agents<br>are doing — today</h2>
+  <p>No coding required on your end. Sign up free, forward one email to your developer, and your dashboard is live.</p>
   <div style="display:flex;gap:12px;justify-content:center">
     <a href="https://app.trace-lit.com/signup" class="btn-main">
       Get started free
