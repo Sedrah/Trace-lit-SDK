@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Primary SEO -->
-<title>Trace-lit — See What Your AI Agents Are Doing</title>
-<meta name="description" content="Know what your AI agents are doing, why they fail, and what they cost — without writing a single line of code. Sign up free, forward one email to your developer, and your dashboard is live.">
+<title>Trace-lit — See What Your AI Is Doing. No Developer Needed.</title>
+<meta name="description" content="Know if your AI agents are working, why they fail, and what they cost — all in plain English. Set up yourself in 3 minutes on Vercel, Railway, n8n, Flowise and more. No coding required.">
 <meta name="keywords" content="AI agent observability, LLM monitoring, LangChain tracing, LangGraph observability, CrewAI monitoring, OpenTelemetry AI, prompt versioning, agent debugging, LLM cost tracking, open source observability">
 <link rel="canonical" href="https://trace-lit.com/">
 <meta name="robots" content="index, follow">
@@ -151,6 +151,12 @@ h1 em{font-style:normal;color:var(--accent2)}
 .hstep-desc{font-size:13px;color:var(--muted);line-height:1.65}
 
 /* dev hero code */
+.hero-platforms{display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap;margin:24px 0 8px}
+.hero-plat-label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:0.06em;white-space:nowrap}
+.hero-plat-pills{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.hero-plat{background:var(--bg2);border:1px solid var(--border);color:var(--muted);font-size:12px;font-weight:500;padding:4px 12px;border-radius:100px;white-space:nowrap;transition:all .2s}
+.hero-plat:hover{border-color:var(--border2);color:var(--text)}
+
 .hero-code{width:100%;max-width:600px;margin:0 auto 36px;border:1px solid var(--border2);border-radius:8px;overflow:hidden;background:var(--bg2);text-align:left}
 .hero-code-bar{background:var(--bg3);padding:10px 16px;display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--border)}
 .hero-code-body{padding:20px 24px;font-family:'DM Mono',monospace;font-size:13px;line-height:1.9}
@@ -165,6 +171,17 @@ h1 em{font-style:normal;color:var(--accent2)}
 .btn-ghost:hover{color:var(--text);border-color:var(--border2)}
 
 /* (howto section removed — merged into hero) */
+
+/* PLATFORMS */
+.platforms-section{padding:0 48px 100px}
+.platforms-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;max-width:960px;margin:0 auto}
+.plat-card{background:var(--bg2);padding:28px 24px;transition:background .2s}
+.plat-card:hover{background:var(--bg3)}
+.plat-card-cta{background:rgba(124,109,240,0.06)}
+.plat-card-cta:hover{background:rgba(124,109,240,0.12)}
+.plat-icon{font-size:22px;margin-bottom:10px}
+.plat-name{font-size:14px;font-weight:700;margin-bottom:6px;color:var(--text)}
+.plat-desc{font-size:12px;color:var(--muted);line-height:1.65}
 
 /* STATS */
 .stats-section{padding:0 48px 100px}
@@ -258,7 +275,8 @@ nav{padding:16px 24px}
 .hero-step-arrow{display:none}
 .hero-cta{flex-direction:column}
 h1{font-size:34px}
-.stats-section,.features-section,.lifecycle-section,.pricing-section,.compat-section,.cta-section{padding-left:24px;padding-right:24px}
+.platforms-section,.stats-section,.features-section,.lifecycle-section,.pricing-section,.compat-section,.cta-section{padding-left:24px;padding-right:24px}
+.platforms-grid{grid-template-columns:repeat(2,1fr)}
 .stats-inner{grid-template-columns:repeat(2,1fr)}
 .features-grid{grid-template-columns:1fr}
 .lifecycle-steps{flex-direction:column;gap:32px}
@@ -304,27 +322,42 @@ body{cursor:auto}
   <!-- ── NON-TECH VIEW (default) ─────────────────────────────── -->
   <div class="aud-panel" id="aud-ntech">
     <div class="hero-label">FOR PRODUCT MANAGERS · OPS TEAMS · BUSINESS OWNERS</div>
-    <h1>Your AI agents are running.<br><em>Do you know if they're working?</em></h1>
-    <p class="hero-sub">See what they did, what went wrong, and what it cost — all in plain English. No coding. No log files. No asking your developer.</p>
+    <h1>See what your AI is doing.<br><em>No developer needed.</em></h1>
+    <p class="hero-sub">Know if it's working, why it failed, and what it cost — all in plain English. Set up yourself in 3 minutes.</p>
 
-    <!-- 3 steps inline — visible without scrolling -->
+    <!-- 3 steps — all done by YOU -->
     <div class="hero-steps">
       <div class="hero-step">
-        <span class="hstep-you">YOU DO THIS</span>
+        <span class="hstep-you">STEP 1 — YOU</span>
         <div class="hstep-title">Sign up</div>
-        <div class="hstep-desc">30 seconds. You get one key — a short string of text. That's it from you for now.</div>
+        <div class="hstep-desc">30 seconds. You get your personal key — a short piece of text.</div>
       </div>
       <div class="hero-step-arrow">→</div>
       <div class="hero-step">
-        <span class="hstep-dev">YOUR DEVELOPER DOES THIS ONCE</span>
-        <div class="hstep-title">Paste 2 settings</div>
-        <div class="hstep-desc">No new code. Just two env vars in their deploy panel. Takes 5 minutes. Never needs touching again.</div>
+        <span class="hstep-you">STEP 2 — YOU</span>
+        <div class="hstep-title">Paste 2 values in your platform</div>
+        <div class="hstep-desc">Open Vercel, Railway, n8n, or Flowise settings. Paste 2 values. Our wizard shows you exactly where — with screenshots.</div>
       </div>
       <div class="hero-step-arrow">→</div>
       <div class="hero-step hstep-highlight">
-        <span class="hstep-you">THEN IT'S ALL YOURS</span>
-        <div class="hstep-title">Open your dashboard</div>
-        <div class="hstep-desc">Every run, failure, and cost — live. Plain English. You own it. No dev required, ever again.</div>
+        <span class="hstep-you">STEP 3 — YOU</span>
+        <div class="hstep-title">Your dashboard is live</div>
+        <div class="hstep-desc">Every AI run, failure, and cost appears in real time. Plain English. No code. No developer. Ever.</div>
+      </div>
+    </div>
+
+    <!-- Platform logos -->
+    <div class="hero-platforms">
+      <span class="hero-plat-label">Works with</span>
+      <div class="hero-plat-pills">
+        <span class="hero-plat">▲ Vercel</span>
+        <span class="hero-plat">🚂 Railway</span>
+        <span class="hero-plat">🎯 Render</span>
+        <span class="hero-plat">🪁 Fly.io</span>
+        <span class="hero-plat">⚙️ n8n</span>
+        <span class="hero-plat">🌊 Flowise</span>
+        <span class="hero-plat">🐍 Python</span>
+        <span class="hero-plat">+ more</span>
       </div>
     </div>
 
@@ -371,6 +404,55 @@ body{cursor:auto}
     </div>
   </div>
 
+</section>
+
+<!-- PLATFORMS -->
+<section class="platforms-section">
+  <div class="section-eyebrow">GUIDED SETUP FOR EVERY PLATFORM</div>
+  <h2 class="section-title">Set up yourself — no developer needed</h2>
+  <p class="section-sub">Sign up, open our step-by-step wizard, pick your platform. We show you exactly where to click with screenshots. Done in 3 minutes.</p>
+  <div class="platforms-grid">
+    <div class="plat-card">
+      <div class="plat-icon">▲</div>
+      <div class="plat-name">Vercel</div>
+      <div class="plat-desc">Settings → Environment Variables → paste 2 values → redeploy</div>
+    </div>
+    <div class="plat-card">
+      <div class="plat-icon">🚂</div>
+      <div class="plat-name">Railway</div>
+      <div class="plat-desc">Service → Variables tab → add 2 values → auto-restarts</div>
+    </div>
+    <div class="plat-card">
+      <div class="plat-icon">🎯</div>
+      <div class="plat-name">Render</div>
+      <div class="plat-desc">Environment → add 2 values → save → redeploy</div>
+    </div>
+    <div class="plat-card">
+      <div class="plat-icon">🪁</div>
+      <div class="plat-name">Fly.io</div>
+      <div class="plat-desc">Secrets panel → add 2 values → Fly restarts automatically</div>
+    </div>
+    <div class="plat-card">
+      <div class="plat-icon">⚙️</div>
+      <div class="plat-name">n8n</div>
+      <div class="plat-desc">Credentials → OpenAI → change base URL + API key → save</div>
+    </div>
+    <div class="plat-card">
+      <div class="plat-icon">🌊</div>
+      <div class="plat-name">Flowise</div>
+      <div class="plat-desc">Click your AI node → credentials → update base URL → run</div>
+    </div>
+    <div class="plat-card">
+      <div class="plat-icon">🐍</div>
+      <div class="plat-name">Python / local</div>
+      <div class="plat-desc">Add 2 lines to your .env file and restart</div>
+    </div>
+    <div class="plat-card plat-card-cta">
+      <div class="plat-icon">→</div>
+      <div class="plat-name">Ready?</div>
+      <div class="plat-desc"><a href="https://app.trace-lit.com/signup" style="color:var(--accent2);text-decoration:none;font-weight:600">Start free →</a> The wizard is waiting for you inside.</div>
+    </div>
+  </div>
 </section>
 
 <!-- STATS -->
