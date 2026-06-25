@@ -1,0 +1,40 @@
+# Trace-lit
+
+> Trace-lit is an open-source AI agent observability and monitoring platform. It covers the full improvement loop for teams building with LangChain, LangGraph, CrewAI, or any OpenTelemetry-compatible framework.
+
+## What it does
+
+Trace-lit gives AI agent teams five capabilities in one platform:
+
+1. **Observe** — traces every agent run in real time: model calls, token counts, latency, USD cost per step.
+2. **Debug** — automatic root cause attribution identifies which step caused a failure and which downstream steps cascaded.
+3. **Version** — every prompt change is tracked by content hash. Any two versions can be compared side by side with a line diff.
+4. **Curate** — spans from production traces can be tagged as good, bad, or neutral to build a labeled evaluation dataset. Datasets export as JSONL.
+5. **Gate** — a CI quality gate scores a new prompt version against the dataset. One curl command returns pass/fail with a numeric score.
+
+## Key features
+
+- OTel native: point any OpenTelemetry-instrumented agent at Trace-lit with two environment variables — no code changes required
+- autopatch(): one-line wrapper for the OpenAI and Anthropic SDKs — automatically captures model, tokens, and cost
+- Failure attribution: rule-based, no external LLM required, fully air-gapped
+- Dataset builder: inline tagging from the trace detail view, JSONL export
+- CI quality gate: error rate, cost, and duration scorers; enterprise tier adds LLM-as-judge
+- I/O capture: stores full LLM input/output per span; enterprise redaction strips PII and secrets before storage
+- Self-hosted: single `docker compose up` — Kafka, ClickHouse, TimescaleDB, FastAPI, React dashboard
+
+## Supported frameworks
+
+LangChain, LangGraph, CrewAI, OpenAI SDK (Python), Anthropic SDK (Python), any OpenTelemetry SDK
+
+## Pricing
+
+- **Community** — $0, self-hosted forever, full platform, no limits
+- **Cloud** — $49/month, fully managed, 99.9% SLA
+- **Enterprise** — custom pricing; adds AI failure analysis (local Ollama), I/O PII redaction, LLM-as-judge eval scoring, SSO, audit logs, air-gapped deployment support
+
+## Links
+
+- Homepage: https://trace-lit.com
+- App / sign up: https://app.trace-lit.com/signup
+- GitHub (SDK + server): https://github.com/Sedrah/Trace-lit-SDK
+- Contact / enterprise: en.sedra@gmail.com
