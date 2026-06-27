@@ -72,8 +72,6 @@ function proxyEnvVars(provider: Provider, key: string) {
 type InstructionStep = { title: string; body: string; screenshot?: string };
 
 function getSteps(platform: Platform, provider: Provider): InstructionStep[] {
-  const isProxy = provider !== "other";
-
   const uiSteps: Record<Platform, InstructionStep[]> = {
     vercel: [
       { title: "Open your Vercel project", body: "Go to vercel.com/dashboard → click your project." },
