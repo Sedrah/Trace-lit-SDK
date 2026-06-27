@@ -68,6 +68,8 @@ html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden;cursor:none}
 
 /* ── PERSONA-DRIVEN SHOW/HIDE ───────────────────────── */
+/* body starts as data-audience="ntech" so dev-only is hidden on load.
+   Switching audience removes the hide rule and natural CSS display takes over. */
 body[data-audience="ntech"] .dev-only{display:none !important}
 body[data-audience="dev"]   .ntech-only{display:none !important}
 
@@ -340,7 +342,7 @@ body{cursor:auto}
   </div>
 
   <!-- ── DEVELOPER HERO ── -->
-  <div class="aud-panel dev-only" id="aud-dev" style="display:none">
+  <div class="aud-panel dev-only" id="aud-dev">
     <div class="hero-label">FOR DEVELOPERS BUILDING AI AGENTS</div>
     <h1>Full observability for<br><em>LangChain, LangGraph, CrewAI</em></h1>
     <p class="hero-sub">Trace every span, attribute every failure, version every prompt. One SDK or any OTel exporter — self-hosted or air-gapped.</p>
@@ -436,7 +438,7 @@ body{cursor:auto}
   </div>
 
   <!-- Dev stats -->
-  <div class="stats-inner dev-only" style="display:none">
+  <div class="stats-inner dev-only">
     <div class="stat"><div class="stat-num" style="color:var(--accent2)">$0</div><div class="stat-label">SELF-HOST FOREVER</div></div>
     <div class="stat"><div class="stat-num" style="color:var(--green)">1</div><div class="stat-label">pip install</div></div>
     <div class="stat"><div class="stat-num">OTel</div><div class="stat-label">NATIVE INGESTION</div></div>
@@ -454,39 +456,39 @@ body{cursor:auto}
   <p class="section-sub ntech-only">Most tools just collect logs. Trace-lit tells you what happened, why it failed, what it cost, and how to make it better.</p>
 
   <!-- Dev lifecycle title -->
-  <h2 class="section-title dev-only" style="display:none">The full agent observability loop</h2>
-  <p class="section-sub dev-only" style="display:none">From a single span to a full production eval pipeline — every stage in one platform.</p>
+  <h2 class="section-title dev-only">The full agent observability loop</h2>
+  <p class="section-sub dev-only">From a single span to a full production eval pipeline — every stage in one platform.</p>
 
   <div class="lifecycle-steps">
     <div class="lstep">
       <div class="lstep-num">01</div>
       <h4>Trace every run</h4>
       <p class="ntech-only">Every agent step, AI call, and action — live. Know exactly what your agent did and in what order.</p>
-      <p class="dev-only" style="display:none">Spans, DAG topology, parent-child nesting — SDK or OTel. Every call captured, every token counted.</p>
+      <p class="dev-only">Spans, DAG topology, parent-child nesting — SDK or OTel. Every call captured, every token counted.</p>
     </div>
     <div class="lstep">
       <div class="lstep-num">02</div>
       <h4>Attribute failures</h4>
       <p class="ntech-only">When something breaks, Trace-lit tells you which step caused it and what else it affected — in plain English.</p>
-      <p class="dev-only" style="display:none">Root-cause span detected, cascade identified. Blast radius visualised on the DAG before you roll back.</p>
+      <p class="dev-only">Root-cause span detected, cascade identified. Blast radius visualised on the DAG before you roll back.</p>
     </div>
     <div class="lstep">
       <div class="lstep-num">03</div>
       <h4>Version prompts</h4>
       <p class="ntech-only">Every update to your AI's instructions is saved automatically. Compare any two versions side by side.</p>
-      <p class="dev-only" style="display:none">Every prompt commit hashed, diffed, and linked to the spans it produced. Roll back in one click.</p>
+      <p class="dev-only">Every prompt commit hashed, diffed, and linked to the spans it produced. Roll back in one click.</p>
     </div>
     <div class="lstep">
       <div class="lstep-num">04</div>
       <h4>Build datasets</h4>
       <p class="ntech-only">Bookmark real runs as good or bad with one click. Build a library of examples your team can learn from.</p>
-      <p class="dev-only" style="display:none">Tag spans directly from the trace view. Curate production examples into structured datasets for fine-tuning or eval.</p>
+      <p class="dev-only">Tag spans directly from the trace view. Curate production examples into structured datasets for fine-tuning or eval.</p>
     </div>
     <div class="lstep">
       <div class="lstep-num">05</div>
       <h4>Gate releases</h4>
       <p class="ntech-only">Before a change goes live, Trace-lit automatically checks if it's better or worse than what you had before.</p>
-      <p class="dev-only" style="display:none">CI quality gate runs your dataset against the new prompt. Fails the build if score drops. No regression ships.</p>
+      <p class="dev-only">CI quality gate runs your dataset against the new prompt. Fails the build if score drops. No regression ships.</p>
     </div>
   </div>
 </section>
@@ -498,16 +500,16 @@ body{cursor:auto}
     <div class="feat">
       <div class="feat-mark"></div>
       <h3 class="ntech-only">Works with any AI tool</h3>
-      <h3 class="dev-only" style="display:none">LangChain · LangGraph · CrewAI · OTel</h3>
+      <h3 class="dev-only">LangChain · LangGraph · CrewAI · OTel</h3>
       <p class="ntech-only">n8n, Flowise, Vercel AI, or custom Python — Trace-lit connects in the background. Nothing changes in how your AI runs.</p>
-      <p class="dev-only" style="display:none">SDK wrappers for every major framework. Native OTel ingestion for everything else. One endpoint, all traces.</p>
+      <p class="dev-only">SDK wrappers for every major framework. Native OTel ingestion for everything else. One endpoint, all traces.</p>
       <div class="feat-tag tag-free">ALL PLANS</div>
     </div>
     <div class="feat">
       <div class="feat-mark"></div>
       <h3>Automatic failure alerts</h3>
       <p class="ntech-only">When an agent fails, Trace-lit identifies exactly which step caused it and what else broke as a result — no digging through logs.</p>
-      <p class="dev-only" style="display:none">Root-cause span flagged, cascade spans marked. Webhook to Slack, PagerDuty, or any endpoint.</p>
+      <p class="dev-only">Root-cause span flagged, cascade spans marked. Webhook to Slack, PagerDuty, or any endpoint.</p>
       <div class="feat-tag tag-free">ALL PLANS</div>
     </div>
     <div class="feat">
@@ -520,22 +522,22 @@ body{cursor:auto}
       <div class="feat-mark"></div>
       <h3>Track every AI update</h3>
       <p class="ntech-only">Every change your team makes to the AI's instructions is saved and dated automatically. Compare any two versions with a click.</p>
-      <p class="dev-only" style="display:none">Every prompt version hashed and stored. Diff any two versions. See which spans each version produced.</p>
+      <p class="dev-only">Every prompt version hashed and stored. Diff any two versions. See which spans each version produced.</p>
       <div class="feat-tag tag-free">ALL PLANS</div>
     </div>
     <div class="feat">
       <div class="feat-mark"></div>
       <h3>Save &amp; label real examples</h3>
       <p class="ntech-only">Bookmark runs as good or bad directly from the dashboard. Your team builds a shared library of what works — no extra tools.</p>
-      <p class="dev-only" style="display:none">Tag spans as pass/fail from the trace view. Export as JSONL for fine-tuning or feed directly into the eval engine.</p>
+      <p class="dev-only">Tag spans as pass/fail from the trace view. Export as JSONL for fine-tuning or feed directly into the eval engine.</p>
       <div class="feat-tag tag-free">ALL PLANS</div>
     </div>
     <div class="feat">
       <div class="feat-mark"></div>
       <h3 class="ntech-only">Never ship a broken update</h3>
-      <h3 class="dev-only" style="display:none">CI quality gate</h3>
+      <h3 class="dev-only">CI quality gate</h3>
       <p class="ntech-only">Before any AI change goes live, Trace-lit scores it against your saved examples. If it's worse, the release is blocked automatically.</p>
-      <p class="dev-only" style="display:none">pytest-style eval runner. Scores against your curated dataset in CI. Returns exit code 1 if quality regresses.</p>
+      <p class="dev-only">pytest-style eval runner. Scores against your curated dataset in CI. Returns exit code 1 if quality regresses.</p>
       <div class="feat-tag tag-free">ALL PLANS</div>
     </div>
     <div class="feat">
@@ -553,9 +555,9 @@ body{cursor:auto}
     <div class="feat">
       <div class="feat-mark"></div>
       <h3 class="ntech-only">Your data stays secure</h3>
-      <h3 class="dev-only" style="display:none">Self-hosted &amp; air-gapped</h3>
+      <h3 class="dev-only">Self-hosted &amp; air-gapped</h3>
       <p class="ntech-only">Enterprise cloud keeps all data in your region. Self-hosted option available for regulated industries.</p>
-      <p class="dev-only" style="display:none">One <code style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2)">docker compose up</code>. ReplicatedMergeTree ClickHouse, Kafka, TimescaleDB. Nothing phones home.</p>
+      <p class="dev-only">One <code style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2)">docker compose up</code>. ReplicatedMergeTree ClickHouse, Kafka, TimescaleDB. Nothing phones home.</p>
       <div class="feat-tag tag-free">ALL PLANS</div>
     </div>
   </div>
@@ -659,7 +661,7 @@ body{cursor:auto}
   </div>
 
   <!-- ── DEVELOPER: Self-hosted pricing ── -->
-  <div class="dev-only" style="display:none">
+  <div class="dev-only">
     <h2 class="section-title">Self-host for free. Support when you need it.</h2>
     <p class="section-sub">Your servers, your data, your rules. Open source forever — no usage caps, no data sharing, no lock-in.</p>
     <p class="pricing-label">YOUR SERVERS · YOUR DATA · FULL CONTROL · NEVER LEAVES YOUR INFRASTRUCTURE</p>
@@ -719,7 +721,7 @@ body{cursor:auto}
 </section>
 
 <!-- ═══════════════════════════════════════════════════ FRAMEWORKS (dev only) -->
-<section class="compat-section dev-only" style="display:none">
+<section class="compat-section dev-only">
   <div class="section-eyebrow" style="margin-bottom:24px">WORKS WITH EVERY MAJOR FRAMEWORK</div>
   <div class="pills">
     <div class="pill">LangChain</div>
@@ -752,7 +754,7 @@ body{cursor:auto}
   </div>
 
   <!-- Dev CTA -->
-  <div class="dev-only" style="display:none">
+  <div class="dev-only">
     <h2>Deploy in one command.<br><em>Full air-gap available.</em></h2>
     <p>Open source forever. Self-host on your own infrastructure or use the cloud. Enterprise support when you need it.</p>
     <div style="display:flex;gap:12px;justify-content:center">
