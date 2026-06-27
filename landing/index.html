@@ -12,7 +12,7 @@
 <meta name="robots" content="index, follow">
 <meta name="author" content="Trace-lit">
 
-<!-- Open Graph (Facebook, LinkedIn, Slack unfurl) -->
+<!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://trace-lit.com/">
 <meta property="og:title" content="Trace-lit — AI Agent Observability & Monitoring Platform">
@@ -21,11 +21,9 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:site_name" content="Trace-lit">
-<meta property="og:locale" content="en_US">
 
-<!-- Twitter / X Card -->
+<!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:url" content="https://trace-lit.com/">
 <meta name="twitter:title" content="Trace-lit — AI Agent Observability">
 <meta name="twitter:description" content="The full loop for AI agent teams: observe, debug, version, curate, gate. Open source & self-hostable.">
 <meta name="twitter:image" content="https://trace-lit.com/og.png">
@@ -41,48 +39,18 @@
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Linux, macOS, Windows",
   "description": "Full-stack AI agent observability platform. Observe every run, attribute every failure, version every prompt, and gate every release. Works with LangChain, LangGraph, CrewAI, and OpenTelemetry.",
-  "keywords": "AI agent observability, LLM monitoring, LangChain tracing, agent debugging, prompt versioning, open source",
   "offers": [
-    {
-      "@type": "Offer",
-      "name": "Community",
-      "price": "0",
-      "priceCurrency": "USD",
-      "description": "Self-hosted, full platform, no limits, no expiry."
-    },
-    {
-      "@type": "Offer",
-      "name": "Cloud",
-      "price": "49",
-      "priceCurrency": "USD",
-      "description": "Fully managed hosting with 99.9% uptime SLA."
-    },
-    {
-      "@type": "Offer",
-      "name": "Enterprise",
-      "description": "Air-gapped deployment, PII redaction, LLM-as-judge eval, SSO, dedicated support."
-    }
+    { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "USD", "description": "1,000 runs/month, 7-day history, 1 user. No credit card." },
+    { "@type": "Offer", "name": "Builder", "price": "9", "priceCurrency": "USD", "description": "50,000 runs/month, 90-day history, 3 users." },
+    { "@type": "Offer", "name": "Growth", "price": "29", "priceCurrency": "USD", "description": "250,000 runs/month, unlimited history, 10 users, 99.9% SLA." },
+    { "@type": "Offer", "name": "Enterprise Cloud", "description": "Unlimited runs, compliance, SSO, dedicated support." },
+    { "@type": "Offer", "name": "Open Source", "price": "0", "priceCurrency": "USD", "description": "Self-hosted. Unlimited runs, users, and history. No data sharing." },
+    { "@type": "Offer", "name": "Enterprise Self-hosted", "description": "Air-gapped deployment, PII redaction, LLM-as-judge eval, SSO." }
   ],
-  "creator": {
-    "@type": "Organization",
-    "name": "Trace-lit",
-    "url": "https://trace-lit.com",
-    "email": "en.sedra@gmail.com"
-  },
+  "creator": { "@type": "Organization", "name": "Trace-lit", "url": "https://trace-lit.com", "email": "en.sedra@gmail.com" },
   "codeRepository": "https://github.com/Sedrah/Trace-lit-SDK",
   "license": "https://github.com/Sedrah/Trace-lit-SDK/blob/main/LICENSE",
-  "isAccessibleForFree": true,
-  "featureList": [
-    "AI agent run tracing",
-    "LLM cost tracking",
-    "Failure attribution and root cause analysis",
-    "Prompt versioning and diff",
-    "Dataset builder from production traces",
-    "CI quality gate for prompt regressions",
-    "OpenTelemetry native ingestion",
-    "LangChain, LangGraph, CrewAI integration",
-    "Self-hosted Docker Compose deployment"
-  ]
+  "isAccessibleForFree": true
 }
 </script>
 
@@ -98,6 +66,10 @@
 }
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden;cursor:none}
+
+/* ── PERSONA-DRIVEN SHOW/HIDE ───────────────────────── */
+body[data-audience="ntech"] .dev-only{display:none !important}
+body[data-audience="dev"]   .ntech-only{display:none !important}
 
 /* cursor */
 .cursor{position:fixed;width:8px;height:8px;background:var(--accent2);border-radius:50%;pointer-events:none;z-index:9999;transition:transform .15s ease;mix-blend-mode:screen}
@@ -138,7 +110,7 @@ h1{font-size:clamp(36px,5vw,68px);font-weight:800;letter-spacing:-0.04em;line-he
 h1 em{font-style:normal;color:var(--accent2)}
 .hero-sub{font-size:18px;color:var(--muted);max-width:540px;margin:0 auto 40px;line-height:1.7;font-weight:400}
 
-/* 3 steps in hero */
+/* 3-step cards in hero */
 .hero-steps{display:flex;align-items:stretch;justify-content:center;gap:0;margin:0 auto 40px;max-width:860px}
 .hero-step{flex:1;background:var(--bg2);border:1px solid var(--border);padding:24px 22px;text-align:left;position:relative}
 .hero-step:first-child{border-radius:8px 0 0 8px}
@@ -146,17 +118,17 @@ h1 em{font-style:normal;color:var(--accent2)}
 .hstep-highlight{background:rgba(124,109,240,0.07);border-color:rgba(124,109,240,0.25)}
 .hero-step-arrow{display:flex;align-items:center;padding:0;color:var(--border2);font-size:16px;flex-shrink:0}
 .hstep-you{font-size:10px;font-weight:700;letter-spacing:0.08em;color:var(--accent2);font-family:'DM Mono',monospace;margin-bottom:10px;display:block}
-.hstep-dev{font-size:10px;font-weight:700;letter-spacing:0.08em;color:var(--amber);font-family:'DM Mono',monospace;margin-bottom:10px;display:block}
 .hstep-title{font-size:16px;font-weight:700;margin-bottom:8px;color:var(--text)}
 .hstep-desc{font-size:13px;color:var(--muted);line-height:1.65}
 
-/* dev hero code */
+/* platform pills */
 .hero-platforms{display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap;margin:24px 0 8px}
 .hero-plat-label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:0.06em;white-space:nowrap}
 .hero-plat-pills{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 .hero-plat{background:var(--bg2);border:1px solid var(--border);color:var(--muted);font-size:12px;font-weight:500;padding:4px 12px;border-radius:100px;white-space:nowrap;transition:all .2s}
 .hero-plat:hover{border-color:var(--border2);color:var(--text)}
 
+/* dev code block in hero */
 .hero-code{width:100%;max-width:600px;margin:0 auto 36px;border:1px solid var(--border2);border-radius:8px;overflow:hidden;background:var(--bg2);text-align:left}
 .hero-code-bar{background:var(--bg3);padding:10px 16px;display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--border)}
 .hero-code-body{padding:20px 24px;font-family:'DM Mono',monospace;font-size:13px;line-height:1.9}
@@ -170,9 +142,7 @@ h1 em{font-style:normal;color:var(--accent2)}
 .btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--muted);border:1px solid var(--border2);padding:14px 24px;border-radius:6px;font-size:15px;font-family:'Inter',sans-serif;font-weight:600;cursor:pointer;text-decoration:none;transition:all .2s}
 .btn-ghost:hover{color:var(--text);border-color:var(--border2)}
 
-/* (howto section removed — merged into hero) */
-
-/* PLATFORMS */
+/* PLATFORMS (ntech-only) */
 .platforms-section{padding:0 48px 100px}
 .platforms-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;max-width:960px;margin:0 auto}
 .plat-card{background:var(--bg2);padding:28px 24px;transition:background .2s}
@@ -219,10 +189,6 @@ h1 em{font-style:normal;color:var(--accent2)}
 
 /* PRICING */
 .pricing-section{padding:0 48px 100px}
-.pricing-tabs{display:flex;gap:4px;justify-content:center;margin-bottom:48px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:4px;width:fit-content;margin-left:auto;margin-right:auto}
-.pricing-tab{padding:8px 28px;border-radius:4px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .2s;letter-spacing:0.02em}
-.pricing-tab.active{background:var(--bg3);color:var(--text);border:1px solid var(--border2)}
-.pricing-panel{display:none}.pricing-panel.active{display:block}
 .pricing-label{text-align:center;font-size:12px;color:var(--muted);margin-bottom:20px;font-family:'DM Mono',monospace;letter-spacing:0.06em}
 .pricing-grid{display:grid;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;max-width:960px;margin:0 auto}
 .plan{background:var(--bg2);padding:40px 36px;position:relative;display:flex;flex-direction:column}
@@ -247,7 +213,13 @@ h1 em{font-style:normal;color:var(--accent2)}
 .plan-features li.dim{color:var(--border2)}
 .plan-features li strong{color:var(--text);font-weight:600}
 
-/* FRAMEWORKS */
+/* code snippet boxes in pricing */
+.snippet-box{max-width:680px;margin:32px auto 0;border:1px solid var(--border2);border-radius:8px;overflow:hidden;background:var(--bg2)}
+.snippet-bar{background:var(--bg3);padding:10px 16px;display:flex;align-items:center;border-bottom:1px solid var(--border)}
+.snippet-bar span{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted)}
+.snippet-body{padding:20px 24px;font-family:'DM Mono',monospace;font-size:13px;line-height:2}
+
+/* COMPAT (dev-only) */
 .compat-section{padding:0 48px 100px;text-align:center}
 .pills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;max-width:600px;margin:0 auto}
 .pill{background:var(--bg2);border:1px solid var(--border2);padding:7px 18px;border-radius:2px;font-size:12px;font-weight:600;color:var(--muted);font-family:'DM Mono',monospace;transition:all .2s;letter-spacing:0.04em}
@@ -282,7 +254,6 @@ h1{font-size:34px}
 .lifecycle-steps{flex-direction:column;gap:32px}
 .lifecycle-steps::before{display:none}
 .pricing-grid{grid-template-columns:1fr !important}
-.pricing-tabs{flex-direction:column;width:100%}
 footer{flex-direction:column;gap:12px;text-align:center}
 .footer-links{justify-content:center;flex-wrap:wrap}
 body{cursor:auto}
@@ -290,7 +261,7 @@ body{cursor:auto}
 }
 </style>
 </head>
-<body>
+<body data-audience="ntech">
 
 <div class="cursor" id="cursor"></div>
 <div class="cursor-ring" id="cursorRing"></div>
@@ -308,35 +279,34 @@ body{cursor:auto}
   </div>
 </nav>
 
-<!-- HERO -->
+<!-- ═══════════════════════════════════════════════════ HERO -->
 <section class="hero">
   <div class="hero-glow"></div>
   <div class="hero-glow2"></div>
 
-  <!-- Audience toggle — FIRST THING on the page -->
+  <!-- Audience toggle — drives the ENTIRE PAGE -->
   <div class="audience-tabs">
     <button class="aud-tab aud-active" onclick="switchAudience('ntech',this)">👤 I manage AI — I don't code</button>
     <button class="aud-tab" onclick="switchAudience('dev',this)">👩‍💻 I build AI agents</button>
   </div>
 
-  <!-- ── NON-TECH VIEW (default) ─────────────────────────────── -->
-  <div class="aud-panel" id="aud-ntech">
+  <!-- ── NON-TECH HERO ── -->
+  <div class="aud-panel ntech-only" id="aud-ntech">
     <div class="hero-label">FOR PRODUCT MANAGERS · OPS TEAMS · BUSINESS OWNERS</div>
     <h1>See what your AI is doing.<br><em>No developer needed.</em></h1>
     <p class="hero-sub">Know if it's working, why it failed, and what it cost — all in plain English. Set up yourself in 3 minutes.</p>
 
-    <!-- 3 steps — all done by YOU -->
     <div class="hero-steps">
       <div class="hero-step">
         <span class="hstep-you">STEP 1 — YOU</span>
-        <div class="hstep-title">Sign up</div>
-        <div class="hstep-desc">30 seconds. You get your personal key — a short piece of text.</div>
+        <div class="hstep-title">Sign up free</div>
+        <div class="hstep-desc">30 seconds. No credit card. You get a personal key — a short piece of text.</div>
       </div>
       <div class="hero-step-arrow">→</div>
       <div class="hero-step">
         <span class="hstep-you">STEP 2 — YOU</span>
         <div class="hstep-title">Paste 2 values in your platform</div>
-        <div class="hstep-desc">Open Vercel, Railway, n8n, or Flowise settings. Paste 2 values. Our wizard shows you exactly where — with screenshots.</div>
+        <div class="hstep-desc">Open Vercel, Railway, n8n, or Flowise settings. Paste 2 values. Our wizard shows you exactly where — no guesswork.</div>
       </div>
       <div class="hero-step-arrow">→</div>
       <div class="hero-step hstep-highlight">
@@ -346,7 +316,6 @@ body{cursor:auto}
       </div>
     </div>
 
-    <!-- Platform logos -->
     <div class="hero-platforms">
       <span class="hero-plat-label">Works with</span>
       <div class="hero-plat-pills">
@@ -370,11 +339,11 @@ body{cursor:auto}
     </div>
   </div>
 
-  <!-- ── DEVELOPER VIEW ──────────────────────────────────────── -->
-  <div class="aud-panel" id="aud-dev" style="display:none">
+  <!-- ── DEVELOPER HERO ── -->
+  <div class="aud-panel dev-only" id="aud-dev" style="display:none">
     <div class="hero-label">FOR DEVELOPERS BUILDING AI AGENTS</div>
     <h1>Full observability for<br><em>LangChain, LangGraph, CrewAI</em></h1>
-    <p class="hero-sub">Trace every span, attribute every failure, version every prompt. One SDK or any OTel exporter — self-hosted or cloud.</p>
+    <p class="hero-sub">Trace every span, attribute every failure, version every prompt. One SDK or any OTel exporter — self-hosted or air-gapped.</p>
 
     <div class="hero-code">
       <div class="hero-code-bar">
@@ -400,17 +369,17 @@ body{cursor:auto}
         View on GitHub
         <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 7h10M7 2l5 5-5 5"/></svg>
       </a>
-      <a href="https://app.trace-lit.com/signup" class="btn-ghost">Start free</a>
+      <a href="#pricing" class="btn-ghost">Self-host for free →</a>
     </div>
   </div>
 
 </section>
 
-<!-- PLATFORMS -->
-<section class="platforms-section">
+<!-- ═══════════════════════════════════════════════════ PLATFORMS (non-tech only) -->
+<section class="platforms-section ntech-only">
   <div class="section-eyebrow">GUIDED SETUP FOR EVERY PLATFORM</div>
   <h2 class="section-title">Set up yourself — no developer needed</h2>
-  <p class="section-sub">Sign up, open our step-by-step wizard, pick your platform. We show you exactly where to click with screenshots. Done in 3 minutes.</p>
+  <p class="section-sub">Sign up, open our step-by-step wizard, pick your platform. We show you exactly where to click. Done in 3 minutes.</p>
   <div class="platforms-grid">
     <div class="plat-card">
       <div class="plat-icon">▲</div>
@@ -450,69 +419,95 @@ body{cursor:auto}
     <div class="plat-card plat-card-cta">
       <div class="plat-icon">→</div>
       <div class="plat-name">Ready?</div>
-      <div class="plat-desc"><a href="https://app.trace-lit.com/signup" style="color:var(--accent2);text-decoration:none;font-weight:600">Start free →</a> The wizard is waiting for you inside.</div>
+      <div class="plat-desc"><a href="https://app.trace-lit.com/signup" style="color:var(--accent2);text-decoration:none;font-weight:600">Start free →</a> The wizard is waiting inside.</div>
     </div>
   </div>
 </section>
 
-<!-- STATS -->
+<!-- ═══════════════════════════════════════════════════ STATS (persona-specific) -->
 <section class="stats-section">
-  <div class="stats-inner">
+
+  <!-- Non-tech stats -->
+  <div class="stats-inner ntech-only">
     <div class="stat"><div class="stat-num" style="color:var(--accent2)">$0</div><div class="stat-label">TO GET STARTED</div></div>
-    <div class="stat"><div class="stat-num" style="color:var(--green)">5 min</div><div class="stat-label">AVERAGE SETUP TIME</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--green)">3 min</div><div class="stat-label">AVERAGE SETUP TIME</div></div>
     <div class="stat"><div class="stat-num">0</div><div class="stat-label">LINES OF CODE FOR YOU</div></div>
-    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">YOUR DATA, YOUR CONTROL</div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">PLAIN ENGLISH ALERTS</div></div>
   </div>
+
+  <!-- Dev stats -->
+  <div class="stats-inner dev-only" style="display:none">
+    <div class="stat"><div class="stat-num" style="color:var(--accent2)">$0</div><div class="stat-label">SELF-HOST FOREVER</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--green)">1</div><div class="stat-label">pip install</div></div>
+    <div class="stat"><div class="stat-num">OTel</div><div class="stat-label">NATIVE INGESTION</div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">AIR-GAP CAPABLE</div></div>
+  </div>
+
 </section>
 
-<!-- LIFECYCLE -->
+<!-- ═══════════════════════════════════════════════════ LIFECYCLE -->
 <section class="lifecycle-section">
   <div class="section-eyebrow">THE FULL PICTURE</div>
-  <h2 class="section-title">Everything your team needs to trust their AI</h2>
-  <p class="section-sub">Most tools just collect logs. Trace-lit tells you what happened, why it failed, what it cost, and how to make it better.</p>
+
+  <!-- Non-tech lifecycle title -->
+  <h2 class="section-title ntech-only">Everything your team needs to trust their AI</h2>
+  <p class="section-sub ntech-only">Most tools just collect logs. Trace-lit tells you what happened, why it failed, what it cost, and how to make it better.</p>
+
+  <!-- Dev lifecycle title -->
+  <h2 class="section-title dev-only" style="display:none">The full agent observability loop</h2>
+  <p class="section-sub dev-only" style="display:none">From a single span to a full production eval pipeline — every stage in one platform.</p>
+
   <div class="lifecycle-steps">
     <div class="lstep">
       <div class="lstep-num">01</div>
-      <h4>See every run</h4>
-      <p>Every agent step, AI call, and action — live. Know exactly what your agent did and in what order.</p>
+      <h4>Trace every run</h4>
+      <p class="ntech-only">Every agent step, AI call, and action — live. Know exactly what your agent did and in what order.</p>
+      <p class="dev-only" style="display:none">Spans, DAG topology, parent-child nesting — SDK or OTel. Every call captured, every token counted.</p>
     </div>
     <div class="lstep">
       <div class="lstep-num">02</div>
-      <h4>Understand failures</h4>
-      <p>When something breaks, Trace-lit tells you which step caused it and what else it affected — in plain English.</p>
+      <h4>Attribute failures</h4>
+      <p class="ntech-only">When something breaks, Trace-lit tells you which step caused it and what else it affected — in plain English.</p>
+      <p class="dev-only" style="display:none">Root-cause span detected, cascade identified. Blast radius visualised on the DAG before you roll back.</p>
     </div>
     <div class="lstep">
       <div class="lstep-num">03</div>
-      <h4>Track every change</h4>
-      <p>Every update to your AI's instructions is saved automatically. Compare any two versions side by side.</p>
+      <h4>Version prompts</h4>
+      <p class="ntech-only">Every update to your AI's instructions is saved automatically. Compare any two versions side by side.</p>
+      <p class="dev-only" style="display:none">Every prompt commit hashed, diffed, and linked to the spans it produced. Roll back in one click.</p>
     </div>
     <div class="lstep">
       <div class="lstep-num">04</div>
-      <h4>Save good &amp; bad examples</h4>
-      <p>Bookmark real runs as good or bad with one click. Build a library of examples your team can learn from.</p>
+      <h4>Build datasets</h4>
+      <p class="ntech-only">Bookmark real runs as good or bad with one click. Build a library of examples your team can learn from.</p>
+      <p class="dev-only" style="display:none">Tag spans directly from the trace view. Curate production examples into structured datasets for fine-tuning or eval.</p>
     </div>
     <div class="lstep">
       <div class="lstep-num">05</div>
-      <h4>Prevent bad updates</h4>
-      <p>Before a change goes live, Trace-lit automatically checks if it's better or worse than what you had before.</p>
+      <h4>Gate releases</h4>
+      <p class="ntech-only">Before a change goes live, Trace-lit automatically checks if it's better or worse than what you had before.</p>
+      <p class="dev-only" style="display:none">CI quality gate runs your dataset against the new prompt. Fails the build if score drops. No regression ships.</p>
     </div>
   </div>
 </section>
 
-<!-- FEATURES -->
+<!-- ═══════════════════════════════════════════════════ FEATURES -->
 <section class="features-section" id="features">
   <div class="section-eyebrow">WHAT YOU GET</div>
   <div class="features-grid">
     <div class="feat">
       <div class="feat-mark"></div>
-      <h3>Works with any AI framework</h3>
-      <p>Your developer connects it once — whether they use LangChain, CrewAI, OpenAI, or anything else. No lock-in.</p>
+      <h3 class="ntech-only">Works with any AI tool</h3>
+      <h3 class="dev-only" style="display:none">LangChain · LangGraph · CrewAI · OTel</h3>
+      <p class="ntech-only">n8n, Flowise, Vercel AI, or custom Python — Trace-lit connects in the background. Nothing changes in how your AI runs.</p>
+      <p class="dev-only" style="display:none">SDK wrappers for every major framework. Native OTel ingestion for everything else. One endpoint, all traces.</p>
       <div class="feat-tag tag-free">ALL PLANS</div>
     </div>
     <div class="feat">
       <div class="feat-mark"></div>
       <h3>Automatic failure alerts</h3>
-      <p>When an agent fails, Trace-lit identifies exactly which step caused it and what else broke as a result — no digging through logs.</p>
+      <p class="ntech-only">When an agent fails, Trace-lit identifies exactly which step caused it and what else broke as a result — no digging through logs.</p>
+      <p class="dev-only" style="display:none">Root-cause span flagged, cascade spans marked. Webhook to Slack, PagerDuty, or any endpoint.</p>
       <div class="feat-tag tag-free">ALL PLANS</div>
     </div>
     <div class="feat">
@@ -524,19 +519,23 @@ body{cursor:auto}
     <div class="feat">
       <div class="feat-mark"></div>
       <h3>Track every AI update</h3>
-      <p>Every change your team makes to the AI's instructions is saved and dated automatically. Compare any two versions with a click.</p>
+      <p class="ntech-only">Every change your team makes to the AI's instructions is saved and dated automatically. Compare any two versions with a click.</p>
+      <p class="dev-only" style="display:none">Every prompt version hashed and stored. Diff any two versions. See which spans each version produced.</p>
       <div class="feat-tag tag-free">ALL PLANS</div>
     </div>
     <div class="feat">
       <div class="feat-mark"></div>
       <h3>Save &amp; label real examples</h3>
-      <p>Bookmark runs as good or bad directly from the dashboard. Your team builds a shared library of what works — no extra tools.</p>
+      <p class="ntech-only">Bookmark runs as good or bad directly from the dashboard. Your team builds a shared library of what works — no extra tools.</p>
+      <p class="dev-only" style="display:none">Tag spans as pass/fail from the trace view. Export as JSONL for fine-tuning or feed directly into the eval engine.</p>
       <div class="feat-tag tag-free">ALL PLANS</div>
     </div>
     <div class="feat">
       <div class="feat-mark"></div>
-      <h3>Never ship a broken update</h3>
-      <p>Before any AI change goes live, Trace-lit scores it against your saved examples. If it's worse, the release is blocked automatically.</p>
+      <h3 class="ntech-only">Never ship a broken update</h3>
+      <h3 class="dev-only" style="display:none">CI quality gate</h3>
+      <p class="ntech-only">Before any AI change goes live, Trace-lit scores it against your saved examples. If it's worse, the release is blocked automatically.</p>
+      <p class="dev-only" style="display:none">pytest-style eval runner. Scores against your curated dataset in CI. Returns exit code 1 if quality regresses.</p>
       <div class="feat-tag tag-free">ALL PLANS</div>
     </div>
     <div class="feat">
@@ -553,30 +552,27 @@ body{cursor:auto}
     </div>
     <div class="feat">
       <div class="feat-mark"></div>
-      <h3>Your data stays on your servers</h3>
-      <p>Deploy on your own infrastructure with one command. Nothing leaves your environment — built for teams in regulated industries.</p>
+      <h3 class="ntech-only">Your data stays secure</h3>
+      <h3 class="dev-only" style="display:none">Self-hosted &amp; air-gapped</h3>
+      <p class="ntech-only">Enterprise cloud keeps all data in your region. Self-hosted option available for regulated industries.</p>
+      <p class="dev-only" style="display:none">One <code style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent2)">docker compose up</code>. ReplicatedMergeTree ClickHouse, Kafka, TimescaleDB. Nothing phones home.</p>
       <div class="feat-tag tag-free">ALL PLANS</div>
     </div>
   </div>
 </section>
 
-<!-- PRICING -->
+<!-- ═══════════════════════════════════════════════════ PRICING -->
 <section class="pricing-section" id="pricing">
   <div class="section-eyebrow">PRICING</div>
-  <h2 class="section-title">Simple, honest pricing</h2>
-  <p class="section-sub">Two ways to run Trace-lit. Pick what fits your team.</p>
 
-  <div class="pricing-tabs">
-    <button class="pricing-tab active" onclick="switchTab('cloud',this)">☁ Cloud — no setup</button>
-    <button class="pricing-tab" onclick="switchTab('selfhost',this)">⚙ Self-hosted — your servers</button>
-  </div>
-
-  <!-- CLOUD PLANS -->
-  <div class="pricing-panel active" id="tab-cloud">
+  <!-- ── NON-TECH: Cloud pricing ── -->
+  <div class="ntech-only">
+    <h2 class="section-title">Simple, transparent pricing</h2>
+    <p class="section-sub">We manage everything. You just use the dashboard. No servers, no setup complexity.</p>
     <p class="pricing-label">MANAGED BY TRACE-LIT · NO INSTALLATION · PROXY SETUP IN 2 MINUTES</p>
+
     <div class="pricing-grid" style="grid-template-columns:repeat(4,1fr)">
 
-      <!-- Free -->
       <div class="plan">
         <div class="plan-name">FREE</div>
         <div class="plan-price">$0<span> / forever</span></div>
@@ -592,7 +588,6 @@ body{cursor:auto}
         </ul>
       </div>
 
-      <!-- Builder -->
       <div class="plan">
         <div class="plan-name">BUILDER</div>
         <div class="plan-price">$9<span> / month</span></div>
@@ -609,7 +604,6 @@ body{cursor:auto}
         </ul>
       </div>
 
-      <!-- Growth -->
       <div class="plan plan-featured">
         <div class="plan-badge">MOST POPULAR</div>
         <div class="plan-name">GROWTH</div>
@@ -628,7 +622,6 @@ body{cursor:auto}
         </ul>
       </div>
 
-      <!-- Enterprise Cloud -->
       <div class="plan">
         <div class="plan-name">ENTERPRISE</div>
         <div class="plan-price" style="font-size:28px">Custom</div>
@@ -649,12 +642,9 @@ body{cursor:auto}
 
     </div>
 
-    <!-- Proxy setup snippet -->
-    <div style="max-width:680px;margin:32px auto 0;border:1px solid var(--border2);border-radius:8px;overflow:hidden;background:var(--bg2)">
-      <div style="background:var(--bg3);padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)">
-        <span style="font-size:11px;font-family:'DM Mono',monospace;color:var(--muted)">CLOUD SETUP — TWO ENV VARS. NO CODE CHANGES.</span>
-      </div>
-      <div style="padding:20px 24px;font-family:'DM Mono',monospace;font-size:13px;line-height:2">
+    <div class="snippet-box">
+      <div class="snippet-bar"><span>CLOUD SETUP — TWO ENV VARS. NO CODE CHANGES.</span></div>
+      <div class="snippet-body">
         <div style="color:var(--muted)"># OpenAI — paste into Vercel / Railway / Render / .env</div>
         <div><span style="color:var(--accent2)">OPENAI_BASE_URL</span><span style="color:var(--text)">=https://app.trace-lit.com/proxy/openai/v1</span></div>
         <div><span style="color:var(--accent2)">OPENAI_API_KEY</span><span style="color:var(--text)">=&lt;your-tracelit-key&gt;||&lt;your-openai-key&gt;</span></div>
@@ -668,12 +658,14 @@ body{cursor:auto}
     </div>
   </div>
 
-  <!-- SELF-HOSTED PLANS -->
-  <div class="pricing-panel" id="tab-selfhost">
+  <!-- ── DEVELOPER: Self-hosted pricing ── -->
+  <div class="dev-only" style="display:none">
+    <h2 class="section-title">Self-host for free. Support when you need it.</h2>
+    <p class="section-sub">Your servers, your data, your rules. Open source forever — no usage caps, no data sharing, no lock-in.</p>
     <p class="pricing-label">YOUR SERVERS · YOUR DATA · FULL CONTROL · NEVER LEAVES YOUR INFRASTRUCTURE</p>
+
     <div class="pricing-grid" style="grid-template-columns:repeat(2,1fr);max-width:640px">
 
-      <!-- Open Source -->
       <div class="plan">
         <div class="plan-name">OPEN SOURCE</div>
         <div class="plan-price">$0<span> / forever</span></div>
@@ -690,7 +682,6 @@ body{cursor:auto}
         </ul>
       </div>
 
-      <!-- Enterprise Self-hosted -->
       <div class="plan plan-featured">
         <div class="plan-name">ENTERPRISE</div>
         <div class="plan-price" style="font-size:28px">Custom</div>
@@ -711,17 +702,15 @@ body{cursor:auto}
 
     </div>
 
-    <!-- Self-host setup snippet -->
-    <div style="max-width:680px;margin:32px auto 0;border:1px solid var(--border2);border-radius:8px;overflow:hidden;background:var(--bg2)">
-      <div style="background:var(--bg3);padding:10px 16px;border-bottom:1px solid var(--border)">
-        <span style="font-size:11px;font-family:'DM Mono',monospace;color:var(--muted)">SELF-HOSTED SETUP — ONE COMMAND</span>
-      </div>
-      <div style="padding:20px 24px;font-family:'DM Mono',monospace;font-size:13px;line-height:2">
-        <div style="color:var(--muted)"># Clone and start the full stack (Kafka, ClickHouse, API, dashboard)</div>
+    <div class="snippet-box">
+      <div class="snippet-bar"><span>SELF-HOSTED SETUP — ONE COMMAND</span></div>
+      <div class="snippet-body">
+        <div style="color:var(--muted)"># Clone and start the full stack (Kafka, ClickHouse, TimescaleDB, API, dashboard)</div>
         <div><span style="color:var(--accent2)">git clone</span><span style="color:var(--text)"> https://github.com/Sedrah/Trace-lit-SDK</span></div>
         <div><span style="color:var(--accent2)">docker compose</span><span style="color:var(--text)"> -f infra/docker-compose.yml up -d</span></div>
         <br>
         <div style="color:var(--muted)"># Dashboard at http://localhost:3000 · API at http://localhost:8000</div>
+        <div><span style="color:var(--muted)"># For air-gap: no outbound traffic required. All data stays local.</span></div>
         <div><span style="color:var(--green)">✓</span><span style="color:var(--text)"> Full platform running on your own machine.</span></div>
       </div>
     </div>
@@ -729,8 +718,8 @@ body{cursor:auto}
 
 </section>
 
-<!-- FRAMEWORKS -->
-<section class="compat-section">
+<!-- ═══════════════════════════════════════════════════ FRAMEWORKS (dev only) -->
+<section class="compat-section dev-only" style="display:none">
   <div class="section-eyebrow" style="margin-bottom:24px">WORKS WITH EVERY MAJOR FRAMEWORK</div>
   <div class="pills">
     <div class="pill">LangChain</div>
@@ -745,18 +734,36 @@ body{cursor:auto}
   </div>
 </section>
 
-<!-- FINAL CTA -->
+<!-- ═══════════════════════════════════════════════════ FINAL CTA -->
 <section class="cta-section">
   <div class="cta-glow"></div>
-  <h2>See what your AI agents<br>are doing — today</h2>
-  <p>No coding required on your end. Sign up free, forward one email to your developer, and your dashboard is live.</p>
-  <div style="display:flex;gap:12px;justify-content:center">
-    <a href="https://app.trace-lit.com/signup" class="btn-main">
-      Get started free
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 7h10M7 2l5 5-5 5"/></svg>
-    </a>
-    <a href="mailto:en.sedra@gmail.com?subject=Trace-lit Enterprise" class="btn-ghost">Talk to sales</a>
+
+  <!-- Non-tech CTA -->
+  <div class="ntech-only">
+    <h2>See what your AI agents<br>are doing — today</h2>
+    <p>No coding required. Sign up free, follow the wizard, and your dashboard is live in 3 minutes.</p>
+    <div style="display:flex;gap:12px;justify-content:center">
+      <a href="https://app.trace-lit.com/signup" class="btn-main">
+        Get started free
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 7h10M7 2l5 5-5 5"/></svg>
+      </a>
+      <a href="mailto:en.sedra@gmail.com?subject=Trace-lit Enterprise" class="btn-ghost">Talk to sales</a>
+    </div>
   </div>
+
+  <!-- Dev CTA -->
+  <div class="dev-only" style="display:none">
+    <h2>Deploy in one command.<br><em>Full air-gap available.</em></h2>
+    <p>Open source forever. Self-host on your own infrastructure or use the cloud. Enterprise support when you need it.</p>
+    <div style="display:flex;gap:12px;justify-content:center">
+      <a href="https://github.com/Sedrah/Trace-lit-SDK" target="_blank" class="btn-main">
+        View on GitHub
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 7h10M7 2l5 5-5 5"/></svg>
+      </a>
+      <a href="mailto:en.sedra@gmail.com?subject=Trace-lit Enterprise Self-hosted" class="btn-ghost">Enterprise inquiry</a>
+    </div>
+  </div>
+
 </section>
 
 <footer>
@@ -773,16 +780,11 @@ body{cursor:auto}
 <script>
 function switchAudience(aud, btn) {
   document.querySelectorAll('.aud-tab').forEach(t => t.classList.remove('aud-active'));
-  document.querySelectorAll('.aud-panel').forEach(p => { p.style.display='none'; });
   btn.classList.add('aud-active');
-  document.getElementById('aud-' + aud).style.display = 'block';
+  // Drive the entire page via data-audience on body
+  document.body.dataset.audience = aud;
 }
-function switchTab(tab, btn) {
-  document.querySelectorAll('.pricing-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.pricing-panel').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('tab-' + tab).classList.add('active');
-}
+
 const cursor = document.getElementById('cursor');
 const ring = document.getElementById('cursorRing');
 let mx=0,my=0,rx=0,ry=0;
