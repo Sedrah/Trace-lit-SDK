@@ -71,7 +71,7 @@ function proxyEnvVars(provider: Provider, key: string) {
 
 type InstructionStep = { title: string; body: string; screenshot?: string };
 
-function getSteps(platform: Platform, provider: Provider): InstructionStep[] {
+function getSteps(platform: Platform): InstructionStep[] {
   const uiSteps: Record<Platform, InstructionStep[]> = {
     vercel: [
       { title: "Open your Vercel project", body: "Go to vercel.com/dashboard → click your project." },
@@ -244,7 +244,7 @@ export default function Setup() {
   }
 
   const envVars = platform && provider ? proxyEnvVars(provider, tlKey) : [];
-  const instructionSteps = platform && provider ? getSteps(platform, provider) : [];
+  const instructionSteps = platform ? getSteps(platform) : [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50 flex flex-col items-center justify-center px-4 py-12">
